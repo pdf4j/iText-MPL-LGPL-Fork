@@ -1,5 +1,5 @@
 /*
- * $Id: HelloSystemOut.java 2365 2006-09-14 22:52:48Z xlv $
+ * $Id: HelloSystemOut.java 3015 2007-11-25 18:45:06Z xlv $
  * $Name$
  *
  * This code is part of the 'iText Tutorial'.
@@ -46,7 +46,8 @@ public class HelloSystemOut {
 			// step 2:
 			// we create a writer that listens to the document
 			// and directs a PDF-stream to System.out (and a txt file)
-			PdfWriter.getInstance(document, System.out);
+			PdfWriter w = PdfWriter.getInstance(document, System.out);
+			w.setCloseStream(false); // System.out should not be closed
 			PdfWriter.getInstance(document,
 					new FileOutputStream("HelloWorld.txt"));
 

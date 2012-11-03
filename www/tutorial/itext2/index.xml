@@ -11,7 +11,7 @@
 			<site:book asin="0321304748">PDF Reference (4th Edition)</site:book>
 			<site:keyword>Fonts</site:keyword>
 		</site:amazonbooks>
-		<site:updated>$Date: 2007-02-20 07:38:53 -0500 (Tue, 20 Feb 2007) $</site:updated>
+		<site:updated>$Date: 2007-11-08 19:41:31 -0500 (Thu, 08 Nov 2007) $</site:updated>
 		<site:author>Bruno Lowagie</site:author>
 	</site:metadata>
 	
@@ -83,8 +83,8 @@ All the classes in package com.lowagie.bc were removed.
 You now need the following BouncyCastle jars in your CLASSPATH
 if you want support for encryption:
 <ul>
-<li><a target="blank" href="http://prdownloads.sourceforge.net/itext/bcmail-jdk14-135.jar">bcmail-jdk14-135.jar</a></li>
-<li><a target="blank" href="http://prdownloads.sourceforge.net/itext/bcprov-jdk14-135.jar">bcprov-jdk14-135.jar</a></li>
+<li><a target="blank" href="http://prdownloads.sourceforge.net/itext/bcmail-jdk14-138.jar">bcmail-jdk14-138.jar</a></li>
+<li><a target="blank" href="http://prdownloads.sourceforge.net/itext/bcprov-jdk14-138.jar">bcprov-jdk14-138.jar</a></li>
 </ul>
 Note that you can download other versions of these jars for other JDKs from <a href="http://bouncycastle.org/">BouncyCastle.org</a>.
 <div class="subtitle">iText version / JDK version</div>

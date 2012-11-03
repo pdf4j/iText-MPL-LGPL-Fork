@@ -1,5 +1,5 @@
 /*
- * $Id: JTable2Pdf.java 2381 2006-09-15 23:25:28Z xlv $
+ * $Id: JTable2Pdf.java 3016 2007-11-26 03:54:13Z xlv $
  * $Name$
  *
  * This code is part of the 'iText Tutorial'.
@@ -171,10 +171,11 @@ public class JTable2Pdf extends JFrame {
 	 *            no arguments needed
 	 */
 	public static void main(String[] args) {
+        System.out.println("Printing a JTable");
         JTable2Pdf frame = new JTable2Pdf();
         frame.pack();
         frame.setVisible(true);
         frame.print();
-        frame.exit();
+        frame.dispose();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: AwtImage.java 1742 2005-05-09 11:52:51Z blowagie $
+ * $Id: AwtImage.java 3016 2007-11-26 03:54:13Z xlv $
  * $Name$
  *
  * This code is part of the 'iText Tutorial'.
@@ -78,6 +78,5 @@ public class AwtImage {
         
         // step 5: we close the document
         document.close();
-        System.exit(0);
     }
 }

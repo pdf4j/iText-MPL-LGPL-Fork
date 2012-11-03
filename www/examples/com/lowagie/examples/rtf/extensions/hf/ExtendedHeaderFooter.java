@@ -1,5 +1,5 @@
 /*
- * $Id: ExtendedHeaderFooter.java 2767 2007-05-20 11:58:29Z blowagie $
+ * $Id: ExtendedHeaderFooter.java 3004 2007-11-21 15:24:27Z blowagie $
  * $Name$
  *
  * This code is free software. It may only be copied or modified
@@ -37,7 +37,7 @@ import com.lowagie.text.rtf.headerfooter.RtfHeaderFooter;
  * RtfHeaderFooter object to create more complex headers or footers
  * using more complex elements such as multiple paragraphs or tables.
  * 
- * @version $Revision: 2767 $
+ * @version $Revision: 3004 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  */
 public class ExtendedHeaderFooter {
@@ -67,7 +67,7 @@ public class ExtendedHeaderFooter {
             // Create the table that will be used as the footer
             Table footer = new Table(2);
             footer.setBorder(0);
-            footer.getDefaultLayout().setBorder(0);
+            footer.getDefaultCell().setBorder(0);
             footer.setWidth(100);
             footer.addCell(new Cell("(c) Mark Hall"));
             Paragraph pageNumber = new Paragraph("Page ");

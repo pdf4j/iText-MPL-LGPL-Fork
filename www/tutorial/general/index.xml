@@ -14,7 +14,7 @@
 			<site:keyword>JAVA</site:keyword>
 			<site:keyword>PDF</site:keyword>
 		</site:amazonbooks>
-		<site:updated>$Date: 2007-01-26 09:41:44 -0500 (Fri, 26 Jan 2007) $</site:updated>
+		<site:updated>$Date: 2007-11-08 19:41:31 -0500 (Thu, 08 Nov 2007) $</site:updated>
 		<site:author>Bruno Lowagie</site:author>
 	</site:metadata>
 	
@@ -59,7 +59,7 @@
 		<site:example>
 			<site:java src="HelloEncrypted" standalone="yes" />
 			<site:result>HelloEncrypted.pdf</site:result>
-			<site:extrajar>bcprov-jdk14-135.jar</site:extrajar>
+			<site:extrajar>bcprov-jdk14-138.jar</site:extrajar>
 			<site:description>Again a PDF with the text 'Hello World', but this time the document is encrypted. To read it, you need to know the userpassword: 'Hello'</site:description>
 		</site:example>
 		<site:example>

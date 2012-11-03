@@ -50,6 +50,14 @@
 	<xsl:template name="commercial">
 		<div class="commercial"><br />
 		
+		<div align="Center"><a href="http://www.prchecker.info/" target="_blank" title="iText, the #1 Java-PDF library">
+		<img src="http://www.prchecker.info/PR1_img.gif" alt="iText, the #1 Java-PDF library" border="0" /></a></div><br />
+		
+<script type="text/javascript"><![CDATA[<!--
+var uri = 'http://imp.tradedoubler.com/imp?type(js)pool(238100)a(1457679)' + new String (Math.random()).substring (2, 11);
+document.write('<sc'+'ript type="text/javascript" src="'+uri+'" charset="ISO-8859-1"></sc'+'ript>');
+//-->]]></script>
+<br />
 <script type="text/javascript"><![CDATA[<!--
 google_ad_client = "pub-0340380473790570";
 google_ad_width = 120;
@@ -122,58 +130,27 @@ document.write('<iframe src="http://rcm.amazon.com/e/cm?t=itisacatalofwebp&o=1&p
 					</blockquote>
 					<div class="title">Table of contents of this online tutorial</div>
 <br />
-<ul>
-					<xsl:for-each select="./site:part">
-						<li><xsl:element name="a">
-							<xsl:attribute name="href">#<xsl:value-of select="@name" /></xsl:attribute>
-							<div class="subtitle"><xsl:value-of select="site:title" /></div>
-						</xsl:element></li>
-					</xsl:for-each>
-					</ul>
 					<br /><br />
 					<xsl:for-each select="./site:part">
 						<xsl:element name="a">
 							<xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
 						</xsl:element>
 						<div class="title"><xsl:value-of select="site:title" /></div>
-						<xsl:if test="count(./site:chapter)=0">
-							<div class="chapter">Under Construction</div>
-						</xsl:if>
 						<xsl:for-each select="./site:chapter">
 							<xsl:variable name="dir">/<xsl:value-of select="@path" /></xsl:variable>
 							<xsl:variable name="name"><xsl:value-of select="translate(@path, '/', '_')" /></xsl:variable>
 							<xsl:variable name="path"><xsl:value-of select="@path" />/index.xml</xsl:variable>
-							<xsl:variable name="link"><xsl:value-of select="@path" />/index.html</xsl:variable>
+							<xsl:variable name="link"><xsl:value-of select="@path" />/index.php</xsl:variable>
 							<xsl:for-each select="document($path)/site:page">
-								<table width="100%" border="0" cellspacing="3" cellpadding="3">
-									<tr>
-										<td colspan="2">
-											<xsl:element name="a">
-												<xsl:attribute name="class">chapter</xsl:attribute>
-												<xsl:attribute name="href"><xsl:value-of select="$link" /></xsl:attribute>
-												<xsl:attribute name="name"><xsl:value-of select="$name" /></xsl:attribute>
-												<xsl:value-of select="site:metadata/site:title"/>
-											</xsl:element>
-											<xsl:value-of select="site:metadata/site:summary"/>
-										</td>
-									</tr>
-									<tr>
-										<td width="250" valign="top">
-											<div class="subtitle">Sections</div>
-											<ul><xsl:for-each select="site:chapter/site:section">
-												<li><xsl:element name="a">
-													<xsl:attribute name="href"><xsl:value-of select="$link" />#<xsl:value-of select="@name" /></xsl:attribute>
-													<xsl:attribute name="class">small</xsl:attribute>
-													<xsl:value-of select="site:sectiontitle" />
-												</xsl:element></li>
-											</xsl:for-each></ul>
-										</td>
-										<td valign="top">
-											<div class="subtitle">Examples</div>
-											<xsl:apply-templates select="site:examples"><xsl:with-param name="dir" select="$dir" /></xsl:apply-templates>
-										</td>
-									</tr>
-								</table>
+							<div>
+							<xsl:element name="a">
+								<xsl:attribute name="class">chapter</xsl:attribute>
+								<xsl:attribute name="href"><xsl:value-of select="$link" /></xsl:attribute>
+								<xsl:attribute name="name"><xsl:value-of select="$name" /></xsl:attribute>
+								<xsl:value-of select="site:metadata/site:title"/>
+							</xsl:element>
+							<xsl:value-of select="site:metadata/site:summary"/>
+							</div>
 							</xsl:for-each>
 						</xsl:for-each>
 						<a class="top" href="#top">Go to top of the page</a>
@@ -181,6 +158,8 @@ document.write('<iframe src="http://rcm.amazon.com/e/cm?t=itisacatalofwebp&o=1&p
 					<xsl:call-template name="footer" />
 				</div>
 				<xsl:call-template name="commercial" />
+				<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+				<script type="text/javascript"><![CDATA[_uacct = "UA-1749025-1";urchinTracker();]]></script>
 			</body>
 		</html>
 	</xsl:template>
@@ -271,7 +250,7 @@ document.write('<iframe src="http://rcm.amazon.com/e/cm?t=itisacatalofwebp&o=1&p
 
 	<xsl:template match="site:tutorial">
 		<xsl:element name="a">
-			<xsl:attribute name="href">.<xsl:value-of select="$root" /><xsl:value-of select="@chapter" />/index.html#<xsl:value-of select="@section" /></xsl:attribute>
+			<xsl:attribute name="href">.<xsl:value-of select="$root" /><xsl:value-of select="@chapter" />/index.php#<xsl:value-of select="@section" /></xsl:attribute>
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>
@@ -457,7 +436,7 @@ document.write('<iframe src="http://rcm.amazon.com/e/cm?t=itisacatalofwebp&o=1&p
 						<xsl:attribute name="id">sidebar</xsl:attribute>
 						<xsl:element name="a">
 							<xsl:attribute name="class">toc</xsl:attribute>
-							<xsl:attribute name="href">.<xsl:value-of select="$root" />/index.html#<xsl:value-of select="translate(substring($branch, 2), '/', '_')" /></xsl:attribute>
+							<xsl:attribute name="href">.<xsl:value-of select="$root" />/index.php#<xsl:value-of select="translate(substring($branch, 2), '/', '_')" /></xsl:attribute>
 							Table of Contents
 						</xsl:element>
 						<div align="Center" class="small">Best viewed with:<br />
@@ -490,6 +469,8 @@ google_cpa_choice = "CAAQyaj8zwEaCIwcWMzeycafKMu293M";
 					</xsl:element>
 				</xsl:element>
 				<xsl:call-template name="commercial" />
+				<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+				<script type="text/javascript"><![CDATA[_uacct = "UA-1749025-1";urchinTracker();]]></script>
 			</body>
 		</html>
 	</xsl:template>

@@ -1,5 +1,5 @@
 /*
- * $Id: EncryptorExample.java 1742 2005-05-09 11:52:51Z blowagie $
+ * $Id: EncryptorExample.java 2992 2007-11-19 08:12:53Z blowagie $
  * $Name$
  *
  * This code is part of the 'iText Tutorial'.
@@ -37,7 +37,7 @@ public class EncryptorExample {
 					new FileOutputStream("encrypted.pdf"),
 					"Hello".getBytes(),
 					"World".getBytes(),
-					PdfWriter.AllowPrinting | PdfWriter.AllowCopy,
+					PdfWriter.ALLOW_PRINTING | PdfWriter.ALLOW_COPY,
 					false);
 		}
 		catch(Exception e) {

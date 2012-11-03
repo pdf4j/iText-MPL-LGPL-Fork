@@ -7,7 +7,7 @@
 		<site:title>the history of iText</site:title>
 		<site:summary>Release dates and changelogs of iText.</site:summary>
 		<site:keywords>PDF, JAVA, iText, history, release, changelog, log, changes, Lowagie, Bruno</site:keywords>
-		<site:updated>$Date: 2007-05-24 05:12:40 -0400 (Thu, 24 May 2007) $</site:updated>
+		<site:updated>$Date: 2008-01-25 05:16:33 -0500 (Fri, 25 Jan 2008) $</site:updated>
 	</site:metadata>
 	<site:content>
 	<div>
@@ -17,9 +17,277 @@
 
 
 <site:release number="V200" name="iText 2" date="unknown">
-<site:remark>2006-02-15</site:remark>
+<site:remark>?</site:remark>
 <site:changelog>
-<ul>2006-05-25: iText 2.0.3
+<ul>2008-01-25: iText 2.0.8
+<li>Changes made by Paulo
+<ul>
+<li>Encrypted docs with wrong keys now fail fast.</li>
+<li>Functionality to extract all the names from a font (Thimo Seitz).</li>
+<li>Metadata can now be added to PDF and RTF at any time, not only before opening the document. HTML generation will still have the old limitation.</li>
+<li>PdfEncodings: the winansi encoding didn't process the char \u00a0.</li>
+<li>PdfGraphics2D: addition of hyperlink capability when drawing a string in PDFGraphics2D object. The
+url is submitted using a RenderingHint. The renderhint is initialized with
+a HyperlinkOFF value, if a hyperlink should be added setRenderingHint with
+the url is called during paint of the link. After the link is painted
+setRenderingHint with null value should be called. The Hyperlink Rendering
+Hint is present at all times in PDFGraphics2D object; it can be found by
+iterating all keys and using the toString function.</li>
+<li>TIFF images:<ul><li>Fix for invalid array sizes.</li><li>Some tiffs have a bogus value in the ROWSPERSTRIP tag.</li></ul></li>
+<li>PdfSmartCopy: PdfSmartCopy also compares the dictionary values up to a nested depth of 10;
+lifted the restriction to compare templates.</li>
+</ul></li>
+<li>Changes made by Xavier
+<ul>
+<li>Code cleanup: adding missing @since tags</li>
+<li>directory structure reorganization: core and swing subdirectories in src and test.</li>
+<li>ANT scripts: <ul>
+<li>Use of x.y.z-SNAPSHOT in Document.java ITEXT_VERSION and in jdiff output</li>
+<li>more consistent use of ant property files.</li>
+<li>use jdk 1.4 api for javadoc links</li>
+<li>jdiff task was using older file in copy without overwrite arg</li>
+<li>itext.test.classpath property needs to be setup before calling javac</li>
+<li>ant delete target added</li>
+<li>new ant targets for rtf parser support: compile.rtf, jar.rtf and test.rtf</li>
+<li>javadoc commands use 'maxmemory' argument instead of '-J-Xmx'</li>
+<li>maven bundle updates: lower case names to match artifact and javadoc jar added</li>
+<li>added "jar" dependency for sign.jar to make sure latest changes are picked up</li>
+</ul></li>
+</ul></li>
+<li>Changes made by Mark
+<ul>
+<li>memory increased for javadoc task</li>
+<li>Preparation for the import of the new rtf parser code.</li>
+<li>First junit test for the RTF package. Also updated the test.xml so that the test.rtf depends on the jar.rtf.</li>
+<li>Fixed a bug with style numbering. The style number is now only set after the inheritance handled, so that the default styles are always added before any user styles.</li>
+</ul></li>
+<li>Changes made by Bruno
+<ul>
+<li>Added an extra constructor for List (suggestion by Alexis Pigeon)</li>
+<li>Changed (package) private methods/variables into protected or even public on many places in PdfDocument.</li>
+<li>Introduction of BadPasswordException</li>
+<li>Introduction of the 'numberStyle' concept for Section titles (implemented by Bruno after a question on the list by Friedhelm Hellerhoff).</li>
+<li>Introduction of Element.isContent() and Element.isNestable() as suggested by Kris Raney.
+Indicates if an element contains real content and if it can be nested.</li>
+<li>Introduction of the LargeElement interface.
+Objects implementing this interface (PdfPTable, Table, Section and Chapter) are considered to be 'dangerous' in terms of memory consumption.
+The LargeElement interface offers a way to add the object to the document (multiple times) before all the content has been added to the large object.
+Every time the large object is added to the Document, part of the object's content is flushed.</li>
+<li>Solved a bug in the old Table class (actually in PdfTable) that occurred with repeating headers in very specific situations.</li>
+<li>Added a rewrite of RUPS (Reading / Updating PDF Syntax) to the project.
+This also involves adding new ANT scripts, a new JNLP and new jars:
+SUN's PDF Renderer and Dom4j (these jars are not needed for the core iText; only for RUPS).</li>
+<li>After a mail communication with Brian Burkhalter (SUN),
+the license notices for the classes derived from JAI code
+was updated.</li><li>The license notices for
+TIFFConstants were updated because the list of TIFF constants
+was originally made by Silicon Graphics.</li>
+</ul></li>
+</ul>
+<ul>2007-11-28: iText 2.0.7
+<li>Changes made by Paulo
+<ul>
+<li>TiffImage: Deflate compression can also be identified by type 8.</li>
+<li>TiffImage: Added support for fill order in tiff.</li>
+<li>PdfDocument: Indentation right was missing the image offset.</li>
+<li>Barcode128: The AIs from 7030 to 7039 couldn't be used.</li>
+<li>Page number added to "Invalid page number" exception message</li>
+<li>Supported button replacement when several buttons have the same name.</li>
+<li>PdfGraphics2D: A null transform should draw at 0,0 (reported on the mailing list by Phil Cope Nov 6, 2007).</li>
+<li>PdfGraphics2D: Keep the transform immutable in drawImage() (suggested on the mailing list by Mark Storer)</li>
+<li>PdfReader: Some producers don't have a document id with encrypted documents.</li>
+<li>Fix: Invalid images don't throw an exception in setField()</li>
+<li>Fix: The non-breaking space was being incorrectly translated in pdfdocencoding.</li>
+<li>Fix: PDF/A docs should have version 1.4</li>
+<li>Fix: Documents with PDF/A conformance must have the CIDset key in the font descriptor for Unicode TrueType fonts.</li>
+<li>Removed the duplicated bit reversal code for TIFF.</li>
+</ul>
+</li>
+<li>Changes made by Xavier
+<ul>
+<li>Javadoc updates</li>
+<li>Toolbox error dialog now has version number in title.
+Side effect: "java -jar iText.jar" is enough to get the version number.
+If the toolbox jar is present, the GUI can display the versions numbers
+using "Help->Versions". If the toolbox is not there, the iText version is in the dialog title.
+This may help with customer support queries. Also make sure the iText version and toolbox error are also displayed for headless mode.</li>
+<li>Code cleanup: e.g. serialVersionUID added to remove eclipse warning</li>
+<li>Bouncy Castle update to v138</li>
+<li>ExtendedColor is now an abstract class</li>
+<li>Changed some names of constant to meet the Java naming conventions.</li>
+<li>Added junit tests for iText (the iText examples)</li>
+<li>Introduction of a jdiff task</li>
+<li>Added extra info for deprecated methods</li>
+<li>added @since tags to all new methods</li>
+<li>Reorganization of the ANT scripts</li>
+<li>Fully configurable signing</li>
+</ul>
+</li>
+<li>Changes made by Bruno
+<ul>
+<li>XmpWriter: Typo in Processing Instruction (reported on the mailing list).
+Removal of unnecessary space characters.</li>
+<li>Renamed a class: the Greek 'numbering' isn't really a 'numbering'; in analogy with the RomanNumberingFactory vs the RomanAlphabetFactory, it's better to talk about GreekAlphabetFactory.</li>
+<li>Added a number of convenience methods in PdfEncryptor as suggested by Bruno Waes</li>
+<li>Reorganization of the ANT scripts</li>
+<li>Added extra info for deprecated methods</li>
+<li>The iText.jar is now signed with Bruno's personal CAcert certificate.</li>
+</ul>
+</li>
+<li>Changes made by Mark
+<ul>
+<li>Color fixes to the RtfParser by Howard Shank</li>
+<li>Added extra info for deprecated methods</li>
+</ul>
+</li>
+</ul>
+<ul>2007-10-05: iText 2.0.6
+<li>Changes made by Paulo
+<ul>
+<li>Solved a problem with NameTree: in iText 2.0.5, it was possible to create unsorted PDF Name Trees.</li>
+<li>Class ColumnText: it is now possible to have better control over the 'first line' behavior.</li>
+<li>PDF417: removed the optional macro field segment count. Some readers can't process it.</li>
+<li>Fonts: more properties can be extracted from fonts: sub/superscript size and position,
+underline/strikethrough thickness and position.</li>
+<li>Extra check in PdfContentByte: very small font sizes can crash some viewers.</li>
+<li>Fix: PdfReader in partial mode misbehaved in PdfStamper.</li>
+<li>Fix: iText now scales the WMF font size if necessary.</li>
+<li>Fix: an error was thrown if the /Annots array had a null element.</li>
+<li>Fix: Cp437 must also output the control codes (&lt;32).</li>
+<li>Fix: underline or strikethrough fonts could leave a visible line in the wrong place when spacing before was applied.</li>
+<li>Fix: Checkboxes should behave as Radioboxes specially concerning the Opt array</li>
+<li>Performance: avoid the creation of new fonts.</li>
+<li>Support for JPEG2000 images (.jp2 and .j2k)</li>
+<li>Added support to set the button image with images coded in base64. This is particulary important for XFA forms where the image may be coded in the dataset.</li>
+</ul>
+</li>
+<li>Changes made by Bruno
+<ul>
+<li>All lines in a Cell (old Table class) were assumed to have equal heights.
+This isn't always the case. This problem was reported by Chad Loder on the mailing list.</li>
+<li>A lot of RTF functionality was broken in iText 2.0.5. This is fixed in iText 2.0.6.</li>
+<li>Some indentation bugs were fixed in iText 2.0.5; but by doing so a new indentation bug
+was introduced. The bug was reported on SourceForge #1797927 and has now been solved.</li>
+<li>Extra null checks in Font and Phrase; changes to the copy constructor of class Phrase.</li>
+<li>For what it's worth: I changed single quotes into double quotes in XmpWriter</li>
+</ul>
+</li>
+<li>Changes made by Xavier
+<ul><li>Code cleanup in class Jpeg2000</li></ul>
+</li>
+</ul>
+<ul>2007-09-09: iText 2.0.5
+<li>Changes made by Paulo
+<ul>
+<li>Added stamping capabilities for PdfCopy (contributed by Ryo Nakamura; optimized + support for adding annotations by Paulo)</li>
+<li>Added support for PDF/A-1</li>
+<li>Added support for icc profiles in jpeg</li>
+<li>Added support for strikethru in HTMLWorker</li>
+<li>Added support for the rgb() color notation in WebColors</li>
+<li>Outlines can be set all at once in PdfWriter. Note that outlines set by other means, like Chapter, will be overridden.</li>
+<li>PdfFileSpecification: file parameters and mime type can be set</li>
+<li>Better password restriction control</li>
+<li>XML parsing: whitespace is significant and must be processed.</li>
+<li>Field flattening could cause a class cast exception with broken PDFs.</li>
+<li>Tiff: broken tiffs with an invalid IFD pointer returned one less the real number of images</li>
+<li>Tiff: TIFFTAG_JPEGIFOFFSET can be optional</li>
+<li>PdfDate: dates in W3C format in the metadata were different than the PDF dates in the Info dictionary</li>
+<li>Bugfix concerning the retrieval of the user password when owner password is known</li>
+<li>Memory optimizations in class Phrase</li>
+<li>RandomAccessFileOrArray: it's very expensive to open a memory mapped file
+and for the usage pattern of this class in iText it's faster the next re-openings
+to be done as a plain random access file</li>
+<li>Preserve hyperlinks in PdfImportedPage (Michael Schierl)</li>
+<li>Optimization of the DPI rounding in BMP, PNG and TIFF images</li>
+<li>Removed some superfluous synchronized method modifiers.</li>
+<li>Several improvements in memory fragmentation and thread locking in processing font data;
+some of the improvements were suggested on the mailing list and implemented by Paulo;
+one suggestion was sent to Bruno by Actuate.</li>
+<li>PdfGraphics2D: jpeg compression is done with imageio (instead of with com.sun.image.codec.jpg.JPEGCodec)</li>
+<li>PdfGraphics2D: partial acceptance of some extra functionality in drawString contributed by John Hellerud</li>
+<li>PdfGraphics2D: enable bold simulation as proposed by John Hellerud, but with with extra check of the BaseFont</li>
+<li>PdfPageLabels: added a series of null checks</li>
+<li>PdfReader: fix to ascii85 decode (fixed by Aiken Sam)</li>
+<li>PdfReader: page dimensions were assumed as direct objects</li>
+<li>PdfSmartCopy was too liberal in comparing streams. Form XObjects (templates) are not candidates for comparison anymore.</li>
+<li>FdfReader: extra check for the FDF key</li>
+<li>PdfPageLabels: better page label options</li>
+<li>Utilities: simplification in toURL()</li>
+<li>RTF: bugfix for hanging indent (fixed by Tim Newsom)</li>
+<li>RTF: added support for images in shapes of the picture frame type (contributed by Tim Newsom)</li>
+</ul></li>
+<li>Changes made by Bruno
+<ul>
+<li>Added support for custom names for document-level JavaScript actions in the Name Dictionary.</li>
+<li>Fixed a series of indentation bugs reported by Janis Achenbach (fix by Bruno in more than one try; tested by Janis).</li>
+<li>Fixed a page size/page margins problem in PdfDocument</li>
+<li>A Copy/Paste error made that DUPLEXFLIPLONGEDGE was not seen as a possible value for DUPLEX.</li>
+<li>FontFactoryImp: parsing the size of a font was not done correctly (fix by Janis Achenbach)</li>
+<li>Bugfix: font propagation affected Phrases/Paragraphs that were reused.</li>
+<li>Bugfix: extra space after a Paragraph affected the indentation.</li>
+<li>Bugfix: Paragraph.setKeepTogether(true) affected the indentation and doubled the spacing after a Paragraph.</li>
+<li>Update of the toString() methods in PdfDictionary and PdfStream;
+for instance: it no longer says 'Dictionary of type: null' for Dictionaries without a /TYPE key.</li>
+<li>XMP: the 'Subject' of PDF metadata is now also added as a Description in the XMP metadata (Suggested by Seung Hyun Park)</li>
+<li>XMP: added support for adding XMP metadata to the page dictionary of each page</li>
+<li>BaseField: if you are using a template as icon, the state of the content of the template can be affected by the background color
+of the button (probably also by other properties of the button appearance).</li>
+<li>PdfPageLabels: minor memory improvement</li>
+<li>Made iText more tolerant towards the type of PDF object that is accepted as value for the /TYPE key.</li>
+<li>Bugfix: table threw an IndexOutOfBoundsException in two specific cases that almost never occur</li>
+<li>Bugfix: List.add(Object o) didn't always return the expected value (suggested by Dhruba Bandopadhyay)</li>
+<li>Bugfix: if an image is new and it's a WMF image, the template has to be read, even if it's not null.</li>
+<li>BuildTutorial: made the switch from CVS to SVN (suggested by Thomas Tampe)</li>
+<li>Updated license information in the iText.jar; extra info about the files in iTextAsian.jar</li>
+</ul></li>
+<li>Changes made by Xavier
+<ul>
+<li>Removal of unused imports</li>
+<li>Removal of useless redefinition of open() in PdfCopy and RtfWriter</li>
+<li>Update from BouncyCastle 1.35 to BouncyCastle 1.37</li>
+</ul></li>
+</ul>
+<ul>2007-06-04: iText 2.0.4
+ <li>Changes made by Xavier
+  <ul>
+  <li>We have moved from CVS to SVN! Xavier is also starting a JDK 1.3 and a 1.5 branch for iText.</li>
+  <li>BarcodePDF417: use StringBuffer instead of concatenating strings. side effect: code now compiles with jdk13.</li>
+  <li>Dynamic generation of the MANIFEST.MF file (change in the ANT script)</li>
+  <li>Several code clean up operations</li>
+  </ul>
+ </li>
+ <li>Changes made by Paulo
+  <ul>
+  <li>TIFF: broken tiffs may not have the next IFD pointer</li>
+  <li>HTMLWorker: added ImageProvider to be able to select arbitrary
+  images based on the "src" property</li>
+  <li>PdfPKCS7: the X509 parsing code for the sub-filter adbe.x509.rsa_sha1 was taking the certificates from the wrong place.</li>
+  <li>added the option to not use memory mapped files</li>
+  <li>named destinations are treated as binary allowing the eventual localization</li>
+  <li>RtfParagraph: changed a member from private to protected to be able to compile RtfListItem</li>
+  <li>Several javadoc corrections</li>
+  </ul>
+ </li>
+ <li>Changes made by Mark
+  <ul>
+  <li>Modified the filterSpecialChar method to write directly to the OutputStream (Thomas Bickel).</li>
+  <li>RtfDocument: just use getBytes for String to byte[] translation.</li>
+  <li>RtfNewPage: made NEW_PAGE constant public</li>
+  <li>Added support for different bullet characters and for spacing before/after list items.
+  The idea for the solution was suggested by Felix Satyaputra.</li>
+  </ul>
+ </li>
+ <li>Changes made by Bruno
+  <ul>
+  <li>The organization of the files (lib directory) has been changed;
+  the jars needed to compile iText and the tutorial examples are now in SVN.</li>
+  <li>Changes to the ANT scripts due to the move from CVS to SVN.</li>
+  <li>Clean up of the ANT scripts</li>
+  <li>New documentation: how to get the code from SVN, how to create an Eclipse project, how to use the ANT scripts</li>
+  </ul>
+ </li>
+</ul>
+<ul>2007-05-25: iText 2.0.3
  <li>Changes made by Paulo
   <ul>
   <li>AcroForms: make sure there 's always a /DA key</li>
@@ -102,7 +370,7 @@
   </ul>
  </li>
 </ul>
-<ul>2006-04-13: iText 2.0.2
+<ul>2007-04-13: iText 2.0.2
 <li>Changes made by Paulo
 <ul>
 <li>Added some convenience methods in PdfArray and PdfDictionary</li>
@@ -141,7 +409,7 @@ These convenience methods make it easier for tool builders to work with encrypti
 </ul>
 </li>
 </ul>
-<ul>2006-03-07: iText 2.0.1
+<ul>2007-03-07: iText 2.0.1
 <li>Changes made by Paulo
 <ul>
 <li>JPG: fix for the Adobe Application-Specific JPEG Marker length (fix by Cory Lewis)</li>
@@ -197,7 +465,7 @@ to numerous mails. Because of possible IP issues I had to remove this code.</li>
 </ul>
 </li>
 </ul>
-<ul>2006-02-15: iText 2.0.0
+<ul>2007-02-15: iText 2.0.0
 <li>Changes made by Paulo
 <ul>
 <li>Certificate encryption. This change has a huge impact on projects that use encryption.

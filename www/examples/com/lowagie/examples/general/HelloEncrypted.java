@@ -1,5 +1,5 @@
 /*
- * $Id: HelloEncrypted.java 2730 2007-04-28 12:52:49Z blowagie $
+ * $Id: HelloEncrypted.java 2992 2007-11-19 08:12:53Z blowagie $
  * $Name$
  *
  * This code is part of the 'iText Tutorial'.
@@ -49,7 +49,7 @@ public class HelloEncrypted {
 			// and directs a PDF-stream to a file
 			PdfWriter writer = PdfWriter.getInstance(document,
 					new FileOutputStream("HelloEncrypted.pdf"));
-			writer.setEncryption("Hello".getBytes(), "World".getBytes(), PdfWriter.AllowCopy | PdfWriter.AllowPrinting, PdfWriter.STANDARD_ENCRYPTION_128);
+			writer.setEncryption("Hello".getBytes(), "World".getBytes(), PdfWriter.ALLOW_COPY | PdfWriter.ALLOW_PRINTING, PdfWriter.STANDARD_ENCRYPTION_128);
 			// step 3: we open the document
 			document.open();
 			// step 4: we add a paragraph to the document

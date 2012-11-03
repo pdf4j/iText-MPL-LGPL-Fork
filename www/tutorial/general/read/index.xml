@@ -12,7 +12,7 @@
 			<site:keyword>JAVA</site:keyword>
 			<site:keyword>PDF</site:keyword>
 		</site:amazonbooks>
-		<site:updated>$Date: 2007-01-26 09:41:44 -0500 (Fri, 26 Jan 2007) $</site:updated>
+		<site:updated>$Date: 2007-11-08 19:41:31 -0500 (Thu, 08 Nov 2007) $</site:updated>
 		<site:author>Bruno Lowagie</site:author>
 	</site:metadata>
 	
@@ -28,7 +28,7 @@
 			<site:java src="ReadEncrypted" standalone="yes" />
 			<site:externalresource>HelloEncrypted.pdf</site:externalresource>
 			<site:result>info_encrypted.txt</site:result>
-			<site:extrajar>bcprov-jdk14-135.jar</site:extrajar>
+			<site:extrajar>bcprov-jdk14-138.jar</site:extrajar>
 			<site:description>Reading information from an encrypted PDF file</site:description>
 		</site:example>
 	</site:examples>
