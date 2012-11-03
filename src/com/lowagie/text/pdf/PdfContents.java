@@ -1,6 +1,6 @@
 /*
- * $Id: PdfContents.java,v 1.59 2006/09/14 23:10:48 xlv Exp $
- * $Name:  $
+ * $Id: PdfContents.java 2742 2007-05-08 13:04:56Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -98,23 +98,23 @@ class PdfContents extends PdfStream {
             switch (rotation) {
                 case 90:
                     out.write(ROTATE90);
-                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.top())));
+                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.getTop())));
                     out.write(' ');
                     out.write('0');
                     out.write(ROTATEFINAL);
                     break;
                 case 180:
                     out.write(ROTATE180);
-                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.right())));
+                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.getRight())));
                     out.write(' ');
-                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.top())));
+                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.getTop())));
                     out.write(ROTATEFINAL);
                     break;
                 case 270:
                     out.write(ROTATE270);
                     out.write('0');
                     out.write(' ');
-                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.right())));
+                    out.write(DocWriter.getISOBytes(ByteBuffer.formatDouble(page.getRight())));
                     out.write(ROTATEFINAL);
                     break;
             }

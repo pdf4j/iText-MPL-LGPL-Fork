@@ -1,6 +1,6 @@
 /*
- * $Id: ColumnText.java,v 1.71 2006/10/27 17:23:17 xlv Exp $
- * $Name:  $
+ * $Id: ColumnText.java 2742 2007-05-08 13:04:56Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *
@@ -58,7 +58,6 @@ import com.lowagie.text.Chunk;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.ExceptionConverter;
-import com.lowagie.text.Graphic;
 import com.lowagie.text.Image;
 import com.lowagie.text.ListItem;
 import com.lowagie.text.Paragraph;
@@ -91,6 +90,53 @@ import com.lowagie.text.SimpleTable;
  */
 
 public class ColumnText {
+    /** Eliminate the arabic vowels */    
+    public static final int AR_NOVOWEL = ArabicLigaturizer.ar_novowel;
+    /** Compose the tashkeel in the ligatures. */    
+    public static final int AR_COMPOSEDTASHKEEL = ArabicLigaturizer.ar_composedtashkeel;
+    /** Do some extra double ligatures. */    
+    public static final int AR_LIG = ArabicLigaturizer.ar_lig;
+    /**
+     * Digit shaping option: Replace European digits (U+0030...U+0039) by Arabic-Indic digits.
+     */
+    public static final int DIGITS_EN2AN = ArabicLigaturizer.DIGITS_EN2AN;
+    
+    /**
+     * Digit shaping option: Replace Arabic-Indic digits by European digits (U+0030...U+0039).
+     */
+    public static final int DIGITS_AN2EN = ArabicLigaturizer.DIGITS_AN2EN;
+    
+    /**
+     * Digit shaping option:
+     * Replace European digits (U+0030...U+0039) by Arabic-Indic digits
+     * if the most recent strongly directional character
+     * is an Arabic letter (its Bidi direction value is RIGHT_TO_LEFT_ARABIC).
+     * The initial state at the start of the text is assumed to be not an Arabic,
+     * letter, so European digits at the start of the text will not change.
+     * Compare to DIGITS_ALEN2AN_INIT_AL.
+     */
+    public static final int DIGITS_EN2AN_INIT_LR = ArabicLigaturizer.DIGITS_EN2AN_INIT_LR;
+    
+    /**
+     * Digit shaping option:
+     * Replace European digits (U+0030...U+0039) by Arabic-Indic digits
+     * if the most recent strongly directional character
+     * is an Arabic letter (its Bidi direction value is RIGHT_TO_LEFT_ARABIC).
+     * The initial state at the start of the text is assumed to be an Arabic,
+     * letter, so European digits at the start of the text will change.
+     * Compare to DIGITS_ALEN2AN_INT_LR.
+     */
+    public static final int DIGITS_EN2AN_INIT_AL = ArabicLigaturizer.DIGITS_EN2AN_INIT_AL;
+    
+    /**
+     * Digit type option: Use Arabic-Indic digits (U+0660...U+0669).
+     */
+    public static final int DIGIT_TYPE_AN = ArabicLigaturizer.DIGIT_TYPE_AN;
+    
+    /**
+     * Digit type option: Use Eastern (Extended) Arabic-Indic digits (U+06f0...U+06f9).
+     */
+    public static final int DIGIT_TYPE_AN_EXTENDED = ArabicLigaturizer.DIGIT_TYPE_AN_EXTENDED;
     
     protected int runDirection = PdfWriter.RUN_DIRECTION_DEFAULT;
     
@@ -355,14 +401,14 @@ public class ColumnText {
             PdfPTable t = new PdfPTable(1);
             float w = img.getWidthPercentage();
             if (w == 0) {
-                t.setTotalWidth(img.scaledWidth());
+                t.setTotalWidth(img.getScaledWidth());
                 t.setLockedWidth(true);
             }
             else
                 t.setWidthPercentage(w);
-            t.setSpacingAfter(img.spacingAfter());
-            t.setSpacingBefore(img.spacingBefore());
-            switch (img.alignment()) {
+            t.setSpacingAfter(img.getSpacingAfter());
+            t.setSpacingBefore(img.getSpacingBefore());
+            switch (img.getAlignment()) {
                 case Image.LEFT:
                     t.setHorizontalAlignment(Element.ALIGN_LEFT);
                     break;
@@ -375,10 +421,10 @@ public class ColumnText {
             }
             PdfPCell c = new PdfPCell(img, true);
             c.setPadding(0);
-            c.setBorder(img.border());
-            c.setBorderColor(img.borderColor());
-            c.setBorderWidth(img.borderWidth());
-            c.setBackgroundColor(img.backgroundColor());
+            c.setBorder(img.getBorder());
+            c.setBorderColor(img.getBorderColor());
+            c.setBorderWidth(img.getBorderWidth());
+            c.setBackgroundColor(img.getBackgroundColor());
             t.addCell(c);
             element = t;
         }
@@ -395,7 +441,7 @@ public class ColumnText {
 				throw new IllegalArgumentException("Element not allowed.");
 			}
         }
-        else if (element.type() != Element.PARAGRAPH && element.type() != Element.LIST && element.type() != Element.PTABLE && element.type() != Element.GRAPHIC)
+        else if (element.type() != Element.PARAGRAPH && element.type() != Element.LIST && element.type() != Element.PTABLE)
             throw new IllegalArgumentException("Element not allowed.");
         if (!composite) {
             composite = true;
@@ -1054,12 +1100,12 @@ public class ColumnText {
                     if (compositeColumn == null) {
                         compositeColumn = new ColumnText(canvas);
                         compositeColumn.setUseAscender(firstPass ? useAscender : false);
-                        compositeColumn.setAlignment(para.alignment());
-                        compositeColumn.setIndent(para.indentationLeft() + para.getFirstLineIndent());
+                        compositeColumn.setAlignment(para.getAlignment());
+                        compositeColumn.setIndent(para.getIndentationLeft() + para.getFirstLineIndent());
                         compositeColumn.setExtraParagraphSpace(para.getExtraParagraphSpace());
-                        compositeColumn.setFollowingIndent(para.indentationLeft());
-                        compositeColumn.setRightIndent(para.indentationRight());
-                        compositeColumn.setLeading(para.leading(), para.getMultipliedLeading());
+                        compositeColumn.setFollowingIndent(para.getIndentationLeft());
+                        compositeColumn.setRightIndent(para.getIndentationRight());
+                        compositeColumn.setLeading(para.getLeading(), para.getMultipliedLeading());
                         compositeColumn.setRunDirection(runDirection);
                         compositeColumn.setArabicOptions(arabicOptions);
                         compositeColumn.setSpaceCharRatio(spaceCharRatio);
@@ -1108,7 +1154,7 @@ public class ColumnText {
                 com.lowagie.text.List list = (com.lowagie.text.List)element;
                 ArrayList items = list.getItems();
                 ListItem item = null;
-                float listIndentation = list.indentationLeft();
+                float listIndentation = list.getIndentationLeft();
                 int count = 0;
                 Stack stack = new Stack();
                 for (int k = 0; k < items.size(); ++k) {
@@ -1124,7 +1170,7 @@ public class ColumnText {
                         stack.push(new Object[]{list, new Integer(k), new Float(listIndentation)});
                         list = (com.lowagie.text.List)obj;
                         items = list.getItems();
-                        listIndentation += list.indentationLeft();
+                        listIndentation += list.getIndentationLeft();
                         k = -1;
                         continue;
                     }
@@ -1150,12 +1196,12 @@ public class ColumnText {
                         }
                         compositeColumn = new ColumnText(canvas);
                         compositeColumn.setUseAscender(firstPass ? useAscender : false);
-                        compositeColumn.setAlignment(item.alignment());
-                        compositeColumn.setIndent(item.indentationLeft() + listIndentation + item.getFirstLineIndent());
+                        compositeColumn.setAlignment(item.getAlignment());
+                        compositeColumn.setIndent(item.getIndentationLeft() + listIndentation + item.getFirstLineIndent());
                         compositeColumn.setExtraParagraphSpace(item.getExtraParagraphSpace());
                         compositeColumn.setFollowingIndent(compositeColumn.getIndent());
-                        compositeColumn.setRightIndent(item.indentationRight() + list.indentationRight());
-                        compositeColumn.setLeading(item.leading(), item.getMultipliedLeading());
+                        compositeColumn.setRightIndent(item.getIndentationRight() + list.getIndentationRight());
+                        compositeColumn.setLeading(item.getLeading(), item.getMultipliedLeading());
                         compositeColumn.setRunDirection(runDirection);
                         compositeColumn.setArabicOptions(arabicOptions);
                         compositeColumn.setSpaceCharRatio(spaceCharRatio);
@@ -1193,7 +1239,7 @@ public class ColumnText {
                 descender = compositeColumn.descender;
                 if (!Float.isNaN(compositeColumn.firstLineY) && !compositeColumn.firstLineYDone) {
                     if (!simulate)
-                        showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(item.listSymbol()), compositeColumn.leftX + listIndentation, compositeColumn.firstLineY, 0);
+                        showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(item.getListSymbol()), compositeColumn.leftX + listIndentation, compositeColumn.firstLineY, 0);
                     compositeColumn.firstLineYDone = true;
                 }
                 if ((status & NO_MORE_TEXT) != 0) {
@@ -1346,25 +1392,6 @@ public class ColumnText {
                     return NO_MORE_COLUMN;
                 }
             }
-            else if (element.type() == Element.GRAPHIC) {
-                if (!simulate) {
-                    Graphic gr = (Graphic)element;
-                    ByteBuffer bf = gr.getInternalBuffer();
-                    ByteBuffer store = null;
-                    if (bf.size() > 0) {
-                        store = new ByteBuffer();
-                        store.append(bf);
-                        bf.reset();
-                    }
-                    gr.processAttributes(leftX, minY, rightX, maxY, yLine);
-                    canvas.add(gr);
-                    bf.reset();
-                    if (store != null) {
-                        bf.append(store);
-                    }
-                }
-                compositeElements.removeFirst();
-            }
             else
                 compositeElements.removeFirst();
         }
@@ -1408,14 +1435,6 @@ public class ColumnText {
         return canvases;
     }
     
-    /**
-     * Checks if the element has a height of 0.
-     * @return true or false
-     */
-    public boolean zeroHeightElement() {
-        return composite && !compositeElements.isEmpty() && ((Element)compositeElements.getFirst()).type() == Element.GRAPHIC;
-    }
-
     /**
      * Checks if UseAscender is enabled/disabled.
      * @return true is the adjustment of the first line height is based on max ascender.

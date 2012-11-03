@@ -1,6 +1,6 @@
 /*
- * $Id: HtmlTags.java,v 1.69 2005/05/03 14:43:58 blowagie Exp $
- * $Name:  $
+ * $Id: HtmlTags.java 1728 2005-05-03 14:44:38Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *

@@ -1,6 +1,6 @@
 /*
- * $Id: concat_pdf.java,v 1.22 2006/10/27 17:23:25 xlv Exp $
- * $Name:  $
+ * $Id: concat_pdf.java 2441 2006-10-27 17:24:01Z xlv $
+ * $Name$
  *
  * Copyright 2002 by Mark Thompson
  *

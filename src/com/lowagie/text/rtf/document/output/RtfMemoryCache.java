@@ -1,6 +1,6 @@
 /*
- * $Id: RtfMemoryCache.java,v 1.1 2005/02/02 18:09:31 hallm Exp $
- * $Name:  $
+ * $Id: RtfMemoryCache.java 2776 2007-05-23 20:01:40Z hallm $
+ * $Name$
  *
  * Copyright 2005 by Mark Hall
  *
@@ -54,13 +54,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 /**
  * The RtfMemoryCache is an RtfDataCache that keeps the whole rtf document
  * data in memory. Fast but memory intensive.
  * 
- * @version $Revision: 1.1 $
+ * @version $Id: RtfMemoryCache.java 2776 2007-05-23 20:01:40Z hallm $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
+ * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfMemoryCache implements RtfDataCache {
 

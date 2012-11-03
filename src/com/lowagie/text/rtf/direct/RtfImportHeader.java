@@ -1,6 +1,6 @@
 /**
- * $Id: RtfImportHeader.java,v 1.3 2006/08/28 11:21:15 blowagie Exp $
- * $Name:  $
+ * $Id: RtfImportHeader.java 2337 2006-08-28 11:21:15Z blowagie $
+ * $Name$
  *
  * Copyright 2006 by Mark Hall
  *
@@ -64,7 +64,7 @@ import com.lowagie.text.rtf.style.RtfFont;
  * the RTF document that is the target of the import. This guarantees
  * that the merged document has the correct font and color settings.
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 2337 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  */
 public class RtfImportHeader {

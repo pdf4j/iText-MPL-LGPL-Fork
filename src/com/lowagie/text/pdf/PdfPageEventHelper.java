@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPageEventHelper.java,v 1.57 2006/09/14 23:10:50 xlv Exp $
- * $Name:  $
+ * $Id: PdfPageEventHelper.java 2366 2006-09-14 23:10:58Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *

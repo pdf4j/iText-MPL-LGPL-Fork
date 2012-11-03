@@ -1,6 +1,6 @@
 /*
- * $Id: PdfReader.java,v 1.87 2006/11/11 17:04:30 psoares33 Exp $
- * $Name:  $
+ * $Id: PdfReader.java 2764 2007-05-18 21:17:56Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -65,27 +65,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.InflaterInputStream;
+import java.util.Stack;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.security.cert.Certificate;
 
 import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Rectangle;
-import java.util.Stack;
+import com.lowagie.text.pdf.interfaces.PdfViewerPreferences;
+import com.lowagie.text.pdf.internal.PdfViewerPreferencesImp;
+
+import org.bouncycastle.cms.CMSEnvelopedData;
+import org.bouncycastle.cms.RecipientInformation;
 
 /** Reads a PDF document.
  * @author Paulo Soares (psoares@consiste.pt)
  * @author Kazuya Ujihara
  */
-public class PdfReader {
+public class PdfReader implements PdfViewerPreferences {
 
     static final PdfName pageInhCandidates[] = {
         PdfName.MEDIABOX, PdfName.ROTATE, PdfName.RESOURCES, PdfName.CROPBOX
     };
-
-    static final PdfName vpnames[] = {PdfName.HIDETOOLBAR, PdfName.HIDEMENUBAR,
-        PdfName.HIDEWINDOWUI, PdfName.FITWINDOW, PdfName.CENTERWINDOW, PdfName.DISPLAYDOCTITLE};
-    static final int vpints[] = {PdfWriter.HideToolbar, PdfWriter.HideMenubar,
-        PdfWriter.HideWindowUI, PdfWriter.FitWindow, PdfWriter.CenterWindow, PdfWriter.DisplayDocTitle};
-
+   
     static final byte endstream[] = PdfEncodings.convertToBytes("endstream", null);
     static final byte endobj[] = PdfEncodings.convertToBytes("endobj", null);
     protected PRTokeniser tokens;
@@ -104,7 +107,6 @@ public class PdfReader {
     protected PageRefs pageRefs;
     protected PRAcroForm acroForm = null;
     protected boolean acroFormParsed = false;
-    protected ArrayList pageInh;
     protected boolean encrypted = false;
     protected boolean rebuilt = false;
     protected int freeXref;
@@ -114,6 +116,9 @@ public class PdfReader {
     protected char pdfVersion;
     protected PdfEncryption decrypt;
     protected byte password[] = null; //added by ujihara for decryption
+    protected Key certificateKey = null; //added by Aiken Sam for certificate decryption
+    protected Certificate certificate = null; //added by Aiken Sam for certificate decryption
+    protected String certificateKeyProvider = null; //added by Aiken Sam for certificate decryption
     private boolean ownerPasswordUsed;
     protected ArrayList strings = new ArrayList();
     protected boolean sharedStreams = true;
@@ -127,6 +132,7 @@ public class PdfReader {
     private int lastXrefPartial = -1;
     private boolean partial;
     private PRIndirectReference cryptoRef;
+	private PdfViewerPreferencesImp viewerPreferences = new PdfViewerPreferencesImp();
 
     /**
      * Holds value of property appendable.
@@ -173,6 +179,21 @@ public class PdfReader {
         tokens = new PRTokeniser(pdfIn);
         readPdf();
     }
+
+    /** Reads and parses a PDF document.
+     * @param filename the file name of the document
+     * @param certificate the certificate to read the document
+     * @param certificateKey the private key of the certificate
+     * @param certificateKeyProvider the security provider for certificateKey
+     * @throws IOException on error
+     */
+    public PdfReader(String filename, Certificate certificate, Key certificateKey, String certificateKeyProvider) throws IOException {
+        this.certificate = certificate;
+        this.certificateKey = certificateKey;
+        this.certificateKeyProvider = certificateKeyProvider;
+        tokens = new PRTokeniser(filename);
+        readPdf();
+    }        
 
     /** Reads and parses a PDF document.
      * @param url the URL of the document
@@ -548,6 +569,7 @@ public class PdfReader {
         PdfObject encDic = trailer.get(PdfName.ENCRYPT);
         if (encDic == null || encDic.toString().equals("null"))
             return;
+        byte[] encryptionKey = null;    	
         encrypted = true;
         PdfDictionary enc = (PdfDictionary)getPdfObject(encDic);
 
@@ -565,72 +587,187 @@ public class PdfReader {
                 strings.remove(documentIDs.getArrayList().get(1));
         }
 
-        s = enc.get(PdfName.U).toString();
-        strings.remove(enc.get(PdfName.U));
-        byte uValue[] = com.lowagie.text.DocWriter.getISOBytes(s);
-        s = enc.get(PdfName.O).toString();
-        strings.remove(enc.get(PdfName.O));
-        byte oValue[] = com.lowagie.text.DocWriter.getISOBytes(s);
+        byte uValue[] = null;
+        byte oValue[] = null;
+        int cryptoMode = PdfWriter.STANDARD_ENCRYPTION_40;
+        int lengthValue = 0;  
+        
+        PdfObject filter = getPdfObjectRelease(enc.get(PdfName.FILTER));
 
-        o = enc.get(PdfName.R);
-        if (!o.isNumber()) throw new IOException("Illegal R value.");
-        rValue = ((PdfNumber)o).intValue();
-        if (rValue != 2 && rValue != 3 && rValue != 4) throw new IOException("Unknown encryption type (" + rValue + ")");
+        if (filter.equals(PdfName.STANDARD))
+        {        	        
+            s = enc.get(PdfName.U).toString();
+            strings.remove(enc.get(PdfName.U));
+            uValue = com.lowagie.text.DocWriter.getISOBytes(s);
+            s = enc.get(PdfName.O).toString();
+            strings.remove(enc.get(PdfName.O));
+            oValue = com.lowagie.text.DocWriter.getISOBytes(s);
 
-        o = enc.get(PdfName.P);
-        if (!o.isNumber()) throw new IOException("Illegal P value.");
-        pValue = ((PdfNumber)o).intValue();
+            o = enc.get(PdfName.R);
+            if (!o.isNumber()) throw new IOException("Illegal R value.");
+            rValue = ((PdfNumber)o).intValue();
+            if (rValue != 2 && rValue != 3 && rValue != 4)
+                throw new IOException("Unknown encryption type (" + rValue + ")");
 
-        int cryptoMode;
-        int lengthValue = 0;
-        if ( rValue == 3 ){
-            o = enc.get(PdfName.LENGTH);
-            if (!o.isNumber())
-                throw new IOException("Illegal Length value.");
-            lengthValue = ( (PdfNumber) o).intValue();
-            if (lengthValue > 128 || lengthValue < 40 || lengthValue % 8 != 0)
-                throw new IOException("Illegal Length value.");
-            cryptoMode = PdfWriter.STANDARD_ENCRYPTION_128;
-        }
-        else if (rValue == 4) {
-            PdfDictionary dic = (PdfDictionary)enc.get(PdfName.CF);
-            if (dic == null)
-                throw new IOException("/CF not found (encryption)");
-            dic = (PdfDictionary)dic.get(PdfName.STDCF);
-            if (dic == null)
-                throw new IOException("/StdCF not found (encryption)");
-            if (PdfName.V2.equals(dic.get(PdfName.CFM)))
+            o = enc.get(PdfName.P);
+            if (!o.isNumber()) throw new IOException("Illegal P value.");
+            pValue = ((PdfNumber)o).intValue();
+   
+            if ( rValue == 3 ){
+                o = enc.get(PdfName.LENGTH);
+                if (!o.isNumber())
+                    throw new IOException("Illegal Length value.");
+                lengthValue = ( (PdfNumber) o).intValue();
+                if (lengthValue > 128 || lengthValue < 40 || lengthValue % 8 != 0)
+                    throw new IOException("Illegal Length value.");
                 cryptoMode = PdfWriter.STANDARD_ENCRYPTION_128;
-            else if (PdfName.AESV2.equals(dic.get(PdfName.CFM)))
-                cryptoMode = PdfWriter.ENCRYPTION_AES_128;
-            else
-                throw new IOException("No compatible encryption found");
-            PdfObject em = enc.get(PdfName.ENCRYPTMETADATA);
-            if (em != null && em.toString().equals("false"))
-                cryptoMode |= PdfWriter.DO_NOT_ENCRYPT_METADATA;
-        } else {
-            cryptoMode = PdfWriter.STANDARD_ENCRYPTION_40;
-        }
+            }  else if (rValue == 4) {
+                PdfDictionary dic = (PdfDictionary)enc.get(PdfName.CF);
+                if (dic == null)
+                    throw new IOException("/CF not found (encryption)");
+                dic = (PdfDictionary)dic.get(PdfName.STDCF);
+                if (dic == null)
+                    throw new IOException("/StdCF not found (encryption)");
+                if (PdfName.V2.equals(dic.get(PdfName.CFM)))
+                    cryptoMode = PdfWriter.STANDARD_ENCRYPTION_128;
+                else if (PdfName.AESV2.equals(dic.get(PdfName.CFM)))
+                    cryptoMode = PdfWriter.ENCRYPTION_AES_128;
+                else
+                    throw new IOException("No compatible encryption found");
+                PdfObject em = enc.get(PdfName.ENCRYPTMETADATA);
+                if (em != null && em.toString().equals("false"))
+                    cryptoMode |= PdfWriter.DO_NOT_ENCRYPT_METADATA;
+            } else {
+                cryptoMode = PdfWriter.STANDARD_ENCRYPTION_40;
+            }
+        } else if (filter.equals(PdfName.PUBSEC)) {
+            boolean foundRecipient = false;
+            byte[] envelopedData = null;
+            PdfArray recipients = null;
 
+            o = enc.get(PdfName.V);
+            if (!o.isNumber()) throw new IOException("Illegal V value.");
+            int vValue = ((PdfNumber)o).intValue();
+            if (vValue != 1 && vValue != 2 && vValue != 4)
+                throw new IOException("Unknown encryption type V = " + rValue);
+
+            if ( vValue == 2 ){
+                o = enc.get(PdfName.LENGTH);
+                if (!o.isNumber())
+                    throw new IOException("Illegal Length value.");
+                lengthValue = ( (PdfNumber) o).intValue();
+                if (lengthValue > 128 || lengthValue < 40 || lengthValue % 8 != 0)
+                    throw new IOException("Illegal Length value.");
+                cryptoMode = PdfWriter.STANDARD_ENCRYPTION_128;                
+                recipients = (PdfArray)enc.get(PdfName.RECIPIENTS);                                
+            } else if (vValue == 4) {
+                PdfDictionary dic = (PdfDictionary)enc.get(PdfName.CF);
+                if (dic == null)
+                    throw new IOException("/CF not found (encryption)");
+                dic = (PdfDictionary)dic.get(PdfName.DEFAULTCRYPTFILER);
+                if (dic == null)
+                    throw new IOException("/DefaultCryptFilter not found (encryption)");
+                if (PdfName.V2.equals(dic.get(PdfName.CFM)))
+                {
+                    cryptoMode = PdfWriter.STANDARD_ENCRYPTION_128;
+                    lengthValue = 128;
+                }
+                else if (PdfName.AESV2.equals(dic.get(PdfName.CFM)))
+                {
+                    cryptoMode = PdfWriter.ENCRYPTION_AES_128;
+                    lengthValue = 128;
+                }
+                else
+                    throw new IOException("No compatible encryption found");
+                PdfObject em = dic.get(PdfName.ENCRYPTMETADATA);
+                if (em != null && em.toString().equals("false"))
+                    cryptoMode |= PdfWriter.DO_NOT_ENCRYPT_METADATA;
+                
+                recipients = (PdfArray)dic.get(PdfName.RECIPIENTS);                                    
+            } else {
+                cryptoMode = PdfWriter.STANDARD_ENCRYPTION_40;
+                lengthValue = 40;                
+                recipients = (PdfArray)enc.get(PdfName.RECIPIENTS);                
+            }
+
+            for (int i = 0; i<recipients.size(); i++)
+            {
+                PdfObject recipient = (PdfObject)recipients.getArrayList().get(i);
+                strings.remove(recipient);
+                
+                CMSEnvelopedData data = null;
+                try {
+                    data = new CMSEnvelopedData(recipient.getBytes());
+                
+                    Iterator recipientCertificatesIt = 
+                        data.getRecipientInfos().getRecipients().iterator();
+            
+                    while (recipientCertificatesIt.hasNext()) {
+                        RecipientInformation recipientInfo = 
+                            (RecipientInformation)recipientCertificatesIt.next();
+
+                        if (recipientInfo.getRID().match(certificate) && !foundRecipient) {
+    
+                         envelopedData = recipientInfo.getContent(certificateKey, certificateKeyProvider);
+                         foundRecipient = true;                         
+                        }
+                    }                        
+                } catch (Exception f) {
+                    throw new ExceptionConverter(f);
+                }            
+            }
+            
+            if(!foundRecipient || envelopedData == null)
+            {
+                throw new IOException("Bad certificate and key.");
+            }            
+
+            MessageDigest md = null;
+
+            try {
+                md = MessageDigest.getInstance("SHA-1");
+                md.update(envelopedData, 0, 20);
+                for (int i=0; i<recipients.size(); i++)
+                {
+                  byte[] encodedRecipient = ((PdfObject)recipients.getArrayList().get(i)).getBytes();  
+                  md.update(encodedRecipient);
+                }
+                if ((cryptoMode & PdfWriter.DO_NOT_ENCRYPT_METADATA) != 0)
+                    md.update(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255});
+                encryptionKey = md.digest();
+                
+            } catch (Exception f) {
+                throw new ExceptionConverter(f);
+            }
+        }
 
 
         decrypt = new PdfEncryption();
         decrypt.setCryptoMode(cryptoMode, lengthValue);
-        //check by user password
-        decrypt.setupByUserPassword(documentID, password, oValue, pValue);
-        if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
+
+        if (filter.equals(PdfName.STANDARD))
+        {
             //check by owner password
             decrypt.setupByOwnerPassword(documentID, password, uValue, oValue, pValue);
             if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
-                throw new IOException("Bad user password");
+                //check by user password
+                decrypt.setupByUserPassword(documentID, password, oValue, pValue);
+                if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
+                    throw new IOException("Bad user password");
+                }
             }
+            else
+                ownerPasswordUsed = true;
+        } else if (filter.equals(PdfName.PUBSEC)) {   
+            decrypt.setupByEncryptionKey(encryptionKey, lengthValue);
             ownerPasswordUsed = true;
         }
-        
+                 
         for (int k = 0; k < strings.size(); ++k) {
             PdfString str = (PdfString)strings.get(k);
             str.decrypt(this);
         }
+        
         if (encDic.isIndirect()) {
             cryptoRef = (PRIndirectReference)encDic;
             xrefObj.set(cryptoRef.getNumber(), null);
@@ -817,7 +954,6 @@ public class PdfReader {
     }
 
     protected void readPages() throws IOException {
-        pageInh = new ArrayList();
         catalog = (PdfDictionary)getPdfObject(trailer.get(PdfName.ROOT));
         rootPages = (PdfDictionary)getPdfObject(catalog.get(PdfName.PAGES));
         pageRefs = new PageRefs(this);
@@ -2771,146 +2907,35 @@ public class PdfReader {
         removeUnusedObjects();
     }
 
-    /**
-     * @param preferences
-     * @param catalog
-     */
-    public static void setViewerPreferences(int preferences, PdfDictionary catalog) {
-        catalog.remove(PdfName.PAGELAYOUT);
-        catalog.remove(PdfName.PAGEMODE);
-        catalog.remove(PdfName.VIEWERPREFERENCES);
-        if ((preferences & PdfWriter.PageLayoutSinglePage) != 0)
-            catalog.put(PdfName.PAGELAYOUT, PdfName.SINGLEPAGE);
-        else if ((preferences & PdfWriter.PageLayoutOneColumn) != 0)
-            catalog.put(PdfName.PAGELAYOUT, PdfName.ONECOLUMN);
-        else if ((preferences & PdfWriter.PageLayoutTwoColumnLeft) != 0)
-            catalog.put(PdfName.PAGELAYOUT, PdfName.TWOCOLUMNLEFT);
-        else if ((preferences & PdfWriter.PageLayoutTwoColumnRight) != 0)
-            catalog.put(PdfName.PAGELAYOUT, PdfName.TWOCOLUMNRIGHT);
-        else if ((preferences & PdfWriter.PageLayoutTwoPageLeft) != 0)
-            catalog.put(PdfName.PAGELAYOUT, PdfName.TWOPAGELEFT);
-        else if ((preferences & PdfWriter.PageLayoutTwoPageRight) != 0)
-            catalog.put(PdfName.PAGELAYOUT, PdfName.TWOPAGERIGHT);
-        if ((preferences & PdfWriter.PageModeUseNone) != 0)
-            catalog.put(PdfName.PAGEMODE, PdfName.USENONE);
-        else if ((preferences & PdfWriter.PageModeUseOutlines) != 0)
-            catalog.put(PdfName.PAGEMODE, PdfName.USEOUTLINES);
-        else if ((preferences & PdfWriter.PageModeUseThumbs) != 0)
-            catalog.put(PdfName.PAGEMODE, PdfName.USETHUMBS);
-        else if ((preferences & PdfWriter.PageModeFullScreen) != 0)
-            catalog.put(PdfName.PAGEMODE, PdfName.FULLSCREEN);
-        else if ((preferences & PdfWriter.PageModeUseOC) != 0)
-            catalog.put(PdfName.PAGEMODE, PdfName.USEOC);
-        else if ((preferences & PdfWriter.PageModeUseAttachments) != 0)
-            catalog.put(PdfName.PAGEMODE, PdfName.USEATTACHMENTS);
-        if ((preferences & PdfWriter.ViewerPreferencesMask) == 0)
-            return;
-        PdfDictionary vp = new PdfDictionary();
-        if ((preferences & PdfWriter.HideToolbar) != 0)
-            vp.put(PdfName.HIDETOOLBAR, PdfBoolean.PDFTRUE);
-        if ((preferences & PdfWriter.HideMenubar) != 0)
-            vp.put(PdfName.HIDEMENUBAR, PdfBoolean.PDFTRUE);
-        if ((preferences & PdfWriter.HideWindowUI) != 0)
-            vp.put(PdfName.HIDEWINDOWUI, PdfBoolean.PDFTRUE);
-        if ((preferences & PdfWriter.FitWindow) != 0)
-            vp.put(PdfName.FITWINDOW, PdfBoolean.PDFTRUE);
-        if ((preferences & PdfWriter.CenterWindow) != 0)
-            vp.put(PdfName.CENTERWINDOW, PdfBoolean.PDFTRUE);
-        if ((preferences & PdfWriter.DisplayDocTitle) != 0)
-            vp.put(PdfName.DISPLAYDOCTITLE, PdfBoolean.PDFTRUE);
-        if ((preferences & PdfWriter.NonFullScreenPageModeUseNone) != 0)
-            vp.put(PdfName.NONFULLSCREENPAGEMODE, PdfName.USENONE);
-        else if ((preferences & PdfWriter.NonFullScreenPageModeUseOutlines) != 0)
-            vp.put(PdfName.NONFULLSCREENPAGEMODE, PdfName.USEOUTLINES);
-        else if ((preferences & PdfWriter.NonFullScreenPageModeUseThumbs) != 0)
-            vp.put(PdfName.NONFULLSCREENPAGEMODE, PdfName.USETHUMBS);
-        else if ((preferences & PdfWriter.NonFullScreenPageModeUseOC) != 0)
-            vp.put(PdfName.NONFULLSCREENPAGEMODE, PdfName.USEOC);
-        if ((preferences & PdfWriter.DirectionL2R) != 0)
-            vp.put(PdfName.DIRECTION, PdfName.L2R);
-        else if ((preferences & PdfWriter.DirectionR2L) != 0)
-            vp.put(PdfName.DIRECTION, PdfName.R2L);
-        if ((preferences & PdfWriter.PrintScalingNone) != 0)
-            vp.put(PdfName.PRINTSCALING, PdfName.NONE);
-        catalog.put(PdfName.VIEWERPREFERENCES, vp);
-    }
-
-    /**
-     * @param preferences
+    /** Sets the viewer preferences as the sum of several constants.
+     * @param preferences the viewer preferences
+     * @see PdfViewerPreferences#setViewerPreferences
      */
     public void setViewerPreferences(int preferences) {
-        setViewerPreferences(preferences, catalog);
+    	this.viewerPreferences.setViewerPreferences(preferences);
+        setViewerPreferences(this.viewerPreferences);
+    }
+    
+    /** Adds a viewer preference
+     * @param key a key for a viewer preference
+     * @param value	a value for the viewer preference
+     * @see PdfViewerPreferences#addViewerPreference
+     */
+    
+    public void addViewerPreference(PdfName key, PdfObject value) {
+    	this.viewerPreferences.addViewerPreference(key, value);
+        setViewerPreferences(this.viewerPreferences);
+    }
+    
+    void setViewerPreferences(PdfViewerPreferencesImp vp) {
+    	vp.addToCatalog(catalog);
     }
 
     /**
      * @return an int that contains the Viewer Preferences.
      */
-    public int getViewerPreferences() {
-        int prefs = 0;
-        PdfName name = null;
-        PdfObject obj = getPdfObjectRelease(catalog.get(PdfName.PAGELAYOUT));
-        if (obj != null && obj.isName()) {
-            name = (PdfName)obj;
-            if (name.equals(PdfName.SINGLEPAGE))
-                prefs |= PdfWriter.PageLayoutSinglePage;
-            else if (name.equals(PdfName.ONECOLUMN))
-                prefs |= PdfWriter.PageLayoutOneColumn;
-            else if (name.equals(PdfName.TWOCOLUMNLEFT))
-                prefs |= PdfWriter.PageLayoutTwoColumnLeft;
-            else if (name.equals(PdfName.TWOCOLUMNRIGHT))
-                prefs |= PdfWriter.PageLayoutTwoColumnRight;
-            else if (name.equals(PdfName.TWOPAGELEFT))
-                prefs |= PdfWriter.PageLayoutTwoPageLeft;
-            else if (name.equals(PdfName.TWOPAGERIGHT))
-                prefs |= PdfWriter.PageLayoutTwoPageRight;
-        }
-        obj = getPdfObjectRelease(catalog.get(PdfName.PAGEMODE));
-        if (obj != null && obj.isName()) {
-            name = (PdfName)obj;
-            if (name.equals(PdfName.USENONE))
-                prefs |= PdfWriter.PageModeUseNone;
-            else if (name.equals(PdfName.USEOUTLINES))
-                prefs |= PdfWriter.PageModeUseOutlines;
-            else if (name.equals(PdfName.USETHUMBS))
-                prefs |= PdfWriter.PageModeUseThumbs;
-            else if (name.equals(PdfName.USEOC))
-                prefs |= PdfWriter.PageModeUseOC;
-            else if (name.equals(PdfName.USEATTACHMENTS))
-                prefs |= PdfWriter.PageModeUseAttachments;
-        }
-        obj = getPdfObjectRelease(catalog.get(PdfName.VIEWERPREFERENCES));
-        if (obj == null || !obj.isDictionary())
-            return prefs;
-        PdfDictionary vp = (PdfDictionary)obj;
-        for (int k = 0; k < vpnames.length; ++k) {
-            obj = getPdfObject(vp.get(vpnames[k]));
-            if (obj != null && "true".equals(obj.toString()))
-                prefs |= vpints[k];
-        }
-        obj = getPdfObjectRelease(vp.get(PdfName.PRINTSCALING));
-        if (PdfName.NONE.equals(obj))
-            prefs |= PdfWriter.PrintScalingNone;
-        obj = getPdfObjectRelease(vp.get(PdfName.NONFULLSCREENPAGEMODE));
-        if (obj != null && obj.isName()) {
-            name = (PdfName)obj;
-            if (name.equals(PdfName.USENONE))
-                prefs |= PdfWriter.NonFullScreenPageModeUseNone;
-            else if (name.equals(PdfName.USEOUTLINES))
-                prefs |= PdfWriter.NonFullScreenPageModeUseOutlines;
-            else if (name.equals(PdfName.USETHUMBS))
-                prefs |= PdfWriter.NonFullScreenPageModeUseThumbs;
-            else if (name.equals(PdfName.USEOC))
-                prefs |= PdfWriter.NonFullScreenPageModeUseOC;
-        }
-        obj = getPdfObjectRelease(vp.get(PdfName.DIRECTION));
-        if (obj != null && obj.isName()) {
-            name = (PdfName)obj;
-            if (name.equals(PdfName.L2R))
-                prefs |= PdfWriter.DirectionL2R;
-            else if (name.equals(PdfName.R2L))
-                prefs |= PdfWriter.DirectionR2L;
-        }
-        return prefs;
+    public int getSimpleViewerPreferences() {
+    	return PdfViewerPreferencesImp.getViewerPreferences(catalog).getPageLayoutAndMode();
     }
 
     /**
@@ -3158,7 +3183,7 @@ public class PdfReader {
                         page.put(key, dic.get(key));
                 }
                 if (page.get(PdfName.MEDIABOX) == null) {
-                    PdfArray arr = new PdfArray(new float[]{0,0,PageSize.LETTER.right(),PageSize.LETTER.top()});
+                    PdfArray arr = new PdfArray(new float[]{0,0,PageSize.LETTER.getRight(),PageSize.LETTER.getTop()});
                     page.put(PdfName.MEDIABOX, arr);
                 }
                 refsn.add(rpage);
@@ -3272,6 +3297,53 @@ public class PdfReader {
     }
     
     /**
+     * Removes any usage rights that this PDF may have. Only Adobe can grant usage rights
+     * and any PDF modification with iText will invalidate them. Invalidated usage rights may
+     * confuse Acrobat and it's advisabe to remove them altogether.
+     */
+    public void removeUsageRights() {
+        PdfDictionary perms = (PdfDictionary)getPdfObject(catalog.get(PdfName.PERMS));
+        if (perms == null)
+            return;
+        perms.remove(PdfName.UR);
+        perms.remove(PdfName.UR3);
+        if (perms.size() == 0)
+            catalog.remove(PdfName.PERMS);
+    }
+    
+    /**
+     * Gets the certification level for this document. The return values can be <code>PdfSignatureAppearance.NOT_CERTIFIED</code>, 
+     * <code>PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED</code>,
+     * <code>PdfSignatureAppearance.CERTIFIED_FORM_FILLING</code> and
+     * <code>PdfSignatureAppearance.CERTIFIED_FORM_FILLING_AND_ANNOTATIONS</code>.
+     * <p>
+     * No signature validation is made, use the methods availabe for that in <CODE>AcroFields</CODE>.
+     * </p>
+     * @return gets the certification level for this document
+     */
+    public int getCertificationLevel() {
+        PdfDictionary dic = (PdfDictionary)getPdfObject(catalog.get(PdfName.PERMS));
+        if (dic == null)
+            return PdfSignatureAppearance.NOT_CERTIFIED;
+        dic = (PdfDictionary)getPdfObject(dic.get(PdfName.DOCMDP));
+        if (dic == null)
+            return PdfSignatureAppearance.NOT_CERTIFIED;
+        PdfArray arr = (PdfArray)getPdfObject(dic.get(PdfName.REFERENCE));
+        if (arr == null || arr.size() == 0)
+            return PdfSignatureAppearance.NOT_CERTIFIED;
+        dic = (PdfDictionary)getPdfObject((PdfObject)(arr.getArrayList().get(0)));
+        if (dic == null)
+            return PdfSignatureAppearance.NOT_CERTIFIED;
+        dic = (PdfDictionary)getPdfObject(dic.get(PdfName.TRANSFORMPARAMS));
+        if (dic == null)
+            return PdfSignatureAppearance.NOT_CERTIFIED;
+        PdfNumber p = (PdfNumber)getPdfObject(dic.get(PdfName.P));
+        if (p == null)
+            return PdfSignatureAppearance.NOT_CERTIFIED;
+        return p.intValue();
+    } 
+    
+    /**
      * Checks if the document was opened with the owner password so that the end application
      * can decide what level of access restrictions to apply. If the document is not encrypted
      * it will return <CODE>true</CODE>.
@@ -3280,5 +3352,24 @@ public class PdfReader {
      */
     public final boolean isOpenedWithFullPermissions() {
         return !encrypted || ownerPasswordUsed;
+    }
+    
+    public int getCryptoMode() {
+    	if (decrypt == null) 
+    		return -1;
+    	else 
+    		return decrypt.getCryptoMode();
+    }
+    
+    public boolean isMetadataEncrypted() {
+    	if (decrypt == null) 
+    		return false; 
+    	else 
+    		return decrypt.isMetadataEncrypted();
+    }
+    
+    public byte[] computeUserPassword() {
+    	if (!encrypted || !ownerPasswordUsed) return null;
+    	return decrypt.computeUserPassword(password);
     }
 }

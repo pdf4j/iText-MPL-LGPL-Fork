@@ -1,5 +1,5 @@
 /*
- * $Id: MappedRandomAccessFile.java,v 1.4 2006/09/15 20:09:01 xlv Exp $
+ * $Id: MappedRandomAccessFile.java 2515 2006-12-28 12:52:22Z psoares33 $
  *
  * Copyright 2006 Joakim Sandstroem
  *
@@ -170,7 +170,8 @@ public class MappedRandomAccessFile {
     public void close() throws IOException {
         clean(mappedByteBuffer);
         mappedByteBuffer = null;
-        channel.close();
+        if (channel != null)
+            channel.close();
         channel = null;
     }
     

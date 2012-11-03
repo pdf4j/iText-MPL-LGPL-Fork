@@ -1,6 +1,6 @@
 /**
- * $Id: RtfImportMappings.java,v 1.3 2006/08/28 11:21:15 blowagie Exp $
- * $Name:  $
+ * $Id: RtfImportMappings.java 2337 2006-08-28 11:21:15Z blowagie $
+ * $Name$
  *
  * Copyright 2006 by Mark Hall
  *
@@ -62,7 +62,7 @@ import java.util.HashMap;
  * The font mappings are fontNr -&gt; fontName and the color
  * mappigns are colorNr -&gt; Color.
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 2337 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  */
 public class RtfImportMappings {

@@ -1,5 +1,5 @@
 /*
- * $Id: AESCipher.java,v 1.2 2006/11/11 16:55:13 psoares33 Exp $
+ * $Id: AESCipher.java 2718 2007-04-25 21:12:47Z xlv $
  *
  * Copyright 2006 Paulo Soares
  *
@@ -48,7 +48,12 @@
  */
 package com.lowagie.text.pdf.crypto;
 
-import com.lowagie.text.ExceptionConverter;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Creates an AES Cipher with CBC and padding PKCS5/7.
@@ -85,7 +90,7 @@ public class AESCipher {
         try {
             n = bp.doFinal(outp, 0);
         } catch (Exception ex) {
-            throw new ExceptionConverter(ex);
+            return outp;
         }
         if (n != outp.length) {
             byte[] outp2 = new byte[n];

@@ -1,6 +1,6 @@
 /*
- * $Id: PdfContentByte.java,v 1.103 2006/11/16 23:58:33 psoares33 Exp $
- * $Name:  $
+ * $Id: PdfContentByte.java 2752 2007-05-15 14:58:33Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -62,6 +62,8 @@ import com.lowagie.text.Element;
 import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.internal.PdfAnnotationsImp;
+import com.lowagie.text.pdf.internal.PdfXConformanceImp;
 
 /**
  * <CODE>PdfContentByte</CODE> is an object containing the user positioned
@@ -526,7 +528,7 @@ public class PdfContentByte {
      * @param   blue    the intensity of blue. A value between 0 and 1
      */
     private void HelperRGB(float red, float green, float blue) {
-        PdfWriter.checkPDFXConformance(writer, PdfWriter.PDFXKEY_RGB, null);
+    	PdfXConformanceImp.checkPDFXConformance(writer, PdfXConformanceImp.PDFXKEY_RGB, null);
         if (red < 0)
             red = 0.0f;
         else if (red > 1.0f)
@@ -707,7 +709,7 @@ public class PdfContentByte {
     }
     
     /**
-     * Appends a Bêzier curve to the path, starting from the current point.
+     * Appends a B&#xea;zier curve to the path, starting from the current point.
      *
      * @param       x1      x-coordinate of the first control point
      * @param       y1      y-coordinate of the first control point
@@ -722,7 +724,7 @@ public class PdfContentByte {
     }
     
     /**
-     * Appends a Bêzier curve to the path, starting from the current point.
+     * Appends a B&#xea;zier curve to the path, starting from the current point.
      *
      * @param       x2      x-coordinate of the second control point
      * @param       y2      y-coordinate of the second control point
@@ -735,7 +737,7 @@ public class PdfContentByte {
     }
     
     /**
-     * Appends a Bêzier curve to the path, starting from the current point.
+     * Appends a B&#xea;zier curve to the path, starting from the current point.
      *
      * @param       x1      x-coordinate of the first control point
      * @param       y1      y-coordinate of the first control point
@@ -794,10 +796,10 @@ public class PdfContentByte {
      * @param rect a <CODE>Rectangle</CODE>
      */
     public void variableRectangle(Rectangle rect) {
-        float t = rect.top();
-        float b = rect.bottom();
-        float r = rect.right();
-        float l = rect.left();
+        float t = rect.getTop();
+        float b = rect.getBottom();
+        float r = rect.getRight();
+        float l = rect.getLeft();
         float wt = rect.getBorderWidthTop();
         float wb = rect.getBorderWidthBottom();
         float wr = rect.getBorderWidthRight();
@@ -931,13 +933,13 @@ public class PdfContentByte {
     
     public void rectangle(Rectangle rectangle) {
         // the coordinates of the border are retrieved
-        float x1 = rectangle.left();
-        float y1 = rectangle.bottom();
-        float x2 = rectangle.right();
-        float y2 = rectangle.top();
+        float x1 = rectangle.getLeft();
+        float y1 = rectangle.getBottom();
+        float x2 = rectangle.getRight();
+        float y2 = rectangle.getTop();
 
         // the backgroundcolor is set
-        Color background = rectangle.backgroundColor();
+        Color background = rectangle.getBackgroundColor();
         if (background != null) {
             setColorFill(background);
             rectangle(x1, y1, x2 - x1, y2 - y1);
@@ -958,12 +960,12 @@ public class PdfContentByte {
         }
         else {
             // the width is set to the width of the element
-            if (rectangle.borderWidth() != Rectangle.UNDEFINED) {
-                setLineWidth(rectangle.borderWidth());
+            if (rectangle.getBorderWidth() != Rectangle.UNDEFINED) {
+                setLineWidth(rectangle.getBorderWidth());
             }
 
             // the color is set to the color of the element
-            Color color = rectangle.borderColor();
+            Color color = rectangle.getBorderColor();
             if (color != null) {
                 setColorStroke(color);
             }
@@ -1099,11 +1101,11 @@ public class PdfContentByte {
      * @throws DocumentException if the <CODE>Image</CODE> does not have absolute positioning
      */
     public void addImage(Image image, boolean inlineImage) throws DocumentException {
-        if (!image.hasAbsolutePosition())
+        if (!image.hasAbsoluteY())
             throw new DocumentException("The image must have absolute positioning.");
         float matrix[] = image.matrix();
-        matrix[Image.CX] = image.absoluteX() - matrix[Image.CX];
-        matrix[Image.CY] = image.absoluteY() - matrix[Image.CY];
+        matrix[Image.CX] = image.getAbsoluteX() - matrix[Image.CX];
+        matrix[Image.CY] = image.getAbsoluteY() - matrix[Image.CY];
         addImage(image, matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5], inlineImage);
     }
     
@@ -1144,7 +1146,7 @@ public class PdfContentByte {
                 beginLayer(image.getLayer());
             if (image.isImgTemplate()) {
                 writer.addDirectImageSimple(image);
-                PdfTemplate template = image.templateData();
+                PdfTemplate template = image.getTemplateData();
                 float w = template.getWidth();
                 float h = template.getHeight();
                 addTemplate(template, a / w, b / w, c / h, d / h, e, f);
@@ -1208,15 +1210,15 @@ public class PdfContentByte {
             }
             if (image.hasBorders()) {
                 saveState();
-                float w = image.width();
-                float h = image.height();
+                float w = image.getWidth();
+                float h = image.getHeight();
                 concatCTM(a / w, b / w, c / h, d / h, e, f);
                 rectangle(image);
                 restoreState();
             }
             if (image.getLayer() != null)
                 endLayer();
-            Annotation annot = image.annotation();
+            Annotation annot = image.getAnnotation();
             if (annot == null)
                 return;
             float[] r = new float[unitRect.length];
@@ -1236,7 +1238,7 @@ public class PdfContentByte {
             }
             annot = new Annotation(annot);
             annot.setDimensions(llx, lly, urx, ury);
-            PdfAnnotation an = PdfDocument.convertAnnotation(writer, annot);
+            PdfAnnotation an = PdfAnnotationsImp.convertAnnotation(writer, annot, new Rectangle(llx, lly, urx, ury));
             if (an == null)
                 return;
             addAnnotation(an);
@@ -1759,8 +1761,8 @@ public class PdfContentByte {
      * such that the curve goes from (x1, y1) to (x4, y4) with (x2, y2) and
      * (x3, y3) as their respective Bezier control points.
      * <P>
-     * Note: this code was taken from ReportLab (www.reportlab.com), an excelent
-     * PDF generator for Python.
+     * Note: this code was taken from ReportLab (www.reportlab.org), an excelent
+     * PDF generator for Python (BSD license: http://www.reportlab.org/devfaq.html#1.3 ).
      *
      * @param x1 a corner of the enclosing rectangle
      * @param y1 a corner of the enclosing rectangle
@@ -2154,7 +2156,7 @@ public class PdfContentByte {
      * @param color the color
      */
     public void setColorStroke(Color color) {
-        PdfWriter.checkPDFXConformance(writer, PdfWriter.PDFXKEY_COLOR, color);
+    	PdfXConformanceImp.checkPDFXConformance(writer, PdfXConformanceImp.PDFXKEY_COLOR, color);
         int type = ExtendedColor.getType(color);
         switch (type) {
             case ExtendedColor.TYPE_GRAY: {
@@ -2191,7 +2193,7 @@ public class PdfContentByte {
      * @param color the color
      */
     public void setColorFill(Color color) {
-        PdfWriter.checkPDFXConformance(writer, PdfWriter.PDFXKEY_COLOR, color);
+    	PdfXConformanceImp.checkPDFXConformance(writer, PdfXConformanceImp.PDFXKEY_COLOR, color);
         int type = ExtendedColor.getType(color);
         switch (type) {
             case ExtendedColor.TYPE_GRAY: {
@@ -2272,7 +2274,7 @@ public class PdfContentByte {
      * @param tint the tint if it is a spot color, ignored otherwise
      */
     void outputColorNumbers(Color color, float tint) {
-        PdfWriter.checkPDFXConformance(writer, PdfWriter.PDFXKEY_COLOR, color);
+    	PdfXConformanceImp.checkPDFXConformance(writer, PdfXConformanceImp.PDFXKEY_COLOR, color);
         int type = ExtendedColor.getType(color);
         switch (type) {
             case ExtendedColor.TYPE_RGB:

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfGraphics2D.java,v 1.59 2006/11/11 16:54:25 psoares33 Exp $
+ * $Id: PdfGraphics2D.java 2780 2007-05-24 09:19:25Z blowagie $
  *
  * Copyright 2002 by Jim Moore <jim@scolamoore.com>.
  *
@@ -99,6 +99,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import com.lowagie.text.pdf.internal.PolylineShape;
 
 public class PdfGraphics2D extends Graphics2D {
     
@@ -371,6 +373,12 @@ public class PdfGraphics2D extends Graphics2D {
             cb.beginText();
             cb.setFontAndSize(baseFont, fontSize);
             cb.setTextMatrix((float)mx[0], (float)mx[1], (float)mx[2], (float)mx[3], (float)mx[4], (float)mx[5]);
+            Float fontTextAttributeWidth = (Float)font.getAttributes().get(TextAttribute.WIDTH);
+            fontTextAttributeWidth = (fontTextAttributeWidth == null)
+                                     ? TextAttribute.WIDTH_REGULAR
+                                     : fontTextAttributeWidth;
+            if (!TextAttribute.WIDTH_REGULAR.equals(fontTextAttributeWidth))
+                cb.setHorizontalScaling(100.0f / fontTextAttributeWidth.floatValue());
             double width = 0;
             if (font.getSize2D() > 0) {
                 float scale = 1000 / font.getSize2D();
@@ -384,6 +392,8 @@ public class PdfGraphics2D extends Graphics2D {
             if (s.length() > 1) {
                 cb.setCharacterSpacing(0);
             }
+            if (!TextAttribute.WIDTH_REGULAR.equals(fontTextAttributeWidth))
+                cb.setHorizontalScaling(100);
             cb.endText();
             setTransform(at);
             if(underline)
@@ -634,7 +644,11 @@ public class PdfGraphics2D extends Graphics2D {
      * @param arg1
      */
     public void setRenderingHint(Key arg0, Object arg1) {
-        rhints.put(arg0, arg1);
+        if (arg1 != null) {
+            rhints.put(arg0, arg1);
+        } else {
+            rhints.remove(arg0);
+        }
     }
     
     /**
@@ -749,7 +763,7 @@ public class PdfGraphics2D extends Graphics2D {
      * @see Graphics2D#getComposite()
      */
     public Composite getComposite() {
-        return null;
+        return composite;
     }
     
     /**
@@ -807,6 +821,7 @@ public class PdfGraphics2D extends Graphics2D {
         g2.followPath(new Area(new Rectangle2D.Float(0, 0, width, height)), CLIP);
         if (this.clip != null)
             g2.clip = new Area(this.clip);
+        g2.composite = composite;
         g2.stroke = stroke;
         g2.originalStroke = originalStroke;
         g2.strokeOne = (BasicStroke)g2.transformStroke(g2.strokeOne);
@@ -1066,21 +1081,15 @@ public class PdfGraphics2D extends Graphics2D {
      * @see Graphics#drawPolyline(int[], int[], int)
      */
     public void drawPolyline(int[] x, int[] y, int nPoints) {
-        Line2D line = new Line2D.Double(x[0],y[0],x[0],y[0]);
-        for (int i = 1; i < nPoints; i++) {
-            line.setLine(line.getX2(), line.getY2(), x[i], y[i]);
-            draw(line);
-        }
+        PolylineShape polyline = new PolylineShape(x, y, nPoints);
+        draw(polyline);
     }
     
     /**
      * @see Graphics#drawPolygon(int[], int[], int)
      */
     public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-        Polygon poly = new Polygon();
-        for (int i = 0; i < nPoints; i++) {
-            poly.addPoint(xPoints[i], yPoints[i]);
-        }
+        Polygon poly = new Polygon(xPoints, yPoints, nPoints);
         draw(poly);
     }
     
@@ -1357,7 +1366,7 @@ public class PdfGraphics2D extends Graphics2D {
             if (mask!=null) {
                 com.lowagie.text.Image msk = com.lowagie.text.Image.getInstance(mask, null, true);
                 msk.makeMask();
-                msk.setInvertMask(true);
+                msk.setInverted(true);
                 image.setImageMask(msk);
             }
             cb.addImage(image, (float)mx[0], (float)mx[1], (float)mx[2], (float)mx[3], (float)mx[4], (float)mx[5]);
@@ -1443,10 +1452,10 @@ public class PdfGraphics2D extends Graphics2D {
                 BufferedImage img = tp.getImage();
                 Rectangle2D rect = tp.getAnchorRect();
                 com.lowagie.text.Image image = com.lowagie.text.Image.getInstance(img, null);
-                PdfPatternPainter pattern = cb.createPattern(image.width(), image.height());
+                PdfPatternPainter pattern = cb.createPattern(image.getWidth(), image.getHeight());
                 AffineTransform inverse = this.normalizeMatrix();
                 inverse.translate(rect.getX(), rect.getY());
-                inverse.scale(rect.getWidth() / image.width(), -rect.getHeight() / image.height());
+                inverse.scale(rect.getWidth() / image.getWidth(), -rect.getHeight() / image.getHeight());
                 double[] mx = new double[6];
                 inverse.getMatrix(mx);
                 pattern.setPatternMatrix((float)mx[0], (float)mx[1], (float)mx[2], (float)mx[3], (float)mx[4], (float)mx[5]) ;

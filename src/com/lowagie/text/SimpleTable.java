@@ -1,6 +1,6 @@
 /*
- * $Id: SimpleTable.java,v 1.5 2006/10/27 17:23:16 xlv Exp $
- * $Name:  $
+ * $Id: SimpleTable.java 2748 2007-05-12 15:11:48Z blowagie $
+ * $Name$
  *
  * Copyright 1999-2005 by Bruno Lowagie.
  *
@@ -60,7 +60,7 @@ import com.lowagie.text.pdf.PdfPTableEvent;
  * Rectangle that can be used for Cells.
  * This Rectangle is padded and knows how to draw itself in a PdfPTable or PdfPcellEvent.
  */
-public class SimpleTable extends Rectangle implements PdfPTableEvent, Element, TextElementArray {
+public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElementArray {
 
 	/** the content of a Table. */
 	private ArrayList content = new ArrayList();
@@ -141,7 +141,8 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, Element, T
 			sumWidths += widths[i];
 		}
 		if (sumWidths > 0) {
-			table.setAbsWidth(String.valueOf(sumWidths));
+			table.setWidth(sumWidths);
+			table.setLocked(true);
 			table.setWidths(widths);
 		}
 		else {
@@ -157,9 +158,10 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, Element, T
 			}
 		}
 		if (width > 0) {
-			table.setAbsWidth(String.valueOf(width));
+			table.setWidth(width);
+			table.setLocked(true);
 		}
-		if (widthpercentage > 0) {
+		else if (widthpercentage > 0) {
 			table.setWidth(widthpercentage);
 		}
 		return table;
@@ -263,7 +265,7 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, Element, T
 		float[] width = widths[0];
 		Rectangle rect = new Rectangle(width[0], heights[heights.length - 1], width[width.length - 1], heights[0]);
 		rect.cloneNonPositionParameters(this);
-        int bd = rect.border();
+        int bd = rect.getBorder();
         rect.setBorder(Rectangle.NO_BORDER);
 		canvases[PdfPTable.BACKGROUNDCANVAS].rectangle(rect);
         rect.setBorder(bd);

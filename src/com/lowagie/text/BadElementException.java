@@ -1,6 +1,6 @@
 /*
- * $Id: BadElementException.java,v 1.51 2006/09/14 23:39:19 xlv Exp $
- * $Name:  $
+ * $Id: BadElementException.java 2748 2007-05-12 15:11:48Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -71,20 +71,17 @@ public class BadElementException extends DocumentException {
         super(ex);
     }
     
-/**
- * Constructs a <CODE>BadElementException</CODE> whithout a message.
- */
-    
+    /**
+     * Constructs a <CODE>BadElementException</CODE> whithout a message.
+     */
     BadElementException() {
         super();
     }
     
-/**
- * Constructs a <code>BadElementException</code> with a message.
- *
- * @param		message			a message describing the exception
- */
-    
+    /**
+     * Constructs a <code>BadElementException</code> with a message.
+     * @param		message			a message describing the exception
+     */
     public BadElementException(String message) {
         super(message);
     }

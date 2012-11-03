@@ -1,6 +1,6 @@
 /*
- * $Id: PdfDate.java,v 1.66 2006/09/16 00:10:05 xlv Exp $
- * $Name:  $
+ * $Id: PdfDate.java 2383 2006-09-16 00:10:05Z xlv $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

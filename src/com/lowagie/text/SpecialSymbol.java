@@ -1,6 +1,6 @@
 /*
- * $Id: SpecialSymbol.java,v 1.1 2004/12/23 09:14:47 blowagie Exp $
- * $Name:  $
+ * $Id: SpecialSymbol.java 2748 2007-05-12 15:11:48Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -66,13 +66,12 @@ package com.lowagie.text;
 
 public class SpecialSymbol {
     
-/**
- * Returns the first occurrence of a special symbol in a <CODE>String</CODE>.
- *
- * @param	string		a <CODE>String</CODE>
- * @return	an index of -1 if no special symbol was found
- */
-    
+	/**
+	 * Returns the first occurrence of a special symbol in a <CODE>String</CODE>.
+	 *
+	 * @param	string		a <CODE>String</CODE>
+	 * @return	an index of -1 if no special symbol was found
+	 */
     public static int index(String string) {
         int length = string.length();
         for (int i = 0; i < length; i++) {
@@ -83,30 +82,28 @@ public class SpecialSymbol {
         return -1;
     }
     
-/**
- * Gets a chunk with a symbol character.
- * @param c a character that has to be changed into a symbol
- * @param font Font if there is no SYMBOL character corresponding with c
- * @return a SYMBOL version of a character
- */
-    
+    /**
+     * Gets a chunk with a symbol character.
+     * @param c a character that has to be changed into a symbol
+     * @param font Font if there is no SYMBOL character corresponding with c
+     * @return a SYMBOL version of a character
+     */
     public static Chunk get(char c, Font font) {
         char greek = SpecialSymbol.getCorrespondingSymbol(c);
         if (greek == ' ') {
             return new Chunk(String.valueOf(c), font);
         }
-        Font symbol = new Font(Font.SYMBOL, font.size(), font.style(), font.color());
+        Font symbol = new Font(Font.SYMBOL, font.getSize(), font.getStyle(), font.getColor());
         String s = String.valueOf(greek);
         return new Chunk(s, symbol);
     }
     
-/**
- * Looks for the corresponding symbol in the font Symbol.
- *
- * @param	c	the original ASCII-char
- * @return	the corresponding symbol in font Symbol
- */
-    
+    /**
+     * Looks for the corresponding symbol in the font Symbol.
+     *
+     * @param	c	the original ASCII-char
+     * @return	the corresponding symbol in font Symbol
+     */
     public static char getCorrespondingSymbol(char c) {
         switch(c) {
             case 913:
@@ -192,7 +189,7 @@ public class SpecialSymbol {
             case 961:
                 return 'r'; // rho
             case 962:
-                return 's'; // sigma
+                return 'V'; // sigma
             case 963:
                 return 's'; // sigma
             case 964:

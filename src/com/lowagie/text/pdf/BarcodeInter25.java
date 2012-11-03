@@ -1,5 +1,5 @@
 /*
- * $Id: BarcodeInter25.java,v 1.19 2006/09/15 05:11:54 xlv Exp $
+ * $Id: BarcodeInter25.java 2374 2006-09-15 05:11:54Z xlv $
  *
  * Copyright 2002-2006 by Paulo Soares.
  *

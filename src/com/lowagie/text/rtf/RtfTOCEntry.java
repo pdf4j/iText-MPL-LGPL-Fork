@@ -1,5 +1,5 @@
 /**
- * $Id: RtfTOCEntry.java,v 1.24 2006/09/12 12:16:35 blowagie Exp $
+ * $Id: RtfTOCEntry.java 2698 2007-04-19 12:03:08Z blowagie $
  *
  * Copyright 2002 by 
  * <a href="http://www.smb-tec.com">SMB</a> 
@@ -25,7 +25,7 @@
  * where applicable.
  *
  * Alternatively, the contents of this file may be used under the terms of the
- * LGPL license (the “GNU LIBRARY GENERAL PUBLIC LICENSE”), in which case the
+ * LGPL license (the "GNU LIBRARY GENERAL PUBLIC LICENSE"), in which case the
  * provisions of LGPL are applicable instead of those above.  If you wish to
  * allow use of your version of this file only under the terms of the LGPL
  * License and not to allow others to use your version of this file under
@@ -65,7 +65,7 @@ import com.lowagie.text.Font;
  *
  * This class is based on the RtfWriter-package from Mark Hall.
  * @author Steffen.Stundzig (Steffen.Stundzig@smb-tec.com) 
- * @version $Revision: 1.24 $Date: 2006/09/12 12:16:35 $
+ * @version $Revision: 2698 $Date: 2007/03/15 19:26:36 $
  * @deprecated Please move to the RtfWriter2 and associated classes. com.lowagie.text.rtf.field.RtfTOCEntry replaces the functionality of this class.
  */
 public class RtfTOCEntry extends Chunk implements RtfField {
@@ -117,7 +117,7 @@ public class RtfTOCEntry extends Chunk implements RtfField {
 
         if (!hideText) {
             writer.writeInitialFontSignature( out, new Chunk("", contentFont) );
-            out.write( RtfWriter.filterSpecialChar( content(), true ).getBytes() );
+            out.write( RtfWriter.filterSpecialChar( getContent(), true ).getBytes() );
             writer.writeFinishingFontSignature( out, new Chunk("", contentFont) );
         }
 

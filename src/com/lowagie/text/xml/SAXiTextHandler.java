@@ -1,6 +1,6 @@
 /*
- * $Id: SAXiTextHandler.java,v 1.56 2006/09/15 23:37:37 xlv Exp $
- * $Name:  $
+ * $Id: SAXiTextHandler.java 2752 2007-05-15 14:58:33Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *
@@ -72,24 +72,22 @@ import com.lowagie.text.DocListener;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.ElementTags;
-import com.lowagie.text.Entities;
 import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Font;
-import com.lowagie.text.Graphic;
 import com.lowagie.text.Image;
 import com.lowagie.text.List;
 import com.lowagie.text.ListItem;
 import com.lowagie.text.Meta;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.Row;
 import com.lowagie.text.Section;
 import com.lowagie.text.Table;
 import com.lowagie.text.TextElementArray;
+import com.lowagie.text.factories.ElementFactory;
 import com.lowagie.text.html.HtmlTagMap;
 import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.xml.simpleparser.EntitiesToSymbol;
 
 /**
  * This class is a Handler that controls the iText XML to PDF conversion.
@@ -254,8 +252,8 @@ public class SAXiTextHandler extends DefaultHandler {
         }
 
         // chunks
-        if (Chunk.isTag(name)) {
-            currentChunk = new Chunk(attributes);
+        if (ElementTags.CHUNK.equals(name)) {
+            currentChunk = ElementFactory.getChunk(attributes);
             if (bf != null) {
             	currentChunk.setFont(new Font(this.bf));
             }
@@ -263,56 +261,56 @@ public class SAXiTextHandler extends DefaultHandler {
         }
 
         // symbols
-        if (Entities.isTag(name)) {
+        if (ElementTags.ENTITY.equals(name)) {
             Font f = new Font();
             if (currentChunk != null) {
                 handleEndingTags(ElementTags.CHUNK);
-                f = currentChunk.font();
+                f = currentChunk.getFont();
             }
-            currentChunk = Entities.get(attributes.getProperty(ElementTags.ID),
+            currentChunk = EntitiesToSymbol.get(attributes.getProperty(ElementTags.ID),
                     f);
             return;
         }
 
         // phrases
-        if (Phrase.isTag(name)) {
-            stack.push(new Phrase(attributes));
+        if (ElementTags.PHRASE.equals(name)) {
+            stack.push(ElementFactory.getPhrase(attributes));
             return;
         }
 
         // anchors
-        if (Anchor.isTag(name)) {
-            stack.push(new Anchor(attributes));
+        if (ElementTags.ANCHOR.equals(name)) {
+            stack.push(ElementFactory.getAnchor(attributes));
             return;
         }
 
         // paragraphs and titles
-        if (Paragraph.isTag(name) || Section.isTitle(name)) {
-            stack.push(new Paragraph(attributes));
+        if (ElementTags.PARAGRAPH.equals(name) || ElementTags.TITLE.equals(name)) {
+            stack.push(ElementFactory.getParagraph(attributes));
             return;
         }
 
         // lists
-        if (List.isTag(name)) {
-            stack.push(new List(attributes));
+        if (ElementTags.LIST.equals(name)) {
+            stack.push(ElementFactory.getList(attributes));
             return;
         }
-
+        
         // listitems
-        if (ListItem.isTag(name)) {
-            stack.push(new ListItem(attributes));
+        if (ElementTags.LISTITEM.equals(name)) {
+            stack.push(ElementFactory.getListItem(attributes));
             return;
         }
 
         // cells
-        if (Cell.isTag(name)) {
-            stack.push(new Cell(attributes));
+        if (ElementTags.CELL.equals(name)) {
+            stack.push(ElementFactory.getCell(attributes));
             return;
         }
 
         // tables
-        if (Table.isTag(name)) {
-            Table table = new Table(attributes);
+        if (ElementTags.TABLE.equals(name)) {
+            Table table = ElementFactory.getTable(attributes);
             float widths[] = table.getProportionalWidths();
             for (int i = 0; i < widths.length; i++) {
                 if (widths[i] == 0) {
@@ -330,11 +328,11 @@ public class SAXiTextHandler extends DefaultHandler {
         }
 
         // sections
-        if (Section.isTag(name)) {
+        if (ElementTags.SECTION.equals(name)) {
             Element previous = (Element) stack.pop();
             Section section;
             try {
-                section = ((Section) previous).addSection(attributes);
+                section = ElementFactory.getSection((Section) previous, attributes);
             } catch (ClassCastException cce) {
                 throw new ExceptionConverter(cce);
             }
@@ -344,59 +342,18 @@ public class SAXiTextHandler extends DefaultHandler {
         }
 
         // chapters
-        if (Chapter.isTag(name)) {
-            String value; // changed after a suggestion by Serge S. Vasiljev
-            if ((value = (String) attributes.remove(ElementTags.NUMBER)) != null) {
-                chapters = Integer.parseInt(value);
-            } else {
-                chapters++;
-            }
-            Chapter chapter = new Chapter(attributes, chapters);
-            stack.push(chapter);
+        if (ElementTags.CHAPTER.equals(name)) {
+            stack.push(ElementFactory.getChapter(attributes));
             return;
         }
 
         // images
-        if (Image.isTag(name)) {
+        if (ElementTags.IMAGE.equals(name)) {
             try {
-                Image img = Image.getInstance(attributes);
-                Object current;
+                Image img = ElementFactory.getImage(attributes);
                 try {
-                    // if there is an element on the stack...
-                    current = stack.pop();
-                    // ...and it's a Chapter or a Section, the Image can be
-                    // added directly
-                    if (current instanceof Chapter
-                            || current instanceof Section
-                            || current instanceof Cell) {
-                        ((TextElementArray) current).add(img);
-                        stack.push(current);
-                        return;
-                    }
-                    // ...if not, the Image is wrapped in a Chunk before it's
-                    // added
-                    else {
-                        Stack newStack = new Stack();
-                        try {
-                            while (!(current instanceof Chapter
-                                    || current instanceof Section || current instanceof Cell)) {
-                                newStack.push(current);
-                                if (current instanceof Anchor) {
-                                    img.setAnnotation(new Annotation(0, 0, 0,
-                                            0, ((Anchor) current).reference()));
-                                }
-                                current = stack.pop();
-                            }
-                            ((TextElementArray) current).add(img);
-                            stack.push(current);
-                        } catch (EmptyStackException ese) {
-                            document.add(img);
-                        }
-                        while (!newStack.empty()) {
-                            stack.push(newStack.pop());
-                        }
-                        return;
-                    }
+                	addImage(img);
+                    return;
                 } catch (EmptyStackException ese) {
                     // if there is no element on the stack, the Image is added
                     // to the document
@@ -413,8 +370,8 @@ public class SAXiTextHandler extends DefaultHandler {
         }
 
         // annotations
-        if (Annotation.isTag(name)) {
-            Annotation annotation = new Annotation(attributes);
+        if (ElementTags.ANNOTATION.equals(name)) {
+            Annotation annotation = ElementFactory.getAnnotation(attributes);
             TextElementArray current;
             try {
                 try {
@@ -468,30 +425,7 @@ public class SAXiTextHandler extends DefaultHandler {
                 current.add(newPage);
                 stack.push(current);
             } catch (EmptyStackException ese) {
-                try {
-                    document.newPage();
-                } catch (DocumentException de) {
-                    throw new ExceptionConverter(de);
-                }
-            }
-            return;
-        }
-
-        // newpage
-        if (ElementTags.HORIZONTALRULE.equals(name)) {
-            TextElementArray current;
-            Graphic hr = new Graphic();
-            hr.setHorizontalLine(1.0f, 100.0f);
-            try {
-                current = (TextElementArray) stack.pop();
-                current.add(hr);
-                stack.push(current);
-            } catch (EmptyStackException ese) {
-                try {
-                    document.add(hr);
-                } catch (DocumentException de) {
-                    throw new ExceptionConverter(de);
-                }
+                document.newPage();
             }
             return;
         }
@@ -560,6 +494,39 @@ public class SAXiTextHandler extends DefaultHandler {
 
     }
 
+    protected void addImage(Image img) throws EmptyStackException {
+        // if there is an element on the stack...
+        Object current = stack.pop();
+        // ...and it's a Chapter or a Section, the Image can be
+        // added directly
+        if (current instanceof Chapter
+                || current instanceof Section
+                || current instanceof Cell) {
+            ((TextElementArray) current).add(img);
+            stack.push(current);
+            return;
+        }
+        // ...if not, we need to to a lot of stuff
+        else {
+            Stack newStack = new Stack();
+            while (!(current instanceof Chapter
+                    || current instanceof Section || current instanceof Cell)) {
+                newStack.push(current);
+                if (current instanceof Anchor) {
+                    img.setAnnotation(new Annotation(0, 0, 0,
+                            0, ((Anchor) current).getReference()));
+                }
+                current = stack.pop();
+            }
+            ((TextElementArray) current).add(img);
+            stack.push(current);
+            while (!newStack.empty()) {
+                stack.push(newStack.pop());
+            }
+            return;
+        }
+    }
+    
     /**
      * This method gets called when ignorable white space encountered.
      * 
@@ -680,14 +647,14 @@ public class SAXiTextHandler extends DefaultHandler {
         if (ignore)
             return;
         // tags that don't have any content
-        if (isNewpage(name) || Annotation.isTag(name) || Image.isTag(name)
+        if (isNewpage(name) || ElementTags.ANNOTATION.equals(name) || ElementTags.IMAGE.equals(name)
                 || isNewline(name)) {
             return;
         }
 
         try {
             // titles of sections and chapters
-            if (Section.isTitle(name)) {
+            if (ElementTags.TITLE.equals(name)) {
                 Paragraph current = (Paragraph) stack.pop();
                 if (currentChunk != null) {
                     current.add(currentChunk);
@@ -713,13 +680,13 @@ public class SAXiTextHandler extends DefaultHandler {
             }
 
             // chunks
-            if (Chunk.isTag(name)) {
+            if (ElementTags.CHUNK.equals(name)) {
                 return;
             }
 
             // phrases, anchors, lists, tables
-            if (Phrase.isTag(name) || Anchor.isTag(name) || List.isTag(name)
-                    || Paragraph.isTag(name)) {
+            if (ElementTags.PHRASE.equals(name) || ElementTags.ANCHOR.equals(name) || ElementTags.LIST.equals(name)
+                    || ElementTags.PARAGRAPH.equals(name)) {
                 Element current = (Element) stack.pop();
                 try {
                     TextElementArray previous = (TextElementArray) stack.pop();
@@ -732,7 +699,7 @@ public class SAXiTextHandler extends DefaultHandler {
             }
 
             // listitems
-            if (ListItem.isTag(name)) {
+            if (ElementTags.LISTITEM.equals(name)) {
                 ListItem listItem = (ListItem) stack.pop();
                 List list = (List) stack.pop();
                 list.add(listItem);
@@ -740,7 +707,7 @@ public class SAXiTextHandler extends DefaultHandler {
             }
 
             // tables
-            if (Table.isTag(name)) {
+            if (ElementTags.TABLE.equals(name)) {
                 Table table = (Table) stack.pop();
                 try {
                     TextElementArray previous = (TextElementArray) stack.pop();
@@ -753,7 +720,7 @@ public class SAXiTextHandler extends DefaultHandler {
             }
 
             // rows
-            if (Row.isTag(name)) {
+            if (ElementTags.ROW.equals(name)) {
                 ArrayList cells = new ArrayList();
                 int columns = 0;
                 Table table;
@@ -762,15 +729,15 @@ public class SAXiTextHandler extends DefaultHandler {
                     Element element = (Element) stack.pop();
                     if (element.type() == Element.CELL) {
                         cell = (Cell) element;
-                        columns += cell.colspan();
+                        columns += cell.getColspan();
                         cells.add(cell);
                     } else {
                         table = (Table) element;
                         break;
                     }
                 }
-                if (table.columns() < columns) {
-                    table.addColumns(columns - table.columns());
+                if (table.getColumns() < columns) {
+                    table.addColumns(columns - table.getColumns());
                 }
                 Collections.reverse(cells);
                 String width;
@@ -784,18 +751,19 @@ public class SAXiTextHandler extends DefaultHandler {
                 int j = 0;
                 for (Iterator i = cells.iterator(); i.hasNext();) {
                     cell = (Cell) i.next();
-                    if ((width = cell.cellWidth()) == null) {
-                        if (cell.colspan() == 1 && cellWidths[j] == 0) {
+                    width = cell.getWidthAsString();
+                    if (cell.getWidth() == 0) {
+                        if (cell.getColspan() == 1 && cellWidths[j] == 0) {
                             try {
                                 cellWidths[j] = 100f / columns;
                                 total += cellWidths[j];
                             } catch (Exception e) {
                                 // empty on purpose
                             }
-                        } else if (cell.colspan() == 1) {
+                        } else if (cell.getColspan() == 1) {
                             cellNulls[j] = false;
                         }
-                    } else if (cell.colspan() == 1 && width.endsWith("%")) {
+                    } else if (cell.getColspan() == 1 && width.endsWith("%")) {
                         try {
                             cellWidths[j] = Float.parseFloat(
                                     width.substring(0, width.length() - 1)
@@ -805,7 +773,7 @@ public class SAXiTextHandler extends DefaultHandler {
                             // empty on purpose
                         }
                     }
-                    j += cell.colspan();
+                    j += cell.getColspan();
                     table.addCell(cell);
                 }
                 float widths[] = table.getProportionalWidths();
@@ -831,18 +799,18 @@ public class SAXiTextHandler extends DefaultHandler {
             }
 
             // cells
-            if (Cell.isTag(name)) {
+            if (ElementTags.CELL.equals(name)) {
                 return;
             }
 
             // sections
-            if (Section.isTag(name)) {
+            if (ElementTags.SECTION.equals(name)) {
                 stack.pop();
                 return;
             }
 
             // chapters
-            if (Chapter.isTag(name)) {
+            if (ElementTags.CHAPTER.equals(name)) {
                 document.add((Element) stack.pop());
                 return;
             }

@@ -1,6 +1,6 @@
 /*
- * $Id: ElementListener.java,v 1.48 2004/12/14 11:52:46 blowagie Exp $
- * $Name:  $
+ * $Id: ElementListener.java 2564 2007-02-01 15:47:38Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *
@@ -71,5 +71,5 @@ public interface ElementListener extends EventListener {
  * @throws	DocumentException	when a document isn't open yet, or has been closed
  */
     
-    public boolean add(Element element) throws DocumentException;
+    public boolean add(Element element) throws DocumentException; // [L0]
 }

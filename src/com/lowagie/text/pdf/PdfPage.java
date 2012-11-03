@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPage.java,v 1.48 2006/02/16 16:17:52 psoares33 Exp $
- * $Name:  $
+ * $Id: PdfPage.java 2157 2006-02-16 16:17:59Z psoares33 $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

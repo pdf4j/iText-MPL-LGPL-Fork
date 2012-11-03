@@ -1,5 +1,5 @@
 /*
- * $Id: PdfContentParser.java,v 1.5 2006/09/15 23:37:35 xlv Exp $
+ * $Id: PdfContentParser.java 2382 2006-09-15 23:37:38Z xlv $
  *
  * Copyright 2005 by Paulo Soares.
  *

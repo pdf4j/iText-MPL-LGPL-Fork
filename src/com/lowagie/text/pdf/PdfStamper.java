@@ -60,6 +60,10 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.collection.PdfCollection;
+import com.lowagie.text.pdf.interfaces.PdfEncryptionSettings;
+import com.lowagie.text.pdf.interfaces.PdfViewerPreferences;
+import java.security.cert.Certificate;
 
 /** Applies extra content to the pages of a PDF document.
  * This extra content can be all the objects allowed in PdfContentByte
@@ -70,7 +74,8 @@ import com.lowagie.text.Rectangle;
  * flatten them. New fields can be added but not flattened.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class PdfStamper {
+public class PdfStamper
+	implements PdfViewerPreferences, PdfEncryptionSettings {
     /**
      * The writer
      */    
@@ -252,7 +257,7 @@ public class PdfStamper {
             throw new DocumentException("Append mode does not support changing the encryption status.");
         if (stamper.isContentWritten())
             throw new DocumentException("Content was already written to the output.");
-        stamper.setEncryption(userPassword, ownerPassword, permissions, strength128Bits);
+        stamper.setEncryption(userPassword, ownerPassword, permissions, strength128Bits ? PdfWriter.STANDARD_ENCRYPTION_128 : PdfWriter.STANDARD_ENCRYPTION_40);
     }
 
     /** Sets the encryption options for this document. The userPassword and the
@@ -305,12 +310,33 @@ public class PdfStamper {
      * @param userPassword the user password. Can be null or empty
      * @param ownerPassword the owner password. Can be null or empty
      * @param permissions the user permissions
-     * @throws DocumentException if the document is already open
+     * @throws DocumentException if anything was already written to the output
      */
     public void setEncryption(int encryptionType, String userPassword, String ownerPassword, int permissions) throws DocumentException {
         setEncryption(DocWriter.getISOBytes(userPassword), DocWriter.getISOBytes(ownerPassword), permissions, encryptionType);
     }
 
+    /**
+     * Sets the certificate encryption options for this document. An array of one or more public certificates
+     * must be provided together with an array of the same size for the permissions for each certificate.
+     *  The open permissions for the document can be
+     *  AllowPrinting, AllowModifyContents, AllowCopy, AllowModifyAnnotations,
+     *  AllowFillIn, AllowScreenReaders, AllowAssembly and AllowDegradedPrinting.
+     *  The permissions can be combined by ORing them.
+     * Optionally DO_NOT_ENCRYPT_METADATA can be ored to output the metadata in cleartext
+     * @param certs the public certificates to be used for the encryption
+     * @param permissions the user permissions for each of the certicates
+     * @param encryptionType the type of encryption. It can be one of STANDARD_ENCRYPTION_40, STANDARD_ENCRYPTION_128 or ENCRYPTION_AES128.
+     * @throws DocumentException if the encryption was set too late
+     */
+     public void setEncryption(Certificate[] certs, int[] permissions, int encryptionType) throws DocumentException {
+        if (stamper.isAppend())
+            throw new DocumentException("Append mode does not support changing the encryption status.");
+        if (stamper.isContentWritten())
+            throw new DocumentException("Content was already written to the output.");
+        stamper.setEncryption(certs, permissions, encryptionType);
+     }
+     
     /** Gets a page from other PDF document. Note that calling this method more than
      * once with the same parameters will retrieve the same object.
      * @param reader the PDF document where the page is
@@ -442,17 +468,50 @@ public class PdfStamper {
         stamper.addFileAttachment(description, fs);
     }
 
+    /**
+     * This is the most simple way to change a PDF into a
+     * portable collection. Choose one of the following names:
+     * <ul>
+     * <li>PdfName.D (detailed view)
+     * <li>PdfName.T (tiled view)
+     * <li>PdfName.H (hidden)
+     * </ul>
+     * Pass this name as a parameter and your PDF will be
+     * a portable collection with all the embedded and
+     * attached files as entries.
+     * @param initialView can be PdfName.D, PdfName.T or PdfName.H
+     */
     public void makePackage( PdfName initialView ) {
-    	stamper.makePackage( initialView );
+    	PdfCollection collection = new PdfCollection(0);
+    	collection.put(PdfName.VIEW, initialView);
+    	stamper.makePackage( collection );
+    }
+
+    /**
+     * Adds or replaces the Collection Dictionary in the Catalog.
+     * @param	collection	the new collection dictionary.
+     */
+    public void makePackage(PdfCollection collection) {
+    	stamper.makePackage(collection);    	
     }
     
     /**
      * Sets the viewer preferences.
      * @param preferences the viewer preferences
-     * @see PdfWriter#setViewerPreferences(int)
+     * @see PdfViewerPreferences#setViewerPreferences(int)
      */
     public void setViewerPreferences(int preferences) {
         stamper.setViewerPreferences(preferences);
+    }
+    
+    /** Adds a viewer preference
+     * @param key a key for a viewer preference
+     * @param value the value for the viewer preference
+     * @see PdfViewerPreferences#addViewerPreference
+     */
+    
+    public void addViewerPreference(PdfName key, PdfObject value) {
+    	stamper.addViewerPreference(key, value);
     }
 
     /**

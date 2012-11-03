@@ -1,47 +1,34 @@
 /*
- * Copyright 2003-2008 by Paulo Soares.
- * 
- * This code was originally released in 2001 by SUN (see class
- * com.sun.media.imageio.plugins.tiff.TIFFDirectory.java)
- * using the BSD license in a specific wording. In a mail dating from
- * January 23, 2008, Brian Burkhalter (@sun.com) gave us permission
- * to use the code under the following version of the BSD license:
+ * Copyright (c) 2001 Sun Microsystems, Inc. All Rights Reserved.
  *
- * Copyright (c) 2006 Sun Microsystems, Inc. All  Rights Reserved.
- * 
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met: 
- * 
- * - Redistribution of source code must retain the above copyright 
- *   notice, this  list of conditions and the following disclaimer.
- * 
- * - Redistribution in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in 
- *   the documentation and/or other materials provided with the
- *   distribution.
- * 
- * Neither the name of Sun Microsystems, Inc. or the names of 
- * contributors may be used to endorse or promote products derived 
- * from this software without specific prior written permission.
- * 
- * This software is provided "AS IS," without a warranty of any 
- * kind. ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND 
- * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE HEREBY
- * EXCLUDED. SUN MIDROSYSTEMS, INC. ("SUN") AND ITS LICENSORS SHALL 
- * NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF 
- * USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
- * DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR 
- * ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL,
- * CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER CAUSED AND
- * REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF THE USE OF OR
- * INABILITY TO USE THIS SOFTWARE, EVEN IF SUN HAS BEEN ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGES. 
- * 
- * You acknowledge that this software is not designed or intended for 
- * use in the design, construction, operation or maintenance of any 
- * nuclear facility.
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * -Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * -Redistribution in binary form must reproduct the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * Neither the name of Sun Microsystems, Inc. or the names of contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * This software is provided "AS IS," without a warranty of any kind. ALL
+ * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING ANY
+ * IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN AND ITS LICENSORS SHALL NOT BE
+ * LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING
+ * OR DISTRIBUTING THE SOFTWARE OR ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS
+ * LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT,
+ * INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER
+ * CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF THE USE OF
+ * OR INABILITY TO USE SOFTWARE, EVEN IF SUN HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES.
+ *
+ * You acknowledge that Software is not designed,licensed or intended for use in
+ * the design, construction, operation or maintenance of any nuclear facility.
  */
 package com.lowagie.text.pdf.codec;
 import java.io.EOFException;
@@ -108,7 +95,7 @@ public class TIFFDirectory extends Object implements Serializable {
      * The directory parameter specifies which directory to read from
      * the linked list present in the stream; directory 0 is normally
      * read but it is possible to store multiple images in a single
-     * TIFF file by maintaining multiple directories.
+     * TIFF file by maintaing multiple directories.
      *
      * @param stream a SeekableStream to read from.
      * @param directory the index of the directory to read.
@@ -379,13 +366,7 @@ public class TIFFDirectory extends Object implements Serializable {
         }
         
         // Read the offset of the next IFD.
-        try {
-            nextIFDOffset = readUnsignedInt(stream);
-        }
-        catch (Exception e) {
-            // broken tiffs may not have this pointer
-            nextIFDOffset = 0;
-        }
+        nextIFDOffset = readUnsignedInt(stream);
     }
     
     /** Returns the number of directory entries. */
@@ -642,7 +623,7 @@ public class TIFFDirectory extends Object implements Serializable {
                 stream.skip(12*entries);
                 offset = readUnsignedInt(stream, isBigEndian);
             } catch(EOFException eof) {
-                //numDirectories--;
+                numDirectories--;
                 break;
             }
         }

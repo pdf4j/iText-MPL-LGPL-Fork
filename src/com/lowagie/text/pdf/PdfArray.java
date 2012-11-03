@@ -1,6 +1,6 @@
 /*
- * $Id: PdfArray.java,v 1.63 2006/09/10 15:32:31 psoares33 Exp $
- * $Name:  $
+ * $Id: PdfArray.java 2739 2007-05-04 11:24:51Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -62,8 +62,8 @@ import java.util.ListIterator;
  * An array is a sequence of PDF objects. An array may contain a mixture of object types.
  * An array is written as a left square bracket ([), followed by a sequence of objects,
  * followed by a right square bracket (]).<BR>
- * This object is described in the 'Portable Document Format Reference Manual version 1.3'
- * section 4.6 (page 40).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.7'
+ * section 3.2.5 (page 58).
  *
  * @see		PdfObject
  */
@@ -125,8 +125,6 @@ public class PdfArray extends PdfObject {
     
 /**
  * Returns the PDF representation of this <CODE>PdfArray</CODE>.
- *
- * @return		an array of <CODE>byte</CODE>s
  */
     
     public void toPdf(PdfWriter writer, OutputStream os) throws IOException {
@@ -227,5 +225,78 @@ public class PdfArray extends PdfObject {
     
     public String toString() {
     	return arrayList.toString();
+    }
+    
+    public PdfObject getPdfObject( int idx ) {
+        return (PdfObject)arrayList.get(idx);
+    }
+    
+    public PdfObject getDirectObject( int idx ) {
+        return PdfReader.getPdfObject(getPdfObject(idx));
+    }
+    
+    // more of the same like PdfDictionary. (MAS 2/17/06)
+    public PdfDictionary getAsDict(int idx) {
+        PdfDictionary dict = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isDictionary())
+            dict = (PdfDictionary) orig;
+        return dict;
+    }
+    
+    public PdfArray getAsArray(int idx) {
+        PdfArray array = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isArray())
+            array = (PdfArray) orig;
+        return array;
+    }
+    
+    public PdfStream getAsStream(int idx) {
+        PdfStream stream = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isStream())
+            stream = (PdfStream) orig;
+        return stream;
+    }
+    
+    public PdfString getAsString(int idx) {
+        PdfString string = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isString())
+            string = (PdfString) orig;
+        return string;
+    }
+    
+    public PdfNumber getAsNumber(int idx) {
+        PdfNumber number = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isNumber())
+            number = (PdfNumber) orig;
+        return number;
+    }
+    
+    public PdfName getAsName(int idx) {
+        PdfName name = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isName())
+            name = (PdfName) orig;
+        return name;
+    }
+    
+    public PdfBoolean getAsBoolean(int idx) {
+        PdfBoolean bool = null;
+        PdfObject orig = getDirectObject(idx);
+        if (orig != null && orig.isBoolean())
+            bool = (PdfBoolean) orig;
+        return bool;
+    }
+    
+    public PdfIndirectReference getAsIndirectObject(int idx) {
+        PdfIndirectReference ref = null;
+        PdfObject orig = getPdfObject(idx); // not getDirect this time.
+        if (orig != null && orig.isIndirect())
+            ref = (PdfIndirectReference) orig;
+        return ref;
     }
 }

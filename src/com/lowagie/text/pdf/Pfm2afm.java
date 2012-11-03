@@ -1,5 +1,5 @@
 /*
- * $Id: Pfm2afm.java,v 1.7 2007/04/19 14:11:50 blowagie Exp $
+ * $Id: Pfm2afm.java 2700 2007-04-19 14:11:50Z blowagie $
  *
  * Copyright 2005-2007 Paulo Soares
  *

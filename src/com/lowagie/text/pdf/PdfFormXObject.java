@@ -1,6 +1,6 @@
 /*
- * $Id: PdfFormXObject.java,v 1.58 2005/07/16 16:49:22 blowagie Exp $
- * $Name:  $
+ * $Id: PdfFormXObject.java 1824 2005-07-16 16:49:35Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

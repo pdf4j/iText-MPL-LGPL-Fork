@@ -1,6 +1,6 @@
 /*
- * $Id: InputMeta.java,v 1.4 2006/09/14 23:10:52 xlv Exp $
- * $Name:  $
+ * $Id: InputMeta.java 2742 2007-05-08 13:04:56Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -54,7 +54,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.lowagie.text.Image;
+import com.lowagie.text.Utilities;
 
 public class InputMeta {
     
@@ -97,7 +97,7 @@ public class InputMeta {
     
     public void skip(int len) throws IOException{
         length += len;
-        Image.skip(in, len);
+        Utilities.skip(in, len);
     }
     
     public int getLength() {

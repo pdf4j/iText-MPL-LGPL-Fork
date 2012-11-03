@@ -1,6 +1,6 @@
 /*
- * $Id: TrueTypeFont.java,v 1.64 2006/10/02 21:09:37 xlv Exp $
- * $Name:  $
+ * $Id: TrueTypeFont.java 2423 2006-10-02 21:09:37Z xlv $
+ * $Name$
  *
  * Copyright 2001-2006 Paulo Soares
  *

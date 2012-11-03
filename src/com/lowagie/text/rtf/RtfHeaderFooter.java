@@ -1,5 +1,5 @@
 /**
- * $Id: RtfHeaderFooter.java,v 1.22 2006/09/12 13:12:54 blowagie Exp $
+ * $Id: RtfHeaderFooter.java 2356 2006-09-12 13:12:56Z blowagie $
  *
  * Copyright 2002 by 
  * <a href="http://www.smb-tec.com">SMB</a> 
@@ -66,7 +66,7 @@ import com.lowagie.text.Phrase;
  * This class is based on the RtfWriter-package from Mark Hall.
  * @author Steffen.Stundzig (Steffen.Stundzig@smb-tec.com)
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @version $Revision: 1.22 $Date: 2006/09/12 13:12:54 $
+ * @version $Revision: 2356 $Date: 2006/09/12 12:16:35 $
  * @deprecated Please move to the RtfWriter2 and associated classes. com.lowagie.text.rtf.headerfooter.RtfHeaderFooter replaces the functionality of this class.
  */
 public class RtfHeaderFooter extends HeaderFooter {

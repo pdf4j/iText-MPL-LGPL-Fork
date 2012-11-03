@@ -1,5 +1,5 @@
 /**
- * $Id: RtfField.java,v 1.20 2006/09/14 23:10:54 xlv Exp $
+ * $Id: RtfField.java 2655 2007-03-15 19:26:36Z xlv $
  *
  * Copyright 2002 by 
  * <a href="http://www.smb-tec.com">SMB</a> 
@@ -25,7 +25,7 @@
  * where applicable.
  *
  * Alternatively, the contents of this file may be used under the terms of the
- * LGPL license (the “GNU LIBRARY GENERAL PUBLIC LICENSE”), in which case the
+ * LGPL license (the "GNU LIBRARY GENERAL PUBLIC LICENSE"), in which case the
  * provisions of LGPL are applicable instead of those above.  If you wish to
  * allow use of your version of this file only under the terms of the LGPL
  * License and not to allow others to use your version of this file under
@@ -64,7 +64,7 @@ import java.io.OutputStream;
  *
  * This class is based on the RtfWriter-package from Mark Hall.
  * @author Steffen.Stundzig (Steffen.Stundzig@smb-tec.com) 
- * @version $Revision: 1.20 $Date: 2006/09/14 23:10:54 $
+ * @version $Revision: 2655 $Date: 2006/09/14 23:10:54 $
  * @deprecated Please move to the RtfWriter2 and associated classes.
  */
 public interface RtfField {

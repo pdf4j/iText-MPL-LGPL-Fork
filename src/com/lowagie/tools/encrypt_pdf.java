@@ -1,6 +1,6 @@
 /*
- * $Id: encrypt_pdf.java,v 1.20 2006/09/14 23:10:57 xlv Exp $
- * $Name:  $
+ * $Id: encrypt_pdf.java 2569 2007-02-06 13:10:39Z blowagie $
+ * $Name$
  *
  * Copyright 2002 by Paulo Soares
  *
@@ -70,13 +70,13 @@ public class encrypt_pdf {
     private final static int STRENGTH = 5;
     private final static int MOREINFO = 6;
     private final static int permit[] = {
-        PdfWriter.AllowPrinting,
-        PdfWriter.AllowModifyContents,
-        PdfWriter.AllowCopy,
-        PdfWriter.AllowModifyAnnotations,
-        PdfWriter.AllowFillIn,
-        PdfWriter.AllowScreenReaders,
-        PdfWriter.AllowAssembly,
+    	PdfWriter.AllowPrinting,
+    	PdfWriter.AllowModifyContents,
+    	PdfWriter.AllowCopy,
+    	PdfWriter.AllowModifyAnnotations,
+    	PdfWriter.AllowFillIn,
+    	PdfWriter.AllowScreenReaders,
+    	PdfWriter.AllowAssembly,
         PdfWriter.AllowDegradedPrinting};
 
     private static void usage() {

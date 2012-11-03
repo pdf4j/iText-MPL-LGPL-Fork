@@ -1,6 +1,6 @@
 /*
- * $Id: PdfTextArray.java,v 1.58 2005/05/04 14:32:21 blowagie Exp $
- * $Name:  $
+ * $Id: PdfTextArray.java 1733 2005-05-04 14:33:54Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

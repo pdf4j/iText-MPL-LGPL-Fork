@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 by Michael Niedermair.
+ * Copyright 2003 by Michael Niedermair and 2007 Bruno Lowagie.
  *
  * The contents of this file are subject to the Mozilla Public License Version 1.1
  * (the "License"); you may not use this file except in compliance with the License.
@@ -46,21 +46,25 @@
  */
 package com.lowagie.text;
 
+import com.lowagie.text.factories.RomanNumberFactory;
+
 /**
  * 
  * A special-version of <CODE>LIST</CODE> which use roman-letters.
  * 
  * @see com.lowagie.text.List
- * @version 2003-06-22
- * @author Michael Niedermair
  */
 
 public class RomanList extends List {
 
+// constructors
+	
 	/**
-	 * UpperCase or LowerCase
+	 * Initialization
 	 */
-	protected boolean romanlower;
+	public RomanList() {
+		super(true);
+	}
 
 	/**
 	 * Initialization
@@ -73,32 +77,16 @@ public class RomanList extends List {
 
 	/**
 	 * Initialization 
-	 * @param	romanlower		roman-char in lowercase   
+	 * @param	lowercase		roman-char in lowercase   
 	 * @param 	symbolIndent	indent
 	 */
-	public RomanList(boolean romanlower, int symbolIndent) {
+	public RomanList(boolean lowercase, int symbolIndent) {
 		super(true, symbolIndent);
-		this.romanlower = romanlower;
+		this.lowercase = lowercase;
 	}
 
-	/**
-	 * set the roman-letters to lowercase otherwise to uppercase
-	 * 
-	 * @param romanlower
-	 */
-	public void setRomanLower(boolean romanlower) {
-		this.romanlower = romanlower;
-	}
-
-	/**
-	 * Checks if the list is roman-letter with lowercase
-	 *
-	 * @return	<CODE>true</CODE> if the roman-letter is lowercase, <CODE>false</CODE> otherwise.
-	 */
-	public boolean isRomanLower() {
-		return romanlower;
-	}
-
+// overridden method
+	
 	/**
 	 * Adds an <CODE>Object</CODE> to the <CODE>List</CODE>.
 	 *
@@ -109,18 +97,15 @@ public class RomanList extends List {
 		if (o instanceof ListItem) {
 			ListItem item = (ListItem) o;
 			Chunk chunk;
-			if (romanlower)
-				chunk = new Chunk(toRomanLowerCase(first + list.size()), symbol.font());
-			else
-				chunk = new Chunk(toRomanUppercase(first + list.size()), symbol.font());
-			chunk.append(".");
+			chunk = new Chunk(RomanNumberFactory.getString(first + list.size(), lowercase), symbol.getFont());
+			chunk.append(". ");
 			item.setListSymbol(chunk);
-			item.setIndentationLeft(symbolIndent);
+			item.setIndentationLeft(symbolIndent, autoindent);
 			item.setIndentationRight(0);
 			list.add(item);
 		} else if (o instanceof List) {
 			List nested = (List) o;
-			nested.setIndentationLeft(nested.indentationLeft() + symbolIndent);
+			nested.setIndentationLeft(nested.getIndentationLeft() + symbolIndent);
 			first--;
 			return list.add(nested);
 		} else if (o instanceof String) {
@@ -128,164 +113,45 @@ public class RomanList extends List {
 		}
 		return false;
 	}
-
-	// ****************************************************************************************
-
-	/*
-	 * Wandelt eine Integer-Zahl in römische Schreibweise um
-	 *
-	 * Regeln: http://de.wikipedia.org/wiki/R%F6mische_Ziffern
-	 *  
-	 * 1. Die Ziffern werden addiert, wobei sie von groß nach klein sortiert sind:
-	 *
-	 *  XVII = 10+5+1+1=17 
-	 *
-	 * 2. Eine kleinere Ziffer, die links von einer größeren steht, wird abgezogen:
-	 * 
-	 *  IV = 5-1=4 
-	 *  CM = 1000-100=900 
-	 *
-	 * 3. Maximal drei gleiche Ziffern stehen nebeneinander (Ausnahme: IIII auf Zifferblaettern von Uhren):
-	 * 
-	 *  XL = 40 (und nicht XXXX) 
-	 *  IX = 9 (und nicht VIIII) 
-	 *  Diese "Subtraktionsschreibweise" ist erst im Mittelalter allgemein gebräuchlich geworden. 
-	 *  Vorher wurde oft "IIII" für "4" geshrieben. 
-	 *
-	 * 4. Bei mehreren möglichen Schreibweisen wird in der Regel der kürzesten der Vorzug gegeben:
-	 *
-	 *  IC = 99 (auch LXLIX) 
-	 *  IL = 49 (auch XLIX oder sogar XLVIV) 
-	 *  Andererseits gibt es die Vorschrift, nach der ein Symbol, das einen Wert von 10n darstellt, 
-	 *  nicht einem Symbol, das einen Wert von 10(n+1) darstellt, direkt voranstehen darf. 
-	 *  Nach dieser Regel wäre die Schreibweise "XCIX" für "99" der Schreibweise "IC" vorzuziehen. 
-	 *
-	 * 5. Die römischen Zahlen V, L und D können nicht größeren Zahlen voran gestellt werden:
-	 *
-	 *  XCV = 95 (nicht VC) 
-	 * 
-	 *  Zahlen über 3000 werden dargestellt durch Einkastung der Tausender: |IX|LIV=9054
-	 * 
-	 *
-	 * Zahlen größer als 3.000.000 werden durch Doppelstrich etc. dargestellt.
-	 */
-
+	
+// deprecated methods
+	
 	/**
-	 * Array with Roman digits.
-	 */
-	private static final RomanDigit[] roman =
-		{
-			new RomanDigit('m', 1000, false),
-			new RomanDigit('d', 500, false),
-			new RomanDigit('c', 100, true),
-			new RomanDigit('l', 50, false),
-			new RomanDigit('x', 10, true),
-			new RomanDigit('v', 5, false),
-			new RomanDigit('i', 1, true)};
-
-	/** 
-	 * changes an int into a lower case roman number.
-	 * @param number the original number
-	 * @return the roman number (lower case)
+	 * @deprecated use RomanNumberFactory.getString(int)
 	 */
 	public static String toRoman(int number) {
-		return toRomanLowerCase(number);
+		return RomanNumberFactory.getString(number);
 	}
-
-	/** 
-	 * Changes an int into an upper case roman number.
-	 * @param number the original number
-	 * @return the roman number (upper case)
-	 */
-	public static String toRomanUppercase(int number) {
-		return toRomanLowerCase(number).toUpperCase();
-	}
-
-	/** 
-	 * Changes an int into a lower case roman number.
-	 * @param number the original number
-	 * @return the roman number (lower case)
+	/**
+	 * @deprecated use RomanNumberFactory.getString(int, boolean)
 	 */
 	public static String toRomanLowerCase(int number) {
-
-		// Buffer
-		StringBuffer buf = new StringBuffer();
-
-		// kleiner 0 ? Vorzeichen festlegen
-		if (number < 0) {
-			buf.append('-');
-			number = -number;
-		}
-
-		// größer 3000
-		if (number > 3000) {
-			// rekursiver Aufruf (ohne tausender-Bereich)
-			buf.append('|');
-			buf.append(toRomanLowerCase(number / 1000));
-			buf.append('|');
-			// tausender-Bereich 
-			number = number - (number / 1000) * 1000;
-		}
-
-		// Schleife
-		int pos = 0;
-		while (true) {
-			// roman-array durchlaufen
-			RomanDigit dig = roman[pos];
-
-			// solange Zahl größer roman-Wert
-			while (number >= dig.value) {
-				// Zeichen hinzufügen
-				buf.append(dig.digit);
-				// Wert des Zeichens abziehen
-				number -= dig.value;
-			}
-
-			// Abbruch
-			if (number <= 0) {
-				break;
-			}
-			// pre=false suchen (ab Stelle pos)
-			int j = pos;
-			while (!roman[++j].pre);
-
-			// neuer Wert größer
-			if (number + roman[j].value >= dig.value) {
-				// hinzufügen
-				buf.append(roman[j].digit).append(dig.digit);
-				// Wert vom Rest abziehen
-				number -= dig.value - roman[j].value;
-			}
-			pos++;
-		}
-		return buf.toString();
+		return RomanNumberFactory.getString(number, true);
+	}
+	/**
+	 * @deprecated use RomanNumberFactory.getString(int, boolean)
+	 */
+	public static String toRomanUpperCase(int number) {
+		return RomanNumberFactory.getString(number, false);
 	}
 
 	/**
-	 * Helper class for Roman Digits
+	 * set the roman-letters to lowercase otherwise to uppercase
+	 * 
+	 * @param romanlower
+	 * @deprecated use setLowercase(boolean)
 	 */
-	private static class RomanDigit {
-
-		/** part of a roman number */
-		public char digit;
-
-		/** value of the roman digit */
-		public int value;
-
-		/** can the digit be used as a prefix */
-		public boolean pre;
-
-		/**
-		 * Constructs a roman digit
-		 * @param digit the roman digit
-		 * @param value the value
-		 * @param pre can it be used as a prefix
-		 */
-		RomanDigit(char digit, int value, boolean pre) {
-			this.digit = digit;
-			this.value = value;
-			this.pre = pre;
-		}
+	public void setRomanLower(boolean romanlower) {
+		setLowercase(romanlower);
 	}
 
+	/**
+	 * Checks if the list is roman-letter with lowercase
+	 *
+	 * @return	<CODE>true</CODE> if the roman-letter is lowercase, <CODE>false</CODE> otherwise.
+	 * @deprecated use isLowercase()
+	 */
+	public boolean isRomanLower() {
+		return isLowercase();
+	}
 }

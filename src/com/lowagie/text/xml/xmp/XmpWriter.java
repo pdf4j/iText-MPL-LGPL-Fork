@@ -1,6 +1,6 @@
 /*
- * $Id: XmpWriter.java,v 1.10 2006/09/21 16:45:03 xlv Exp $
- * $Name:  $
+ * $Id: XmpWriter.java 2399 2006-09-21 16:45:04Z xlv $
+ * $Name$
  *
  * Copyright 2005 by Bruno Lowagie.
  *

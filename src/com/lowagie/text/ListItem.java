@@ -1,6 +1,6 @@
 /*
- * $Id: ListItem.java,v 1.82 2006/09/15 23:37:32 xlv Exp $
- * $Name:  $
+ * $Id: ListItem.java 2748 2007-05-12 15:11:48Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -50,11 +50,6 @@
 
 package com.lowagie.text;
 
-import java.util.Properties;
-
-import com.lowagie.text.markup.MarkupParser;
-import com.lowagie.text.markup.MarkupTags;
-
 /**
  * A <CODE>ListItem</CODE> is a <CODE>Paragraph</CODE>
  * that can be added to a <CODE>List</CODE>.
@@ -102,193 +97,178 @@ import com.lowagie.text.markup.MarkupTags;
  * @see	Paragraph
  */
 
-public class ListItem extends Paragraph implements TextElementArray, MarkupAttributes {
+public class ListItem extends Paragraph {
     
-    // membervariables
-    
-private static final long serialVersionUID = 1970670787169329006L;
-/** this is the symbol that wil proceed the listitem. */
+    // constants
+	private static final long serialVersionUID = 1970670787169329006L;
+	
+	// member variables
+	
+	/** this is the symbol that wil precede the listitem. */
     private Chunk symbol;
     
     // constructors
     
-/**
- * Constructs a <CODE>ListItem</CODE>.
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE>.
+     */
     public ListItem() {
         super();
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain leading.
- *
- * @param	leading		the leading
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain leading.
+     *
+     * @param	leading		the leading
+     */    
     public ListItem(float leading) {
         super(leading);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Chunk</CODE>.
- *
- * @param	chunk		a <CODE>Chunk</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Chunk</CODE>.
+     *
+     * @param	chunk		a <CODE>Chunk</CODE>
+     */
     public ListItem(Chunk chunk) {
         super(chunk);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>.
- *
- * @param	string		a <CODE>String</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>.
+     *
+     * @param	string		a <CODE>String</CODE>
+     */
     public ListItem(String string) {
         super(string);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>
- * and a certain <CODE>Font</CODE>.
- *
- * @param	string		a <CODE>String</CODE>
- * @param	font		a <CODE>String</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>
+     * and a certain <CODE>Font</CODE>.
+     *
+     * @param	string		a <CODE>String</CODE>
+     * @param	font		a <CODE>String</CODE>
+     */
     public ListItem(String string, Font font) {
         super(string, font);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Chunk</CODE>
- * and a certain leading.
- *
- * @param	leading		the leading
- * @param	chunk		a <CODE>Chunk</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Chunk</CODE>
+     * and a certain leading.
+     *
+     * @param	leading		the leading
+     * @param	chunk		a <CODE>Chunk</CODE>
+     */
     public ListItem(float leading, Chunk chunk) {
         super(leading, chunk);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>
- * and a certain leading.
- *
- * @param	leading		the leading
- * @param	string		a <CODE>String</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>
+     * and a certain leading.
+     *
+     * @param	leading		the leading
+     * @param	string		a <CODE>String</CODE>
+     */
     public ListItem(float leading, String string) {
         super(leading, string);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain leading, <CODE>String</CODE>
- * and <CODE>Font</CODE>.
- *
- * @param	leading		the leading
- * @param	string		a <CODE>String</CODE>
- * @param	font		a <CODE>Font</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain leading, <CODE>String</CODE>
+     * and <CODE>Font</CODE>.
+     *
+     * @param	leading		the leading
+     * @param	string		a <CODE>String</CODE>
+     * @param	font		a <CODE>Font</CODE>
+     */
     public ListItem(float leading, String string, Font font) {
         super(leading, string, font);
     }
     
-/**
- * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Phrase</CODE>.
- *
- * @param	phrase		a <CODE>Phrase</CODE>
- */
-    
+    /**
+     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Phrase</CODE>.
+     *
+     * @param	phrase		a <CODE>Phrase</CODE>
+     */
     public ListItem(Phrase phrase) {
         super(phrase);
     }
     
-        /**
-         * Returns a <CODE>ListItem</CODE> that has been constructed taking in account
-         * the value of some <VAR>attributes</VAR>.
-         *
-         * @param	attributes		Some attributes
-         */
-    
-    public ListItem(Properties attributes) {
-        super("", FontFactory.getFont(attributes));
-        String value;
-        if ((value = (String)attributes.remove(ElementTags.ITEXT)) != null) {
-            add(new Chunk(value));
-        }
-        if ((value = (String)attributes.remove(ElementTags.LEADING)) != null) {
-            setLeading(Float.parseFloat(value + "f"));
-        }
-        else if ((value = (String)attributes.remove(MarkupTags.CSS_KEY_LINEHEIGHT)) != null) {
-            setLeading(MarkupParser.parseLength(value));
-        }
-        if ((value = (String)attributes.remove(ElementTags.INDENTATIONLEFT)) != null) {
-            setIndentationLeft(Float.parseFloat(value + "f"));
-        }
-        if ((value = (String)attributes.remove(ElementTags.INDENTATIONRIGHT)) != null) {
-            setIndentationRight(Float.parseFloat(value + "f"));
-        }
-        if ((value = (String)attributes.remove(ElementTags.ALIGN)) != null) {
-            setAlignment(value);
-        }
-        if (attributes.size() > 0) setMarkupAttributes(attributes);
-    }
-    
     // implementation of the Element-methods
     
-/**
- * Gets the type of the text element.
- *
- * @return	a type
- */
-    
+    /**
+     * Gets the type of the text element.
+     *
+     * @return	a type
+     */
     public int type() {
         return Element.LISTITEM;
     }
     
     // methods
     
-/**
- * Sets the listsymbol.
- *
- * @param	symbol	a <CODE>Chunk</CODE>
- */
-    
+    /**
+     * Sets the listsymbol.
+     *
+     * @param	symbol	a <CODE>Chunk</CODE>
+     */
     public void setListSymbol(Chunk symbol) {
     	if (this.symbol == null) {
     		this.symbol = symbol;
-    		if (this.symbol.font().isStandardFont()) {
+    		if (this.symbol.getFont().isStandardFont()) {
     			this.symbol.setFont(font);
     		}
     	}
     }
     
+    /**
+     * Sets the indentation of this paragraph on the left side.
+     *
+     * @param	indentation		the new indentation
+     */
+    public void setIndentationLeft(float indentation, boolean autoindent) {
+    	if (autoindent) {
+    		setIndentationLeft(getListSymbol().getWidthPoint());
+    	}
+    	else {
+    		setIndentationLeft(indentation);
+    	}
+    }
+    
     // methods to retrieve information
-    
-/**
- * Returns the listsymbol.
- *
- * @return	a <CODE>Chunk</CODE>
- */
-    
-    public Chunk listSymbol() {
+
+	/**
+     * Returns the listsymbol.
+     *
+     * @return	a <CODE>Chunk</CODE>
+     */
+    public Chunk getListSymbol() {
         return symbol;
     }
-    
-/**
- * Checks if a given tag corresponds with this object.
- *
- * @param   tag     the given tag
- * @return  true if the tag corresponds
- */
-    
-    public static boolean isTag(String tag) {
-        return ElementTags.LISTITEM.equals(tag);
+        
+    // deprecated stuff
+        
+    /**
+     * Returns a <CODE>ListItem</CODE> that has been constructed taking in account
+     * the value of some <VAR>attributes</VAR>.
+     *
+     * @param	attributes		Some attributes
+     * @deprecated use ElementFactory.getParagraph(attributes)
+     */
+    public ListItem(java.util.Properties attributes) {
+    	this(com.lowagie.text.factories.ElementFactory.getParagraph(attributes));
     }
+    
+    /**
+	 * Returns the listsymbol.
+	 *
+	 * @return	a <CODE>Chunk</CODE>
+	 * @deprecated Use {@link #getListSymbol()} instead
+	 */
+	public Chunk listSymbol() {
+		return getListSymbol();
+	}
 }

@@ -1,6 +1,6 @@
 /*
- * $Id: HtmlEncoder.java,v 1.58 2006/09/15 23:37:33 xlv Exp $
- * $Name:  $
+ * $Id: HtmlEncoder.java 2547 2007-01-26 13:46:13Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -151,7 +151,7 @@ public class HtmlEncoder {
                 buffer.append("&#").append((int)character).append(';');
             }
         }
-        return buffer.toString().trim();
+        return buffer.toString();
     }
     
 /**

@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPageLabels.java,v 1.49 2006/09/21 00:57:35 xlv Exp $
- * $Name:  $
+ * $Id: PdfPageLabels.java 2685 2007-04-16 12:09:48Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -50,8 +50,12 @@
 
 package com.lowagie.text.pdf;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
+
+import com.lowagie.text.factories.RomanAlphabetFactory;
+import com.lowagie.text.factories.RomanNumberFactory;
 
 /** Page labels are used to identify each
  * page visually on the screen or in print.
@@ -163,5 +167,71 @@ public class PdfPageLabels {
         }
         dic.put(PdfName.NUMS, array);
         return dic;
+    }
+    
+    /**
+     * Retrieves the page labels from a PDF as an array of String objects.
+     * @param reader a PdfReader object that has the page labels you want to retrieve
+     * @return	a String array
+     */
+    public static String[] getPageLabels(PdfReader reader) {
+    	
+		int n = reader.getNumberOfPages();
+		String[] labelstrings = new String[n];
+		
+    	PdfDictionary dict = reader.getCatalog();
+		PdfDictionary labels = (PdfDictionary)PdfReader.getPdfObject((PdfObject)dict.get(PdfName.PAGELABELS));
+		PdfArray numbers = (PdfArray)PdfReader.getPdfObject((PdfObject)labels.get(PdfName.NUMS));
+		
+		PdfNumber pageIndex;
+		PdfDictionary pageLabel;
+		HashMap numberTree = new HashMap();
+		for (Iterator i = numbers.listIterator(); i.hasNext(); ) {
+			pageIndex = (PdfNumber)i.next();
+			pageLabel = (PdfDictionary) PdfReader.getPdfObject((PdfObject)i.next());
+			numberTree.put(new Integer(pageIndex.intValue()), pageLabel);
+		}
+		
+		int pagecount = 1;
+		Integer current;
+		String prefix = "";
+		char type = 'D';
+		for (int i = 0; i < n; i++) {
+			current = new Integer(i);
+			if (numberTree.containsKey(current)) {
+				PdfDictionary d = (PdfDictionary)numberTree.get(current);
+				if (d.contains(PdfName.ST)) {
+					pagecount = ((PdfNumber)d.get(PdfName.ST)).intValue();
+				}
+				else {
+					pagecount = 1;
+				}
+				if (d.contains(PdfName.P)) {
+					prefix = ((PdfString)d.get(PdfName.P)).toString();
+				}
+				if (d.contains(PdfName.S)) {
+					type = ((PdfName)d.get(PdfName.S)).toString().charAt(1);
+				}
+			}
+			switch(type) {
+			default:
+				labelstrings[i] = prefix + pagecount;
+				break;
+			case 'R':
+				labelstrings[i] = prefix + RomanNumberFactory.getUpperCaseString(pagecount);
+				break;
+			case 'r':
+				labelstrings[i] = prefix + RomanNumberFactory.getLowerCaseString(pagecount);
+				break;
+			case 'A':
+				labelstrings[i] = prefix + RomanAlphabetFactory.getUpperCaseString(pagecount);
+				break;
+			case 'a':
+				labelstrings[i] = prefix + RomanAlphabetFactory.getLowerCaseString(pagecount);
+				break;
+			}
+			pagecount++;
+		}
+		return labelstrings;
     }
 }

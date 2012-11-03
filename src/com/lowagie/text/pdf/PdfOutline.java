@@ -1,6 +1,6 @@
 /*
- * $Id: PdfOutline.java,v 1.53 2006/09/14 23:10:49 xlv Exp $
- * $Name:  $
+ * $Id: PdfOutline.java 2697 2007-04-19 11:59:59Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -272,7 +272,7 @@ public class PdfOutline extends PdfDictionary {
         StringBuffer buf = new StringBuffer();
         for (Iterator i = title.getChunks().iterator(); i.hasNext(); ) {
             Chunk chunk = (Chunk) i.next();
-            buf.append(chunk.content());
+            buf.append(chunk.getContent());
         }
         this.action = action;
         initOutline(parent, buf.toString(), open);
@@ -308,7 +308,7 @@ public class PdfOutline extends PdfDictionary {
         StringBuffer buf = new StringBuffer();
         for (Iterator i = title.getChunks().iterator(); i.hasNext(); ) {
             Chunk chunk = (Chunk) i.next();
-            buf.append(chunk.content());
+            buf.append(chunk.getContent());
         }
         this.destination = destination;
         initOutline(parent, buf.toString(), open);

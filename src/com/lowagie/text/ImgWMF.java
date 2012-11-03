@@ -1,6 +1,6 @@
 /*
- * $Id: ImgWMF.java,v 1.48 2006/09/14 23:10:40 xlv Exp $
- * $Name:  $
+ * $Id: ImgWMF.java 2752 2007-05-15 14:58:33Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Paulo Soares.
  *
@@ -67,7 +67,7 @@ import com.lowagie.text.pdf.codec.wmf.MetaDo;
  * @see		Image
  */
 
-public class ImgWMF extends Image implements Element {
+public class ImgWMF extends Image {
     
     // Constructors
     
@@ -98,7 +98,7 @@ public class ImgWMF extends Image implements Element {
      */
     
     public ImgWMF(String filename) throws BadElementException, MalformedURLException, IOException {
-        this(Image.toURL(filename));
+        this(Utilities.toURL(filename));
     }
     
     /**
@@ -157,8 +157,8 @@ public class ImgWMF extends Image implements Element {
             if (is != null) {
                 is.close();
             }
-            plainWidth = width();
-            plainHeight = height();
+            plainWidth = getWidth();
+            plainHeight = getHeight();
         }
     }
     
@@ -169,8 +169,8 @@ public class ImgWMF extends Image implements Element {
      */    
     public void readWMF(PdfTemplate template) throws IOException, DocumentException {
         setTemplateData(template);
-        template.setWidth(width());
-        template.setHeight(height());
+        template.setWidth(getWidth());
+        template.setHeight(getHeight());
         InputStream is = null;
         try {
             if (rawData == null){

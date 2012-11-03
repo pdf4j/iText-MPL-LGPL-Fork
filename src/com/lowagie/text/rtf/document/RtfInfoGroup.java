@@ -1,6 +1,6 @@
 /*
- * $Id: RtfInfoGroup.java,v 1.16 2005/05/04 14:33:52 blowagie Exp $
- * $Name:  $
+ * $Id: RtfInfoGroup.java 2776 2007-05-23 20:01:40Z hallm $
+ * $Name$
  *
  * Copyright 2003, 2004 by Mark Hall
  *
@@ -52,6 +52,7 @@ package com.lowagie.text.rtf.document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import com.lowagie.text.rtf.RtfElement;
@@ -60,8 +61,9 @@ import com.lowagie.text.rtf.RtfElement;
 /**
  * The RtfInfoGroup stores information group elements. 
  * 
- * @version $Version:$
+ * @version $Id: RtfInfoGroup.java 2776 2007-05-23 20:01:40Z hallm $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
+ * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfInfoGroup extends RtfElement {
     /**
@@ -97,21 +99,33 @@ public class RtfInfoGroup extends RtfElement {
      * Writes the RtfInfoGroup and its RtfInfoElement elements.
      * 
      * @return A byte array containing the group and its elements
+     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() {
+    public byte[] write()
+    {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-            result.write(OPEN_GROUP);
-            result.write(INFO_GROUP);
-            for(int i = 0; i < infoElements.size(); i++) {
-                RtfInfoElement infoElement = (RtfInfoElement) infoElements.get(i);
-                result.write(infoElement.write());
-            }
-            result.write(CLOSE_GROUP);
-            result.write((byte)'\n');
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
-        }
+			writeContent(result);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
         return result.toByteArray();
     }
+    
+    /**
+     * Writes the element content to the given output stream.
+     */    
+    public void writeContent(final OutputStream result) throws IOException
+    {
+    	result.write(OPEN_GROUP);
+		result.write(INFO_GROUP);
+		for(int i = 0; i < infoElements.size(); i++) {
+			RtfInfoElement infoElement = (RtfInfoElement) infoElements.get(i);
+			//result.write(infoElement.write());
+			infoElement.writeContent(result);
+		}
+		result.write(CLOSE_GROUP);
+		result.write((byte) '\n');
+    }        
+    
 }

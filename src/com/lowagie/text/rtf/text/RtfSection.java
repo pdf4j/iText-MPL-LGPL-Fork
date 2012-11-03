@@ -1,6 +1,6 @@
 /*
- * $Id: RtfSection.java,v 1.13 2006/09/14 23:10:56 xlv Exp $
- * $Name:  $
+ * $Id: RtfSection.java 2776 2007-05-23 20:01:40Z hallm $
+ * $Name$
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,6 +52,7 @@ package com.lowagie.text.rtf.text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -69,8 +70,9 @@ import com.lowagie.text.rtf.field.RtfTOCEntry;
  * The RtfSection wraps a Section element.
  * INTERNAL CLASS
  * 
- * @version $Revision: 1.13 $
+ * @version $Id: RtfSection.java 2776 2007-05-23 20:01:40Z hallm $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
+ * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfSection extends RtfElement {
 
@@ -95,16 +97,16 @@ public class RtfSection extends RtfElement {
         super(doc);
         items = new ArrayList();
         try {
-            if(section.title() != null) {
-                this.title = (RtfParagraph) doc.getMapper().mapElement(section.title());
+            if(section.getTitle() != null) {
+                this.title = (RtfParagraph) doc.getMapper().mapElement(section.getTitle());
             }
             if(document.getAutogenerateTOCEntries()) {
                 StringBuffer titleText = new StringBuffer();
-                Iterator it = section.title().iterator();
+                Iterator it = section.getTitle().iterator();
                 while(it.hasNext()) {
                     Element element = (Element) it.next();
                     if(element.type() == Element.CHUNK) {
-                        titleText.append(((Chunk) element).content());
+                        titleText.append(((Chunk) element).getContent());
                     }
                 }
                 if(titleText.toString().trim().length() > 0) {
@@ -122,7 +124,7 @@ public class RtfSection extends RtfElement {
                 }
             }
             
-            updateIndentation(section.indentationLeft(), section.indentationRight(), section.indentation());
+            updateIndentation(section.getIndentationLeft(), section.getIndentationRight(), section.getIndentation());
         } catch(DocumentException de) {
             de.printStackTrace();
         }
@@ -132,22 +134,35 @@ public class RtfSection extends RtfElement {
      * Write this RtfSection and its contents
      * 
      * @return A byte array with the RtfSection and its contents
+     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() {
+    public byte[] write()
+    {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-            result.write(RtfParagraph.PARAGRAPH);
-            if(this.title != null) {
-                result.write(this.title.write());
-            }
-            for(int i = 0; i < items.size(); i++) {
-                result.write(((RtfBasicElement) items.get(i)).write());
-            }
+        	writeContent(result);
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
+    /**
+     * Write this RtfSection and its contents
+     */    
+    public void writeContent(final OutputStream result) throws IOException
+    {
+        result.write(RtfParagraph.PARAGRAPH);
+        if(this.title != null) {
+            //.result.write(this.title.write());
+            this.title.writeContent(result);
+        }
+        for(int i = 0; i < items.size(); i++) {
+        	RtfBasicElement rbe = (RtfBasicElement) items.get(i);
+            //.result.write((rbe).write());
+            rbe.writeContent(result);
+        }
+    }        
+
     
     /**
      * Sets whether this RtfSection is in a table. Sets the correct inTable setting for all

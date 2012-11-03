@@ -1,6 +1,6 @@
 /*
- * $Id: Annotation.java,v 1.75 2006/09/15 23:37:31 xlv Exp $
- * $Name:  $
+ * $Id: Annotation.java 2748 2007-05-12 15:11:48Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -53,8 +53,6 @@ package com.lowagie.text;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * An <CODE>Annotation</CODE> is a little note that can be added to a page on
@@ -64,7 +62,7 @@ import java.util.Set;
  * @see Anchor
  */
 
-public class Annotation implements Element, MarkupAttributes {
+public class Annotation implements Element {
 
 	// membervariables
 
@@ -146,9 +144,6 @@ public class Annotation implements Element, MarkupAttributes {
 	/** This is the title of the <CODE>Annotation</CODE>. */
 	protected HashMap annotationAttributes = new HashMap();
 
-	/** Contains extra markupAttributes */
-	protected Properties markupAttributes = null;
-
 	/** This is the lower left x-value */
 	protected float llx = Float.NaN;
 
@@ -176,7 +171,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param ury
 	 *            upper right y coordinate
 	 */
-
 	private Annotation(float llx, float lly, float urx, float ury) {
 		this.llx = llx;
 		this.lly = lly;
@@ -184,10 +178,12 @@ public class Annotation implements Element, MarkupAttributes {
 		this.ury = ury;
 	}
 
+	/**
+	 * Copy constructor.
+	 */
     public Annotation(Annotation an) {
         annotationtype = an.annotationtype;
         annotationAttributes = an.annotationAttributes;
-        markupAttributes = an.markupAttributes;
         llx = an.llx;
         lly = an.lly;
         urx = an.urx;
@@ -203,7 +199,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param text
 	 *            the content of the annotation
 	 */
-
 	public Annotation(String title, String text) {
 		annotationtype = TEXT;
 		annotationAttributes.put(TITLE, title);
@@ -227,7 +222,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param ury
 	 *            the upper right y-value
 	 */
-
 	public Annotation(String title, String text, float llx, float lly,
 			float urx, float ury) {
 		this(llx, lly, urx, ury);
@@ -250,7 +244,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param url
 	 *            the external reference
 	 */
-
 	public Annotation(float llx, float lly, float urx, float ury, URL url) {
 		this(llx, lly, urx, ury);
 		annotationtype = URL_NET;
@@ -271,7 +264,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param url
 	 *            the external reference
 	 */
-
 	public Annotation(float llx, float lly, float urx, float ury, String url) {
 		this(llx, lly, urx, ury);
 		annotationtype = URL_AS_STRING;
@@ -294,7 +286,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param dest
 	 *            the destination in this file
 	 */
-
 	public Annotation(float llx, float lly, float urx, float ury, String file,
 			String dest) {
 		this(llx, lly, urx, ury);
@@ -343,7 +334,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param page
 	 *            a page number in this file
 	 */
-
 	public Annotation(float llx, float lly, float urx, float ury, String file,
 			int page) {
 		this(llx, lly, urx, ury);
@@ -366,7 +356,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param named
 	 *            a named destination in this file
 	 */
-
 	public Annotation(float llx, float lly, float urx, float ury, int named) {
 		this(llx, lly, urx, ury);
 		annotationtype = NAMED_DEST;
@@ -393,7 +382,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param defaultdir
 	 *            the default directory to run this application in
 	 */
-
 	public Annotation(float llx, float lly, float urx, float ury,
 			String application, String parameters, String operation,
 			String defaultdir) {
@@ -405,79 +393,6 @@ public class Annotation implements Element, MarkupAttributes {
 		annotationAttributes.put(DEFAULTDIR, defaultdir);
 	}
 
-	/**
-	 * Returns an <CODE>Annotation</CODE> that has been constructed taking in
-	 * account the value of some <VAR>attributes </VAR>.
-	 * 
-	 * @param attributes
-	 *            Some attributes
-	 */
-
-	public Annotation(Properties attributes) {
-		String value = (String) attributes.remove(ElementTags.LLX);
-		if (value != null) {
-			llx = Float.parseFloat(value + "f");
-		}
-		value = (String) attributes.remove(ElementTags.LLY);
-		if (value != null) {
-			lly = Float.parseFloat(value + "f");
-		}
-		value = (String) attributes.remove(ElementTags.URX);
-		if (value != null) {
-			urx = Float.parseFloat(value + "f");
-		}
-		value = (String) attributes.remove(ElementTags.URY);
-		if (value != null) {
-			ury = Float.parseFloat(value + "f");
-		}
-		String title = (String) attributes.remove(ElementTags.TITLE);
-		String text = (String) attributes.remove(ElementTags.CONTENT);
-		if (title != null || text != null) {
-			annotationtype = TEXT;
-		} else if ((value = (String) attributes.remove(ElementTags.URL)) != null) {
-			annotationtype = URL_AS_STRING;
-			annotationAttributes.put(FILE, value);
-		} else if ((value = (String) attributes.remove(ElementTags.NAMED)) != null) {
-			annotationtype = NAMED_DEST;
-			annotationAttributes.put(NAMED, Integer.valueOf(value));
-		} else {
-			String file = (String) attributes.remove(ElementTags.FILE);
-			String destination = (String) attributes
-					.remove(ElementTags.DESTINATION);
-			String page = (String) attributes.remove(ElementTags.PAGE);
-			if (file != null) {
-				annotationAttributes.put(FILE, file);
-				if (destination != null) {
-					annotationtype = FILE_DEST;
-					annotationAttributes.put(DESTINATION, destination);
-				} else if (page != null) {
-					annotationtype = FILE_PAGE;
-					annotationAttributes.put(FILE, file);
-					annotationAttributes.put(PAGE, Integer.valueOf(page));
-				}
-			} else if ((value = (String) attributes.remove(ElementTags.NAMED)) != null) {
-				annotationtype = LAUNCH;
-				annotationAttributes.put(APPLICATION, value);
-				annotationAttributes.put(PARAMETERS, attributes
-						.remove(ElementTags.PARAMETERS));
-				annotationAttributes.put(OPERATION, attributes
-						.remove(ElementTags.OPERATION));
-				annotationAttributes.put(DEFAULTDIR, attributes
-						.remove(ElementTags.DEFAULTDIR));
-			}
-		}
-		if (annotationtype == TEXT) {
-			if (title == null)
-				title = "";
-			if (text == null)
-				text = "";
-			annotationAttributes.put(TITLE, title);
-			annotationAttributes.put(CONTENT, text);
-		}
-		if (attributes.size() > 0)
-			setMarkupAttributes(attributes);
-	}
-
 	// implementation of the Element-methods
 
 	/**
@@ -485,12 +400,9 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a type
 	 */
-
 	public int type() {
 		return Element.ANNOTATION;
 	}
-
-	// methods
 
 	/**
 	 * Processes the element by adding it (or the different parts) to an <CODE>
@@ -500,7 +412,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 *            an <CODE>ElementListener</CODE>
 	 * @return <CODE>true</CODE> if the element was processed successfully
 	 */
-
 	public boolean process(ElementListener listener) {
 		try {
 			return listener.add(this);
@@ -533,7 +444,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * @param ury
 	 *            the upper right y-value
 	 */
-
 	public void setDimensions(float llx, float lly, float urx, float ury) {
 		this.llx = llx;
 		this.lly = lly;
@@ -548,7 +458,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a value
 	 */
-
 	public float llx() {
 		return llx;
 	}
@@ -558,7 +467,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a value
 	 */
-
 	public float lly() {
 		return lly;
 	}
@@ -568,7 +476,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a value
 	 */
-
 	public float urx() {
 		return urx;
 	}
@@ -578,7 +485,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a value
 	 */
-
 	public float ury() {
 		return ury;
 	}
@@ -590,7 +496,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 *            the default value
 	 * @return a value
 	 */
-
 	public float llx(float def) {
 		if (Float.isNaN(llx))
 			return def;
@@ -604,7 +509,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 *            the default value
 	 * @return a value
 	 */
-
 	public float lly(float def) {
 		if (Float.isNaN(lly))
 			return def;
@@ -618,7 +522,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 *            the default value
 	 * @return a value
 	 */
-
 	public float urx(float def) {
 		if (Float.isNaN(urx))
 			return def;
@@ -632,7 +535,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 *            the default value
 	 * @return a value
 	 */
-
 	public float ury(float def) {
 		if (Float.isNaN(ury))
 			return def;
@@ -644,7 +546,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a type
 	 */
-
 	public int annotationType() {
 		return annotationtype;
 	}
@@ -654,7 +555,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a name
 	 */
-
 	public String title() {
 		String s = (String) annotationAttributes.get(TITLE);
 		if (s == null)
@@ -667,7 +567,6 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a reference
 	 */
-
 	public String content() {
 		String s = (String) annotationAttributes.get(CONTENT);
 		if (s == null)
@@ -680,58 +579,19 @@ public class Annotation implements Element, MarkupAttributes {
 	 * 
 	 * @return a reference
 	 */
-
 	public HashMap attributes() {
 		return annotationAttributes;
 	}
 
 	/**
-	 * Checks if a given tag corresponds with this object.
+	 * Returns an <CODE>Annotation</CODE> that has been constructed taking in
+	 * account the value of some <VAR>attributes </VAR>.
 	 * 
-	 * @param tag
-	 *            the given tag
-	 * @return true if the tag corresponds
+	 * @param attributes
+	 *            Some attributes
+	 * @deprecated Use ElementFactory.getAnnotation(attributes)
 	 */
-
-	public static boolean isTag(String tag) {
-		return ElementTags.ANNOTATION.equals(tag);
-	}
-
-	/**
-	 * @see com.lowagie.text.MarkupAttributes#setMarkupAttribute(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public void setMarkupAttribute(String name, String value) {
-		if (markupAttributes == null) markupAttributes = new Properties();
-		markupAttributes.put(name, value);
-	}
-
-	/**
-	 * @see com.lowagie.text.MarkupAttributes#setMarkupAttributes(java.util.Properties)
-	 */
-	public void setMarkupAttributes(Properties markupAttributes) {
-		this.markupAttributes = markupAttributes;
-	}
-
-	/**
-	 * @see com.lowagie.text.MarkupAttributes#getMarkupAttribute(java.lang.String)
-	 */
-	public String getMarkupAttribute(String name) {
-		return (markupAttributes == null) ? null : String
-				.valueOf(markupAttributes.get(name));
-	}
-
-	/**
-	 * @see com.lowagie.text.MarkupAttributes#getMarkupAttributeNames()
-	 */
-	public Set getMarkupAttributeNames() {
-		return Chunk.getKeySet(markupAttributes);
-	}
-
-	/**
-	 * @see com.lowagie.text.MarkupAttributes#getMarkupAttributes()
-	 */
-	public Properties getMarkupAttributes() {
-		return markupAttributes;
+	public Annotation(java.util.Properties attributes) {
+		this(com.lowagie.text.factories.ElementFactory.getAnnotation(attributes));
 	}
 }

@@ -1,6 +1,6 @@
 /*
- * $Id: FontDetails.java,v 1.47 2006/09/14 23:10:46 xlv Exp $
- * $Name:  $
+ * $Id: FontDetails.java 2366 2006-09-14 23:10:58Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *

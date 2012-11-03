@@ -89,10 +89,10 @@ public class TiffImage {
         switch (resolutionUnit) {
             case TIFFConstants.RESUNIT_INCH:
             case TIFFConstants.RESUNIT_NONE:
-                dpi = (int)(frac + 0.5);
+                dpi = (int)frac;
                 break;
             case TIFFConstants.RESUNIT_CENTIMETER:
-                dpi = (int)(frac * 2.54 + 0.5);
+                dpi = (int)(frac * 2.54);
                 break;
         }
         return dpi;
@@ -163,14 +163,13 @@ public class TiffImage {
                 dpiX = 0;
                 dpiY = 0;
             }
-            int rowsStrip = h;
+            long tstrip = 0xFFFFFFFFL;
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_ROWSPERSTRIP))
-                rowsStrip = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
-            if (rowsStrip <= 0 || rowsStrip > h)
-                rowsStrip = h;
+                tstrip = dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
+            int rowsStrip = (int)Math.min(h, tstrip);
             long offset[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPOFFSETS);
             long size[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPBYTECOUNTS);
-            if ((size == null || (size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length()))) && h == rowsStrip) { // some TIFF producers are really lousy, so...
+            if ((size == null || (size.length == 1 && size[0] == 0)) && h == rowsStrip) { // some TIFF producers are really lousy, so...
                 size = new long[]{s.length() - (int)offset[0]};
             }
             boolean reverse = false;
@@ -214,7 +213,7 @@ public class TiffImage {
                 byte im[] = new byte[(int)size[0]];
                 s.seek(offset[0]);
                 s.readFully(im);
-                img = Image.getInstance(w, h, false, imagecomp, params, im);
+                img = Image.getInstance(w, h, reverse, imagecomp, params, im);
                 img.setInverted(true);
             }
             else {
@@ -292,7 +291,6 @@ public class TiffImage {
                 case TIFFConstants.COMPRESSION_LZW:
                 case TIFFConstants.COMPRESSION_PACKBITS:
                 case TIFFConstants.COMPRESSION_DEFLATE:
-                case TIFFConstants.COMPRESSION_ADOBE_DEFLATE:
                 case TIFFConstants.COMPRESSION_OJPEG:
                 case TIFFConstants.COMPRESSION_JPEG:
                     break;
@@ -352,20 +350,12 @@ public class TiffImage {
                 resolutionUnit = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_RESOLUTIONUNIT);
             dpiX = getDpi(dir.getField(TIFFConstants.TIFFTAG_XRESOLUTION), resolutionUnit);
             dpiY = getDpi(dir.getField(TIFFConstants.TIFFTAG_YRESOLUTION), resolutionUnit);
-            int fillOrder = 1;
-            boolean reverse = false;
-            TIFFField fillOrderField =  dir.getField(TIFFConstants.TIFFTAG_FILLORDER);
-            if (fillOrderField != null)
-                fillOrder = fillOrderField.getAsInt(0);
-            reverse = (fillOrder == TIFFConstants.FILLORDER_LSB2MSB);
             int rowsStrip = h;
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_ROWSPERSTRIP)) //another hack for broken tiffs
                 rowsStrip = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
-            if (rowsStrip <= 0 || rowsStrip > h)
-                rowsStrip = h;
             long offset[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPOFFSETS);
             long size[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPBYTECOUNTS);
-            if ((size == null || (size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length()))) && h == rowsStrip) { // some TIFF producers are really lousy, so...
+            if ((size == null || (size.length == 1 && size[0] == 0)) && h == rowsStrip) { // some TIFF producers are really lousy, so...
                 size = new long[]{s.length() - (int)offset[0]};
             }
             if (compression == TIFFConstants.COMPRESSION_LZW) {
@@ -395,21 +385,14 @@ public class TiffImage {
                     zip = new DeflaterOutputStream(stream);
             }
             if (compression == TIFFConstants.COMPRESSION_OJPEG) {
-                
-                // Assume that the TIFFTAG_JPEGIFBYTECOUNT tag is optional, since it's obsolete and 
-                // is often missing
-
-                if ((!dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFOFFSET))) {
-                    throw new IOException("Missing tag(s) for OJPEG compression.");
+                if ((!dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFOFFSET))
+                || (!dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFBYTECOUNT))) {
+                    throw new RuntimeException("Missing tag(s) for OJPEG compression.");
                 }
                 int jpegOffset = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_JPEGIFOFFSET);
-                int jpegLength = s.length() - jpegOffset;
-
-                if (dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFBYTECOUNT)) {
-                    jpegLength = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_JPEGIFBYTECOUNT) +
+                int jpegLength = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_JPEGIFBYTECOUNT) +
                         (int)size[0];
-                }
-                
+
                 byte[] jpeg = new byte[Math.min(jpegLength, s.length() - jpegOffset)];
 
                 int posFilePointer = s.getFilePointer();
@@ -435,11 +418,8 @@ public class TiffImage {
                     byte outBuf[] = null;
                     if (compression != TIFFConstants.COMPRESSION_NONE)
                         outBuf = new byte[(w * bitsPerSample * samplePerPixel + 7) / 8 * height];
-                    if (reverse)
-                        TIFFFaxDecoder.reverseBits(im);
                     switch (compression) {
                         case TIFFConstants.COMPRESSION_DEFLATE:
-                        case TIFFConstants.COMPRESSION_ADOBE_DEFLATE:
                             inflate(im, outBuf);
                             break;
                         case TIFFConstants.COMPRESSION_NONE:
@@ -537,29 +517,24 @@ public class TiffImage {
         int srcCount = 0, dstCount = 0;
         byte repeat, b;
         
-        try {
-            while (dstCount < dst.length) {
-                b = data[srcCount++];
-                if (b >= 0 && b <= 127) {
-                    // literal run packet
-                    for (int i=0; i<(b + 1); i++) {
-                        dst[dstCount++] = data[srcCount++];
-                    }
-
-                } else if (b <= -1 && b >= -127) {
-                    // 2 byte encoded run packet
-                    repeat = data[srcCount++];
-                    for (int i=0; i<(-b + 1); i++) {
-                        dst[dstCount++] = repeat;
-                    }
-                } else {
-                    // no-op packet. Do nothing
-                    srcCount++;
+        while (dstCount < dst.length) {
+            b = data[srcCount++];
+            if (b >= 0 && b <= 127) {
+                // literal run packet
+                for (int i=0; i<(b + 1); i++) {
+                    dst[dstCount++] = data[srcCount++];
                 }
+
+            } else if (b <= -1 && b >= -127) {
+                // 2 byte encoded run packet
+                repeat = data[srcCount++];
+                for (int i=0; i<(-b + 1); i++) {
+                    dst[dstCount++] = repeat;
+                }
+            } else {
+                // no-op packet. Do nothing
+                srcCount++;
             }
-        }
-        catch (Exception e) {
-            // do nothing
         }
     }
 

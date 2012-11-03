@@ -1,6 +1,6 @@
 /*
- * $Id: SplitCharacter.java,v 1.44 2005/05/04 14:31:17 blowagie Exp $
- * $Name:  $
+ * $Id: SplitCharacter.java 2739 2007-05-04 11:24:51Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 by Paulo Soares
  *
@@ -93,6 +93,5 @@ public interface SplitCharacter {
      * If shorter than <CODE>end</CODE> the last element is used
      * @return <CODE>true</CODE> if the character(s) can split a line
      */
-    
     public boolean isSplitCharacter(int start, int current, int end, char cc[], PdfChunk ck[]);
 }

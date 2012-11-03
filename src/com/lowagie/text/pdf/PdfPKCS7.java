@@ -51,7 +51,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -64,7 +63,6 @@ import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -78,24 +76,28 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.lowagie.bc.asn1.ASN1EncodableVector;
-import com.lowagie.bc.asn1.ASN1InputStream;
-import com.lowagie.bc.asn1.ASN1OutputStream;
-import com.lowagie.bc.asn1.ASN1Sequence;
-import com.lowagie.bc.asn1.ASN1Set;
-import com.lowagie.bc.asn1.ASN1TaggedObject;
-import com.lowagie.bc.asn1.DERConstructedSet;
-import com.lowagie.bc.asn1.DERInteger;
-import com.lowagie.bc.asn1.DERNull;
-import com.lowagie.bc.asn1.DERObject;
-import com.lowagie.bc.asn1.DERObjectIdentifier;
-import com.lowagie.bc.asn1.DEROctetString;
-import com.lowagie.bc.asn1.DERSequence;
-import com.lowagie.bc.asn1.DERSet;
-import com.lowagie.bc.asn1.DERString;
-import com.lowagie.bc.asn1.DERTaggedObject;
-import com.lowagie.bc.asn1.DERUTCTime;
 import com.lowagie.text.ExceptionConverter;
+import java.math.BigInteger;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OutputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERConstructedSet;
+import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERString;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.jce.provider.X509CRLParser;
+import org.bouncycastle.jce.provider.X509CertParser;
+import org.bouncycastle.util.StreamParsingException;
 
 /**
  * This class does all the processing related to signing and verifying a PKCS#7
@@ -135,6 +137,7 @@ public class PdfPKCS7 {
     private static final String ID_MD2RSA = "1.2.840.113549.1.1.2";
     private static final String ID_MD5RSA = "1.2.840.113549.1.1.4";
     private static final String ID_SHA1RSA = "1.2.840.113549.1.1.5";
+    private static final String ID_ADBE_REVOCATION = "1.2.840.113583.1.1.8";
     /**
      * Holds value of property reason.
      */
@@ -167,14 +170,10 @@ public class PdfPKCS7 {
      * @throws NoSuchAlgorithmException on error
      * @throws IOException on error
      */    
-    public PdfPKCS7(byte[] contentsKey, byte[] certsKey, String provider) throws SecurityException, InvalidKeyException, CertificateException, NoSuchProviderException, NoSuchAlgorithmException, IOException {
-        CertificateFactory cf;
-        if (provider == null)
-            cf = CertificateFactory.getInstance("X.509");
-        else
-            cf = CertificateFactory.getInstance("X.509", provider);
-        if (provider == null)
-            certs = cf.generateCertificates(new ByteArrayInputStream(certsKey));
+    public PdfPKCS7(byte[] contentsKey, byte[] certsKey, String provider) throws SecurityException, InvalidKeyException, CertificateException, NoSuchProviderException, NoSuchAlgorithmException, IOException, StreamParsingException {
+        X509CertParser cr = new X509CertParser();
+        cr.engineInit(new ByteArrayInputStream(contentsKey));
+        certs = cr.engineReadAll();
         signCert = (X509Certificate)certs.iterator().next();
         crls = new ArrayList();
         ASN1InputStream in = new ASN1InputStream(new ByteArrayInputStream(contentsKey));
@@ -198,7 +197,7 @@ public class PdfPKCS7 {
      * @throws NoSuchProviderException on error
      * @throws NoSuchAlgorithmException on error
      */    
-    public PdfPKCS7(byte[] contentsKey, String provider) throws SecurityException, CRLException, InvalidKeyException, CertificateException, NoSuchProviderException, NoSuchAlgorithmException {
+    public PdfPKCS7(byte[] contentsKey, String provider) throws SecurityException, CRLException, InvalidKeyException, CertificateException, NoSuchProviderException, NoSuchAlgorithmException, StreamParsingException {
         ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(contentsKey));
         
         //
@@ -241,13 +240,12 @@ public class PdfPKCS7 {
         }
         
         // the certificates and crls
-        CertificateFactory cf;
-        if (provider == null)
-            cf = CertificateFactory.getInstance("X.509");
-        else
-            cf = CertificateFactory.getInstance("X.509", provider);
-        certs = cf.generateCertificates(new ByteArrayInputStream(contentsKey));
-        crls = cf.generateCRLs(new ByteArrayInputStream(contentsKey));
+        X509CertParser cr = new X509CertParser();
+        cr.engineInit(new ByteArrayInputStream(contentsKey));
+        certs = cr.engineReadAll();
+        X509CRLParser cl = new X509CRLParser();
+        cl.engineInit(new ByteArrayInputStream(contentsKey));
+        crls = cl.engineReadAll();
         
         // the possible ID_PKCS7_DATA
         ASN1Sequence rsaData = (ASN1Sequence)content.getObjectAt(2);
@@ -504,7 +502,8 @@ public class PdfPKCS7 {
     public String getDigestAlgorithm() {
         String dea = digestEncryptionAlgorithm;
         
-        if (digestEncryptionAlgorithm.equals(ID_RSA)) {
+        if (digestEncryptionAlgorithm.equals(ID_RSA) || digestEncryptionAlgorithm.equals(ID_MD5RSA)
+            || digestEncryptionAlgorithm.equals(ID_MD2RSA) || digestEncryptionAlgorithm.equals(ID_SHA1RSA)) {
             dea = "RSA";
         }
         else if (digestEncryptionAlgorithm.equals(ID_DSA)) {
@@ -858,6 +857,17 @@ public class PdfPKCS7 {
                 v.add(new DERObjectIdentifier(ID_MESSAGE_DIGEST));
                 v.add(new DERSet(new DEROctetString(secondDigest)));
                 attribute.add(new DERSequence(v));
+                if (!crls.isEmpty()) {
+                    v = new ASN1EncodableVector();
+                    v.add(new DERObjectIdentifier(ID_ADBE_REVOCATION));
+                    ASN1EncodableVector v2 = new ASN1EncodableVector();
+                    for (Iterator i = crls.iterator();i.hasNext();) {
+                        ASN1InputStream t = new ASN1InputStream(new ByteArrayInputStream((((X509CRL)i.next()).getEncoded())));
+                        v2.add(t.readObject());
+                    }
+                    v.add(new DERSet(new DERSequence(new DERTaggedObject(true, 0, new DERSequence(v2)))));
+                    attribute.add(new DERSequence(v));
+                }                
                 signerinfo.add(new DERTaggedObject(false, 0, new DERSet(attribute)));
             }
             // Add the digestEncryptionAlgorithm
@@ -953,6 +963,17 @@ public class PdfPKCS7 {
             v.add(new DERObjectIdentifier(ID_MESSAGE_DIGEST));
             v.add(new DERSet(new DEROctetString(secondDigest)));
             attribute.add(new DERSequence(v));
+            if (!crls.isEmpty()) {
+                v = new ASN1EncodableVector();
+                v.add(new DERObjectIdentifier(ID_ADBE_REVOCATION));
+                ASN1EncodableVector v2 = new ASN1EncodableVector();
+                for (Iterator i = crls.iterator();i.hasNext();) {
+                    ASN1InputStream t = new ASN1InputStream(new ByteArrayInputStream((((X509CRL)i.next()).getEncoded())));
+                    v2.add(t.readObject());
+                }
+                v.add(new DERSet(new DERSequence(new DERTaggedObject(true, 0, new DERSequence(v2)))));
+                attribute.add(new DERSequence(v));
+            }
             ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
             
             ASN1OutputStream dout = new ASN1OutputStream(bOut);

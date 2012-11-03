@@ -1,6 +1,6 @@
 /*
- * $Id: SpotColor.java,v 1.49 2006/09/14 23:39:20 xlv Exp $
- * $Name:  $
+ * $Id: SpotColor.java 2367 2006-09-14 23:39:21Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *

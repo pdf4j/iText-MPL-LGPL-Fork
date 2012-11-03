@@ -1,5 +1,5 @@
 /*
- * $Id: IVGenerator.java,v 1.2 2006/11/11 16:55:13 psoares33 Exp $
+ * $Id: IVGenerator.java 2699 2007-04-19 12:19:40Z blowagie $
  *
  * Copyright 2006 Paulo Soares
  *
@@ -73,10 +73,19 @@ public class IVGenerator {
      * @return a 16 byte random initialization vector
      */
     public static byte[] getIV() {
-        byte[] b = new byte[16];
+        return getIV(16);
+    }
+    
+    /**
+     * Gets a random initialization vector.
+     * @param len the length of the initialization vector
+     * @return a random initialization vector
+     */
+    public static byte[] getIV(int len) {
+        byte[] b = new byte[len];
         synchronized (arcfour) {
             arcfour.encryptARCFOUR(b);
         }
         return b;
-    }
+    }    
 }

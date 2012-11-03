@@ -2,7 +2,7 @@
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <!-- iText, a JAVA - PDF library                                      -->
-<!-- $Id: release.xml,v 1.10 2006/09/08 12:31:36 blowagie Exp $         -->
+<!-- $Id: release.xml 2766 2007-05-20 11:40:29Z blowagie $         -->
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <project name="iText.release" default="help">
@@ -72,12 +72,23 @@
 		<copy file="${itext.dist}/docs.tar.gz" tofile="${itext.sf}/itext-docs-${releasenumber}.tar.gz" overwrite="yes"/>
 		<copy file="${itext.dist}/iTextAnt.zip" tofile="${itext.sf}/iTextAnt-${releasenumber}.zip" overwrite="yes"/>
 	</target>
+	
+	<target name="earlyaccess.sf" description="--> makes a complete iText release ready to publish on SourceForge">
+		<mkdir dir="${itext.sf}"/>
+        <copy file="${itext.bin}/iText.jar" todir="${itext.dist}" overwrite="yes" />
+		<copy file="${itext.bin}/iText.jar" tofile="${itext.dist}/itext-${earlyaccesslowagie}.jar" overwrite="yes"/>
+		<copy file="${itext.bin}/iText.jar" tofile="${itext.sf}/itext-${earlyaccesslowagie}.jar" overwrite="yes"/>
+		<copy file="${itext.dist}/src.zip" tofile="${itext.sf}/itext-src-${earlyaccesslowagie}.zip" overwrite="yes"/>
+		<copy file="${itext.dist}/src.tar.gz" tofile="${itext.sf}/itext-src-${earlyaccesslowagie}.tar.gz" overwrite="yes"/>
+		<copy file="${itext.dist}/docs.tar.gz" tofile="${itext.sf}/itext-docs-${earlyaccesslowagie}.tar.gz" overwrite="yes"/>
+		<copy file="${itext.dist}/iTextAnt.zip" tofile="${itext.sf}/itext-ant-${earlyaccesslowagie}.zip" overwrite="yes"/>
+	</target>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- Making the jars with the Asian Fontfiles                         -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->	
 	<target name="asian.jar" description="--> makes iTextAsian.jar and iTextAsianCmaps.jar">
-        <jar jarfile="${itext.bin}/iTextAsian.jar" basedir="${itext.src}" includes="**/*.cmap,**/*.properties,**/cmap_info.txt" />
+        <jar jarfile="${itext.bin}/iTextAsian.jar" basedir="${itext.src}" includes="**/*.cmap,**/*.properties" />
         <jar jarfile="${itext.bin}/iTextAsianCmaps.jar" basedir="${itext.src}" excludes="**/*.java, **/*.ps,**/*.txt,**/*.gif,**/*.afm,**/*.html,**/*.cmap,**/*.properties" />
 	</target>
 </project>

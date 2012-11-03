@@ -1,6 +1,6 @@
 /*
- * $Id: MetaState.java,v 1.6 2006/09/14 23:10:52 xlv Exp $
- * $Name:  $
+ * $Id: MetaState.java 2366 2006-09-14 23:10:58Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *

@@ -1,6 +1,6 @@
 /*
- * $Id: XmlPeer.java,v 1.14 2006/09/14 23:10:56 xlv Exp $
- * $Name:  $
+ * $Id: XmlPeer.java 2366 2006-09-14 23:10:58Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *

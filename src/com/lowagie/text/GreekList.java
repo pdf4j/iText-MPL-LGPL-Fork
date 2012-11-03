@@ -1,5 +1,5 @@
 /*
- * Copyright 2003 by Michael Niedermair.
+ * Copyright 2003 by Michael Niedermair and 2007 Bruno Lowagie
  *
  * The contents of this file are subject to the Mozilla Public License Version 1.1
  * (the "License"); you may not use this file except in compliance with the License.
@@ -46,24 +46,28 @@
  */
 package com.lowagie.text;
 
+import com.lowagie.text.factories.GreekNumberFactory;
+
 /**
  * 
  * A special-version of <CODE>LIST</CODE> whitch use greek-letters.
  * 
  * @see com.lowagie.text.List
- * @version 2003-06-22
- * @author Michael Niedermair
  */
 
 public class GreekList extends List {
 
+// constructors
+	
 	/**
-	 * UpperCase or LowerCase
+	 * Initialization
 	 */
-	protected boolean greeklower;
-
+	public GreekList() {
+		super(true);
+		setGreekFont();
+	}
 	/**
-	 * Initialisierung
+	 * Initialization
 	 * 
 	 * @param symbolIndent	indent
 	 */
@@ -73,42 +77,28 @@ public class GreekList extends List {
 	}
 
 	/**
-	 * Initialisierung 
+	 * Initialization 
 	 * @param	greeklower		greek-char in lowercase   
 	 * @param 	symbolIndent	indent
 	 */
 	public GreekList(boolean greeklower, int symbolIndent) {
 		super(true, symbolIndent);
-		this.greeklower = greeklower;
+		lowercase = greeklower;
 		setGreekFont();
 	}
 
+// helper method
+	
 	/**
 	 * change the font to SYMBOL
 	 */
 	protected void setGreekFont() {
-		float fontsize = symbol.font().size();
+		float fontsize = symbol.getFont().getSize();
 		symbol.setFont(FontFactory.getFont(FontFactory.SYMBOL, fontsize, Font.NORMAL));
 	}
 
-	/**
-	 * set the greek-letters to lowercase otherwise to uppercase
-	 * 
-	 * @param greeklower
-	 */
-	public void setGreekLower(boolean greeklower) {
-		this.greeklower = greeklower;
-	}
-
-	/**
-	 * Checks if the list is greek-letter with lowercase
-	 *
-	 * @return	<CODE>true</CODE> if the greek-letter is lowercase, <CODE>false</CODE> otherwise.
-	 */
-	public boolean isGreekLower() {
-		return greeklower;
-	}
-
+// overridden method
+	
 	/**
 	 * Adds an <CODE>Object</CODE> to the <CODE>List</CODE>.
 	 *
@@ -118,30 +108,58 @@ public class GreekList extends List {
 	public boolean add(Object o) {
 		if (o instanceof ListItem) {
 			ListItem item = (ListItem) o;
-			Chunk chunk;
-			int index;
-			if (greeklower) {
-				index = first + list.size() + 944;
-				if (index > 961) index++;
-			}
-			else {
-				index = first + list.size() + 912;
-				if (index > 929) index++;
-			}
-			chunk = SpecialSymbol.get((char) index, symbol.font());
-			chunk.append(".");
+			Chunk chunk = new Chunk(GreekNumberFactory.getString(first + list.size(), lowercase), symbol.getFont());
+			chunk.append(". ");
 			item.setListSymbol(chunk);
-			item.setIndentationLeft(symbolIndent);
+			item.setIndentationLeft(symbolIndent, autoindent);
 			item.setIndentationRight(0);
 			list.add(item);
 		} else if (o instanceof List) {
 			List nested = (List) o;
-			nested.setIndentationLeft(nested.indentationLeft() + symbolIndent);
+			nested.setIndentationLeft(nested.getIndentationLeft() + symbolIndent);
 			first--;
 			return list.add(nested);
 		} else if (o instanceof String) {
 			return this.add(new ListItem((String) o));
 		}
 		return false;
+	}
+
+// deprecated methods
+	
+	/**
+	 * Translates a number to a letter(combination).
+	 * 1-26 correspond with a-z, 27 is aa, 28 is ab, and so on,
+	 * aaa comes right after zz.
+	 * @param index	a number greater than 0
+	 * @return	a String corresponding with the index.
+	 * @deprecated use GreekNumberFactory.getString(int, boolean)
+	 */
+	public static int[] getGreekValue(int index, boolean lowercase) {
+	   	byte[] result = GreekNumberFactory.getString(index, lowercase).getBytes();
+	   	int n = result.length;
+	   	int[] r = new int[n];
+	   	System.arraycopy(result, 0, r, 0, n);
+	   	return r;
+	 }
+
+	/**
+	 * set the greek-letters to lowercase otherwise to uppercase
+	 * 
+	 * @param greeklower
+	 * @deprecated use setLowercase(boolean)
+	 */
+	public void setGreekLower(boolean greeklower) {
+		setLowercase(greeklower);
+	}
+
+	/**
+	 * Checks if the list is greek-letter with lowercase
+	 *
+	 * @return	<CODE>true</CODE> if the greek-letter is lowercase, <CODE>false</CODE> otherwise.
+	 * @deprecated use isLowercase()
+	 */
+	public boolean isGreekLower() {
+		return isLowercase();
 	}
 }

@@ -1,6 +1,6 @@
 /*
- * $Id: PdfLiteral.java,v 1.53 2005/05/04 14:31:48 blowagie Exp $
- * $Name:  $
+ * $Id: PdfLiteral.java 1733 2005-05-04 14:33:54Z blowagie $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *

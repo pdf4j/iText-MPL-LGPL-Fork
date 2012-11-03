@@ -1,6 +1,6 @@
 /*
- * $Id: MetaFont.java,v 1.4 2006/09/14 23:10:52 xlv Exp $
- * $Name:  $
+ * $Id: MetaFont.java 2366 2006-09-14 23:10:58Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
  *

@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPageElement.java,v 1.56 2005/05/04 14:33:11 blowagie Exp $
- * $Name:  $
+ * $Id: PdfPageElement.java 1733 2005-05-04 14:33:54Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

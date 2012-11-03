@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPageEventForwarder.java,v 1.2 2006/09/14 23:10:53 xlv Exp $
- * $Name:  $
+ * $Id: PdfPageEventForwarder.java 2366 2006-09-14 23:10:58Z xlv $
+ * $Name$
  *
  * Copyright 2005 Bruno Lowagie
  *

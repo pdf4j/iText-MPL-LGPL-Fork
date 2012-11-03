@@ -1,6 +1,6 @@
 /*
- * $Id: PdfCopyFieldsImp.java,v 1.17 2006/10/27 17:23:19 xlv Exp $
- * $Name:  $
+ * $Id: PdfCopyFieldsImp.java 2563 2007-02-01 14:43:07Z blowagie $
+ * $Name$
  * Copyright 2004 by Paulo Soares.
  *
  * The contents of this file are subject to the Mozilla Public License Version 1.1
@@ -112,8 +112,6 @@ class PdfCopyFieldsImp extends PdfWriter {
     }
     
     void addDocument(PdfReader reader) throws DocumentException {
-    	if (!reader.isOpenedWithFullPermissions())
-    		throw new IllegalArgumentException("PdfReader not opened with owner password");
         openDoc();
         if (readers2intrefs.containsKey(reader)) {
             reader = new PdfReader(reader);
@@ -531,7 +529,7 @@ class PdfCopyFieldsImp extends PdfWriter {
     
     protected PdfDictionary getCatalog(PdfIndirectReference rootObj) {
         try {
-            PdfDictionary cat = ((PdfDocument)document).getCatalog(rootObj);
+            PdfDictionary cat = pdf.getCatalog(rootObj);
             if (form != null) {
                 PdfIndirectReference ref = addToBody(form).getIndirectReference();
                 cat.put(PdfName.ACROFORM, ref);

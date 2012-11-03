@@ -2,12 +2,18 @@
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <!-- iText, a JAVA - PDF library                                      -->
-<!-- $Id: site.xml,v 1.17 2006/11/25 13:28:07 blowagie Exp $         -->
+<!-- $Id: site.xml 2766 2007-05-20 11:40:29Z blowagie $         -->
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <project name="iText.site" default="help" basedir=".">
 	
 	<property file=".ant.properties" />
+
+	<path id="itext.classpath">
+	    <pathelement location="${itext.classes}"/>
+	    <pathelement path="${itext.bin}/bcmail-jdk14-135.jar"/>
+	    <pathelement path="${itext.bin}/bcprov-jdk14-135.jar"/>
+	</path>
 	
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- Help                                                             -->
@@ -37,7 +43,6 @@
 		<copy file="${itext.src.lowagie}/style.css" todir="${itext.lowagie}" overwrite="no" />
 		<copy file="${itext.src.lowagie}/MPL-1.1.txt" todir="${itext.lowagie}" overwrite="no" />
 		<copy file="${itext.src.lowagie}/lgpl.txt" todir="${itext.lowagie}" overwrite="no" />
-		<copy file="${itext.src.lowagie}/itext.jnlp" todir="${itext.lowagie}" overwrite="no" />
         <xslt basedir="${itext.src.lowagie}" destdir="${itext.lowagie}" extension=".html" style="${itext.src.lowagie}/lowagie.xsl" includes="*.xml">
 			<param name="releasenumber" expression="${releasenumber}"/>
 			<param name="releasedate" expression="${releasedate}"/>
@@ -58,7 +63,19 @@
 		<copy file="${itext.src.tutorial}/style.css" todir="${itext.tutorial}" overwrite="no" />
         <copy todir="${itext.examples}" overwrite="yes">
             <fileset dir="${itext.src.examples}">
-                <include name="**/*.java"/>
+            	<include name="**/*.java"/>	
+                <include name="**/*.xml"/>	
+                <include name="**/*.mpg"/>
+                <include name="**/*.tiff"/>
+        		<include name="**/*.tif"/>
+        		<include name="**/*.gif"/>
+        		<include name="**/*.bmp"/>
+        		<include name="**/*.wmf"/>
+        		<include name="**/*.jpg"/>
+        		<include name="**/*.png"/>
+                <include name="**/*.pdf"/>
+        		<include name="**/*.otf"/>
+        		<include name="**/*.xfdf"/>
             </fileset>
         </copy>
         <copy todir="${itext.tutorial}/images" overwrite="yes">
@@ -86,9 +103,12 @@
 		<ant antfile="${itext.tutorial}/build.xml" inheritAll="false" />
         <mkdir dir="${itext.dist}" />
         <mkdir dir="${itext.downloads}" />
-        <tar tarfile="${itext.downloads}/tutorial.tar" basedir="${itext.build}" includes="tutorial/**, examples/**" />
+        <tar tarfile="${itext.downloads}/tutorial.tar" basedir="${itext.build}" includes="tutorial/**" />
         <gzip zipfile="${itext.dist}/tutorial.tar.gz" src="${itext.downloads}/tutorial.tar" />
         <delete file="${itext.downloads}/tutorial.tar" />
+        <tar tarfile="${itext.downloads}/examples.tar" basedir="${itext.build}" includes="examples/**" />
+        <gzip zipfile="${itext.dist}/examples.tar.gz" src="${itext.downloads}/examples.tar" />
+        <delete file="${itext.downloads}/examples.tar" />
     </target>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -104,7 +124,9 @@
 			<packageset dir="${itext.src}" defaultexcludes="yes">
       			<include name="com/lowagie/**" />
 		    </packageset>
+        	<classpath refid="itext.classpath"/>
             <link href="http://java.sun.com/j2se/1.3/docs/api/" />
+        	<link href="http://www.bouncycastle.org/docs/docs1.4/" />
         	<header>&lt;a href="http://itext.ugent.be/itext-in-action/" target="_blank"&gt;&lt;img src="http://itext.ugent.be/img/lowagie_3d.jpg" border="0" /&gt;&lt;/a&gt;</header>
         </javadoc>
     </target>

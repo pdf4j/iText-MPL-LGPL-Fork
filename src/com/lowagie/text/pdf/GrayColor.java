@@ -1,6 +1,6 @@
 /*
- * $Id: GrayColor.java,v 1.45 2006/09/14 23:39:20 xlv Exp $
- * $Name:  $
+ * $Id: GrayColor.java 2367 2006-09-14 23:39:21Z xlv $
+ * $Name$
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *

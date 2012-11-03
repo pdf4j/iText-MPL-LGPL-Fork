@@ -1,6 +1,6 @@
 /*
- * $Id: PdfIndirectObject.java,v 1.60 2005/05/04 14:31:40 blowagie Exp $
- * $Name:  $
+ * $Id: PdfIndirectObject.java 2739 2007-05-04 11:24:51Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -63,8 +63,8 @@ import com.lowagie.text.DocWriter;
  * An indirect object consists of an object identifier, a direct object, and the <B>endobj</B>
  * keyword. The <I>object identifier</I> consists of an integer <I>object number</I>, an integer
  * <I>generation number</I>, and the <B>obj</B> keyword.<BR>
- * This object is described in the 'Portable Document Format Reference Manual version 1.3'
- * section 4.10 (page 53).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.7'
+ * section 3.2.9 (page 63-65).
  *
  * @see		PdfObject
  * @see		PdfIndirectReference

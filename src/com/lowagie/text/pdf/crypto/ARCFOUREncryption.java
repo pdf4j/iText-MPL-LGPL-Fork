@@ -1,5 +1,5 @@
 /*
- * $Id: ARCFOUREncryption.java,v 1.1 2006/11/08 17:33:43 psoares33 Exp $
+ * $Id: ARCFOUREncryption.java 2699 2007-04-19 12:19:40Z blowagie $
  *
  * Copyright 2006 Paulo Soares
  *

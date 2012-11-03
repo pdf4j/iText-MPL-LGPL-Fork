@@ -1,6 +1,6 @@
 /*
- * $Id: RtfNewPage.java,v 1.7 2006/08/07 10:06:35 blowagie Exp $
- * $Name:  $
+ * $Id: RtfNewPage.java 2788 2007-05-24 17:37:29Z hallm $
+ * $Name$
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,6 +52,7 @@ package com.lowagie.text.rtf.text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import com.lowagie.text.rtf.RtfElement;
 import com.lowagie.text.rtf.document.RtfDocument;
@@ -60,15 +61,16 @@ import com.lowagie.text.rtf.document.RtfDocument;
 /**
  * The RtfNewPage creates a new page. INTERNAL CLASS
  * 
- * @version $Version:$
+ * @version $Id: RtfNewPage.java 2788 2007-05-24 17:37:29Z hallm $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
+ * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfNewPage extends RtfElement {
 
     /**
      * Constant for a new page
      */
-    private static final byte[] NEW_PAGE = "\\page".getBytes();
+    public static final byte[] NEW_PAGE = "\\page".getBytes();
     
     /**
      * Constructs a RtfNewPage
@@ -83,15 +85,24 @@ public class RtfNewPage extends RtfElement {
      * Writes a new page
      * 
      * @return A byte array with the new page set
+     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
     public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-            result.write(NEW_PAGE);
-            result.write(RtfParagraph.PARAGRAPH_DEFAULTS);
+        	writeContent(result);
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
+    /**
+     * Writes a new page
+     */ 
+    public void writeContent(final OutputStream result) throws IOException
+    {
+        result.write(NEW_PAGE);
+        result.write(RtfParagraph.PARAGRAPH_DEFAULTS);    	
+    }
+    
 }

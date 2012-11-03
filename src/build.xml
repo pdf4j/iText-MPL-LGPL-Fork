@@ -2,7 +2,7 @@
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <!-- iText, a JAVA - PDF library                                      -->
-<!-- $Id: build.xml,v 1.7 2006/09/25 21:08:07 xlv Exp $         -->
+<!-- $Id: build.xml 2419 2006-09-25 21:08:07Z xlv $         -->
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <project name="iText" default="help" basedir=".">
@@ -32,6 +32,16 @@
 		<ant antfile="ant/compile.xml" inheritAll="false" target="jar" />
 		<ant antfile="ant/site.xml" inheritAll="false" target="lowagie.com" />
 		<ant antfile="ant/release.xml" inheritAll="false" target="release.sf" />
+	</target>
+	
+	<target name="earlyaccess" description="--> builds a release after you have exported the src and www module from CVS">
+		<ant antfile="ant/download.xml" inheritAll="false" target="download.bin" />
+		<ant antfile="ant/release.xml" inheritAll="false" target="archive.src" />
+		<ant antfile="ant/release.xml" inheritAll="false" target="ant.zip" />
+		<ant antfile="ant/site.xml" inheritAll="false" target="docs.tar.gz" />
+		<ant antfile="ant/compile.xml" inheritAll="false" target="jar" />
+		<ant antfile="ant/site.xml" inheritAll="false" target="lowagie.com" />
+		<ant antfile="ant/release.xml" inheritAll="false" target="earlyaccess.sf" />
 	</target>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -96,10 +106,6 @@
 	
 	<target name="ant.zip">
 		<ant antfile="ant/release.xml" inheritAll="false" target="ant.zip" />
-	</target>
-	
-	<target name="asian.jar">
-		<ant antfile="ant/release.xml" inheritAll="false" target="asian.jar" />
 	</target>
 	
 	<target name="changelog">

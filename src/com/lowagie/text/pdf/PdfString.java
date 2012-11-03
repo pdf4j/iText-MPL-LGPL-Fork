@@ -1,6 +1,6 @@
 /*
- * $Id: PdfString.java,v 1.61 2006/11/09 18:20:12 xlv Exp $
- * $Name:  $
+ * $Id: PdfString.java 2739 2007-05-04 11:24:51Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -63,8 +63,8 @@ import java.io.OutputStream;
  * specify unbalanced parenthesis, non-printing ASCII characters, and the backslash character
  * itself. Use of the \<I>ddd</I> escape sequence is the preferred way to represent characters
  * outside the printable ASCII character set.<BR>
- * This object is described in the 'Portable Document Format Reference Manual version 1.3'
- * section 4.4 (page 37-39).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.7'
+ * section 3.2.3 (page 53-56).
  *
  * @see		PdfObject
  * @see		BadPdfFormatException
@@ -134,8 +134,6 @@ public class PdfString extends PdfObject {
     
     /**
      * Returns the PDF representation of this <CODE>PdfString</CODE>.
-     *
-     * @return		an array of <CODE>byte</CODE>s
      */
     
     public void toPdf(PdfWriter writer, OutputStream os) throws IOException {

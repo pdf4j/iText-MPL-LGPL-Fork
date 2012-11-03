@@ -1,5 +1,5 @@
 /**
- * $Id: GenericRtfField.java,v 1.19 2006/09/12 13:12:53 blowagie Exp $
+ * $Id: GenericRtfField.java 2655 2007-03-15 19:26:36Z xlv $
  *
  * Copyright 2002 by 
  * <a href="http://www.smb-tec.com">SMB</a> 
@@ -25,7 +25,7 @@
  * where applicable.
  *
  * Alternatively, the contents of this file may be used under the terms of the
- * LGPL license (the “GNU LIBRARY GENERAL PUBLIC LICENSE”), in which case the
+ * LGPL license (the "GNU LIBRARY GENERAL PUBLIC LICENSE"), in which case the
  * provisions of LGPL are applicable instead of those above.  If you wish to
  * allow use of your version of this file only under the terms of the LGPL
  * License and not to allow others to use your version of this file under
@@ -66,11 +66,11 @@ import com.lowagie.text.Font;
  * ONLY FOR USE WITH THE RtfWriter NOT with the RtfWriter2.
  *
  * @author Dirk Weigenand (Dirk.Weigenand@smb-tec.com)
- * @version $Id: GenericRtfField.java,v 1.19 2006/09/12 13:12:53 blowagie Exp $
+ * @version $Id: GenericRtfField.java 2655 2007-03-15 19:26:36Z xlv $
  * @since Mon Aug 19 14:50:39 2002
  * @deprecated Please move to the RtfWriter2 and associated classes.
  */
-public class GenericRtfField extends AbstractRtfField implements RtfField {
+public class GenericRtfField extends AbstractRtfField {
     /**
      * Field Initialization Stuff.
      */

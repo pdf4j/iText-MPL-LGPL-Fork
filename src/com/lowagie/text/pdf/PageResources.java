@@ -1,5 +1,5 @@
 /*
- * $Id: PageResources.java,v 1.16 2006/09/24 15:49:14 psoares33 Exp $
+ * $Id: PageResources.java 2414 2006-09-24 15:49:14Z psoares33 $
  *
  * Copyright 2003-2005 by Paulo Soares.
  *

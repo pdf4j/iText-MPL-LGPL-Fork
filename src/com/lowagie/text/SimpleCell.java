@@ -1,6 +1,6 @@
 /*
- * $Id: SimpleCell.java,v 1.7 2005/09/18 13:17:57 blowagie Exp $
- * $Name:  $
+ * $Id: SimpleCell.java 2748 2007-05-12 15:11:48Z blowagie $
+ * $Name$
  *
  * Copyright 1999-2005 by Bruno Lowagie.
  *
@@ -61,12 +61,15 @@ import com.lowagie.text.pdf.PdfPTable;
  * Rectangle that can be used for Cells.
  * This Rectangle is padded and knows how to draw itself in a PdfPTable or PdfPcellEvent.
  */
-public class SimpleCell extends Rectangle implements PdfPCellEvent, Element, TextElementArray {
+public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
 
+	// constants
 	/** the CellAttributes object represents a row. */
 	public static final boolean ROW = true;
 	/** the CellAttributes object represents a cell. */
 	public static final boolean CELL = false;
+	
+	// member variables
 	/** the content of the Cell. */
 	private ArrayList content = new ArrayList();
 	/** the width of the Cell. */
@@ -145,6 +148,7 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, Element, Tex
 				|| element.type() == Element.ANCHOR
 				|| element.type() == Element.CHUNK
 				|| element.type() == Element.LIST
+				|| element.type() == Element.MARKED
 				|| element.type() == Element.JPEG
 				|| element.type() == Element.IMGRAW
 				|| element.type() == Element.IMGTEMPLATE) {
@@ -264,7 +268,7 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, Element, Tex
 		if (Float.isNaN(sp_top)) sp_top = 0f;
 		float sp_bottom = spacing_bottom;
 		if (Float.isNaN(sp_bottom)) sp_bottom = 0f;
-		Rectangle rect = new Rectangle(position.left(sp_left), position.bottom(sp_bottom), position.right(sp_right), position.top(sp_top));
+		Rectangle rect = new Rectangle(position.getLeft(sp_left), position.getBottom(sp_bottom), position.getRight(sp_right), position.getTop(sp_top));
 		rect.cloneNonPositionParameters(this);
 		canvases[PdfPTable.BACKGROUNDCANVAS].rectangle(rect);
 		rect.setBackgroundColor(null);

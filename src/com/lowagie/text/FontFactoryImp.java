@@ -1,6 +1,6 @@
 /*
- * $Id: FontFactoryImp.java,v 1.8 2006/09/15 23:37:31 xlv Exp $
- * $Name:  $
+ * $Id: FontFactoryImp.java 2745 2007-05-09 22:52:57Z xlv $
+ * $Name$
  *
  * Copyright 2002 by Bruno Lowagie.
  *
@@ -60,8 +60,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
-import com.lowagie.text.markup.MarkupParser;
-import com.lowagie.text.markup.MarkupTags;
+import com.lowagie.text.html.Markup;
 import com.lowagie.text.pdf.BaseFont;
 
 /**
@@ -197,9 +196,11 @@ public class FontFactoryImp {
         try {
             try {
                 // the font is a type 1 font or CJK font
-                basefont = BaseFont.createFont(fontname, encoding, embedded, cached, null, null);
+                basefont = BaseFont.createFont(fontname, encoding, embedded, cached, null, null, true);
             }
             catch(DocumentException de) {
+            }
+            if (basefont == null) {
                 // the font is a true type font or an unknown font
                 fontname = trueTypeFonts.getProperty(fontname.toLowerCase());
                 // the font is not registered as truetype font
@@ -238,14 +239,14 @@ public class FontFactoryImp {
         float size = Font.UNDEFINED;
         int style = Font.NORMAL;
         Color color = null;
-        String value = (String) attributes.remove(MarkupTags.HTML_ATTR_STYLE);
+        String value = attributes.getProperty(Markup.HTML_ATTR_STYLE);
         if (value != null && value.length() > 0) {
-            Properties styleAttributes = MarkupParser.parseAttributes(value);
-            if (styleAttributes.size() == 0) {
-                attributes.put(MarkupTags.HTML_ATTR_STYLE, value);
+            Properties styleAttributes = Markup.parseAttributes(value);
+            if (styleAttributes.isEmpty()) {
+                attributes.put(Markup.HTML_ATTR_STYLE, value);
             }
             else {
-                fontname = (String)styleAttributes.remove(MarkupTags.CSS_KEY_FONTFAMILY);
+                fontname = styleAttributes.getProperty(Markup.CSS_KEY_FONTFAMILY);
                 if (fontname != null) {
                     String tmp;
                     while (fontname.indexOf(',') != -1) {
@@ -258,17 +259,17 @@ public class FontFactoryImp {
                         }
                     }
                 }
-                if ((value = (String)styleAttributes.remove(MarkupTags.CSS_KEY_FONTSIZE)) != null) {
-                    size = MarkupParser.parseLength(value);
+                if ((value = styleAttributes.getProperty(Markup.CSS_KEY_FONTSIZE)) != null) {
+                    size = Markup.parseLength(value);
                 }
-                if ((value = (String)styleAttributes.remove(MarkupTags.CSS_KEY_FONTWEIGHT)) != null) {
+                if ((value = styleAttributes.getProperty(Markup.CSS_KEY_FONTWEIGHT)) != null) {
                     style |= Font.getStyleValue(value);
                 }
-                if ((value = (String)styleAttributes.remove(MarkupTags.CSS_KEY_FONTSTYLE)) != null) {
+                if ((value = styleAttributes.getProperty(Markup.CSS_KEY_FONTSTYLE)) != null) {
                     style |= Font.getStyleValue(value);
                 }
-                if ((value = (String)styleAttributes.remove(MarkupTags.CSS_KEY_COLOR)) != null) {
-                    color = MarkupParser.decodeColor(value);
+                if ((value = styleAttributes.getProperty(Markup.CSS_KEY_COLOR)) != null) {
+                    color = Markup.decodeColor(value);
                 }
                 attributes.putAll(styleAttributes);
                 for (Enumeration e = styleAttributes.keys(); e.hasMoreElements();) {
@@ -277,27 +278,27 @@ public class FontFactoryImp {
                 }
             }
         }
-        if ((value = (String)attributes.remove(ElementTags.ENCODING)) != null) {
+        if ((value = attributes.getProperty(ElementTags.ENCODING)) != null) {
             encoding = value;
         }
-        if ("true".equals(attributes.remove(ElementTags.EMBEDDED))) {
+        if ("true".equals(attributes.getProperty(ElementTags.EMBEDDED))) {
             embedded = true;
         }
-        if ((value = (String)attributes.remove(ElementTags.FONT)) != null) {
+        if ((value = attributes.getProperty(ElementTags.FONT)) != null) {
             fontname = value;
         }
-        if ((value = (String)attributes.remove(ElementTags.SIZE)) != null) {
+        if ((value = attributes.getProperty(ElementTags.SIZE)) != null) {
             size = Float.parseFloat(value + "f");
         }
-        if ((value = (String)attributes.remove(MarkupTags.HTML_ATTR_STYLE)) != null) {
+        if ((value = attributes.getProperty(Markup.HTML_ATTR_STYLE)) != null) {
             style |= Font.getStyleValue(value);
         }
-        if ((value = (String)attributes.remove(ElementTags.STYLE)) != null) {
+        if ((value = attributes.getProperty(ElementTags.STYLE)) != null) {
             style |= Font.getStyleValue(value);
         }
-        String r = (String)attributes.remove(ElementTags.RED);
-        String g = (String)attributes.remove(ElementTags.GREEN);
-        String b = (String)attributes.remove(ElementTags.BLUE);
+        String r = attributes.getProperty(ElementTags.RED);
+        String g = attributes.getProperty(ElementTags.GREEN);
+        String b = attributes.getProperty(ElementTags.BLUE);
         if (r != null || g != null || b != null) {
             int red = 0;
             int green = 0;
@@ -307,8 +308,8 @@ public class FontFactoryImp {
             if (b != null) blue = Integer.parseInt(b);
             color = new Color(red, green, blue);
         }
-        else if ((value = (String)attributes.remove(ElementTags.COLOR)) != null) {
-            color = MarkupParser.decodeColor(value);
+        else if ((value = attributes.getProperty(ElementTags.COLOR)) != null) {
+            color = Markup.decodeColor(value);
         }
         if (fontname == null) {
             return getFont(null, encoding, embedded, size, style, color);
@@ -636,7 +637,7 @@ public class FontFactoryImp {
  */
     
     public Set getRegisteredFonts() {
-        return Chunk.getKeySet(trueTypeFonts);
+        return Utilities.getKeySet(trueTypeFonts);
     }
     
 /**
@@ -645,7 +646,7 @@ public class FontFactoryImp {
  */
     
     public Set getRegisteredFamilies() {
-        return Chunk.getKeySet(fontFamilies);
+        return Utilities.getKeySet(fontFamilies);
     }
     
 /**

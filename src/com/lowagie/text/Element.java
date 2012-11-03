@@ -1,6 +1,6 @@
 /*
- * $Id: Element.java,v 1.66 2005/05/04 14:41:15 blowagie Exp $
- * $Name:  $
+ * $Id: Element.java 2566 2007-02-02 15:38:59Z blowagie $
+ * $Name$
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -70,7 +70,6 @@ import java.util.ArrayList;
  * @see Cell
  * @see Chapter
  * @see Chunk
- * @see Graphic
  * @see Header
  * @see Image
  * @see Jpeg
@@ -173,10 +172,10 @@ public interface Element {
 	public static final int IMGTEMPLATE = 35;
 
 	/** This is a possible type of <CODE>Element</CODE>. */
-	public static final int GRAPHIC = 39;
-
-	/** This is a possible type of <CODE>Element</CODE>. */
 	public static final int MULTI_COLUMN_TEXT = 40;
+	
+	/** This is a possible type of <CODE>Element</CODE>. */
+	public static final int MARKED = 50;
 
 	// static membervariables (alignment)
 

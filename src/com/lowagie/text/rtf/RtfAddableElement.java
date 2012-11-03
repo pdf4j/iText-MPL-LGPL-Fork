@@ -1,6 +1,6 @@
 /*
- * $Id: RtfAddableElement.java,v 1.2 2006/10/03 15:23:37 hallm Exp $
- * $Name:  $
+ * $Id: RtfAddableElement.java 2776 2007-05-23 20:01:40Z hallm $
+ * $Name$
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,6 +52,9 @@
 
 package com.lowagie.text.rtf;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Font;
 import com.lowagie.text.rtf.document.RtfDocument;
@@ -62,8 +65,9 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * and it also implements RtfBasicElement. It is an abstract class thus it
  * cannot be instantiated itself and has to be subclassed to be used.
  * 
- * @version $Revision: 1.2 $
+ * @version $Id: RtfAddableElement.java 2776 2007-05-23 20:01:40Z hallm $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
+ * @author Thomas Bickel (tmb99@inode.at)
  */
 public abstract class RtfAddableElement extends Chunk implements RtfBasicElement {
 
@@ -90,9 +94,21 @@ public abstract class RtfAddableElement extends Chunk implements RtfBasicElement
 
 	/**
 	 * Subclasses have to implement this method.
+	 * 
+	 * @deprecated replaced by {@link #writeContent(OutputStream)}
 	 */
 	public abstract byte[] write();
 
+	/**
+     * Writes the element content to the given output stream.
+     * This method replaces the {@link #write()} method which is now deprecated. 
+	 */
+    public void writeContent(OutputStream out) throws IOException
+    {
+    	byte[] content = write();
+    	out.write(content);
+    }
+	
 	/**
 	 * Sets the RtfDocument this RtfAddableElement belongs to
 	 */
