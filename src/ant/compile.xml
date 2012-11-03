@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- iText, a JAVA - PDF library                                      -->
+<!-- $Id: compile.xml 2765 2007-05-20 11:11:16Z blowagie $         -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+<project name="iText.compile" default="help">
+	
+	<property file=".ant.properties" />
+	
+	<path id="itext.classpath">
+	    <pathelement location="${itext.classes}"/>
+	    <pathelement path="${itext.bin}/bcmail-jdk14-135.jar"/>
+	    <pathelement path="${itext.bin}/bcprov-jdk14-135.jar"/>
+	</path>
+	
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Help                                                             -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <target name="help" description="--> shows the help screen">
+        <echo>COMPILING AND JARRING THE CODE (compile.xml)</echo>
+        <echo>ant compile: compiles iText</echo>
+        <echo>ant compile.debug: compiles iText and allows you to debug the code</echo>
+        <echo>ant jar: compiles and jars iText</echo>
+        <echo>ant jar.debug: compiles for debugging and jars iText</echo>
+        <echo />
+	</target>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Compiling the code                                               -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <target name="compile" description="--> compiles the iText code">
+        <mkdir dir="${itext.bin}" />
+        <get usetimestamp="true" src="http://kent.dl.sourceforge.net/sourceforge/itext/bcmail-jdk14-135.jar" dest="${itext.bin}/bcmail-jdk14-135.jar" verbose="true" />
+        <get usetimestamp="true" src="http://kent.dl.sourceforge.net/sourceforge/itext/bcprov-jdk14-135.jar" dest="${itext.bin}/bcprov-jdk14-135.jar" verbose="true" />
+        <mkdir dir="${itext.classes}" />
+        <javac source="1.4" target="1.4" srcdir="${itext.src}" destdir="${itext.classes}">
+    	<classpath refid="itext.classpath"/>
+    	</javac>
+    </target>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Compiling the code for debugging                                 -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <target name="compile.debug" description="--> compiles the iText code for debugging">
+        <mkdir dir="${itext.bin}" />
+        <get usetimestamp="true" src="http://kent.dl.sourceforge.net/sourceforge/itext/bcmail-jdk14-135.jar" dest="${itext.bin}/bcmail-jdk14-135.jar" verbose="true" />
+        <get usetimestamp="true" src="http://kent.dl.sourceforge.net/sourceforge/itext/bcprov-jdk14-135.jar" dest="${itext.bin}/bcprov-jdk14-135.jar" verbose="true" />
+        <mkdir dir="${itext.classes}" />
+        <javac source="1.4" target="1.4" srcdir="${itext.src}" destdir="${itext.classes}" listfiles="yes" debug="true" debuglevel="lines,vars,source">
+        	<classpath refid="itext.classpath"/>
+       	</javac>
+    </target>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Jarring the code                                                 -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <target name="make.jar" description="--> makes a jarfile from the iText code">
+        <mkdir dir="${itext.bin}" />
+        <mkdir dir="${itext.classes}/com/lowagie/text/pdf/fonts" />
+        <copy todir="${itext.classes}/com/lowagie/text/pdf/fonts" overwrite="yes">
+            <fileset dir="${itext.src}/com/lowagie/text/pdf/fonts">
+                <include name="**/*.afm"/>
+                <include name="**/*.html"/>
+            </fileset>
+        </copy>
+        <copy todir="${itext.classes}/com/lowagie/text/" overwrite="yes">
+            <fileset dir="${itext.src}/com/lowagie/text/">
+                <include name="**/*.txt"/>
+            </fileset>
+        </copy>
+        <jar jarfile="${itext.bin}/iText.jar" basedir="${itext.classes}" manifest="../META-INF/MANIFEST.MF" excludes="com/lowagie/examples/**,**/*.cmap,**/*.properties,com/lowagie/text/pdf/fonts/cmaps/**" />
+    </target>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Compiling and Jarring the code                                   -->
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+    <target name="jar"  depends="compile, make.jar" description="--> makes a jarfile from the iText code" />
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Jarring the code (debug)                                         -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+    <target name="jar.debug"  depends="compile.debug, make.jar" description="--> makes a jarfile from the iText code" />
+
+</project>
