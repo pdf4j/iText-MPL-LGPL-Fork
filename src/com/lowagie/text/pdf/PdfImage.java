@@ -1,6 +1,6 @@
 /*
- * $Id: PdfImage.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: PdfImage.java,v 1.68 2006/09/14 23:10:49 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -61,7 +61,7 @@ import com.lowagie.text.Image;
  * <CODE>PdfImage</CODE> is a <CODE>PdfStream</CODE> containing an image-<CODE>Dictionary</CODE> and -stream.
  */
 
-public class PdfImage extends PdfStream {
+class PdfImage extends PdfStream {
     
     static final int TRANSFERSIZE = 4096;
     // membervariables
@@ -84,11 +84,11 @@ public class PdfImage extends PdfStream {
         this.name = new PdfName(name);
         put(PdfName.TYPE, PdfName.XOBJECT);
         put(PdfName.SUBTYPE, PdfName.IMAGE);
-        put(PdfName.WIDTH, new PdfNumber(image.getWidth()));
-        put(PdfName.HEIGHT, new PdfNumber(image.getHeight()));
+        put(PdfName.WIDTH, new PdfNumber(image.width()));
+        put(PdfName.HEIGHT, new PdfNumber(image.height()));
         if (image.getLayer() != null)
             put(PdfName.OC, image.getLayer().getRef());
-        if (image.isMask() && (image.getBpc() == 1 || image.getBpc() > 0xff))
+        if (image.isMask() && (image.bpc() == 1 || image.bpc() > 0xff))
             put(PdfName.IMAGEMASK, PdfBoolean.PDFTRUE);
         if (maskRef != null) {
             if (image.isSmask())
@@ -96,7 +96,7 @@ public class PdfImage extends PdfStream {
             else
                 put(PdfName.MASK, maskRef);
         }
-        if (image.isMask() && image.isInverted())
+        if (image.isMask() && image.isInvertMask())
             put(PdfName.DECODE, new PdfLiteral("[1 0]"));
         if (image.isInterpolation())
             put(PdfName.INTERPOLATE, PdfBoolean.PDFTRUE);
@@ -106,7 +106,7 @@ public class PdfImage extends PdfStream {
             // Raw Image data
             if (image.isImgRaw()) {
                 // will also have the CCITT parameters
-                int colorspace = image.getColorspace();
+                int colorspace = image.colorspace();
                 int transparency[] = image.getTransparency();
                 if (transparency != null && !image.isMask() && maskRef == null) {
                     String s = "[";
@@ -115,9 +115,9 @@ public class PdfImage extends PdfStream {
                     s += "]";
                     put(PdfName.MASK, new PdfLiteral(s));
                 }
-                bytes = image.getRawData();
+                bytes = image.rawData();
                 put(PdfName.LENGTH, new PdfNumber(bytes.length));
-                int bpc = image.getBpc();
+                int bpc = image.bpc();
                 if (bpc > 0xff) {
                     if (!image.isMask())
                         put(PdfName.COLORSPACE, PdfName.DEVICEGRAY);
@@ -135,8 +135,8 @@ public class PdfImage extends PdfStream {
                         decodeparms.put(PdfName.ENDOFLINE, PdfBoolean.PDFTRUE);
                     if ((colorspace & Image.CCITT_ENDOFBLOCK) != 0)
                         decodeparms.put(PdfName.ENDOFBLOCK, PdfBoolean.PDFFALSE);
-                    decodeparms.put(PdfName.COLUMNS, new PdfNumber(image.getWidth()));
-                    decodeparms.put(PdfName.ROWS, new PdfNumber(image.getHeight()));
+                    decodeparms.put(PdfName.COLUMNS, new PdfNumber(image.width()));
+                    decodeparms.put(PdfName.ROWS, new PdfNumber(image.height()));
                     put(PdfName.DECODEPARMS, decodeparms);
                 }
                 else {
@@ -160,9 +160,9 @@ public class PdfImage extends PdfStream {
                     PdfDictionary additional = image.getAdditional();
                     if (additional != null)
                         putAll(additional);
-                    if (image.isMask() && (image.getBpc() == 1 || image.getBpc() > 8))
+                    if (image.isMask() && (image.bpc() == 1 || image.bpc() > 8))
                         remove(PdfName.COLORSPACE);
-                    put(PdfName.BITSPERCOMPONENT, new PdfNumber(image.getBpc()));
+                    put(PdfName.BITSPERCOMPONENT, new PdfNumber(image.bpc()));
                     if (image.isDeflated())
                         put(PdfName.FILTER, PdfName.FLATEDECODE);
                     else {
@@ -174,18 +174,18 @@ public class PdfImage extends PdfStream {
             
             // GIF, JPEG or PNG
             String errorID;
-            if (image.getRawData() == null){
-                is = image.getUrl().openStream();
-                errorID = image.getUrl().toString();
+            if (image.rawData() == null){
+                is = image.url().openStream();
+                errorID = image.url().toString();
             }
             else{
-                is = new java.io.ByteArrayInputStream(image.getRawData());
+                is = new java.io.ByteArrayInputStream(image.rawData());
                 errorID = "Byte array";
             }
             switch(image.type()) {
                 case Image.JPEG:
                     put(PdfName.FILTER, PdfName.DCTDECODE);
-                    switch(image.getColorspace()) {
+                    switch(image.colorspace()) {
                         case 1:
                             put(PdfName.COLORSPACE, PdfName.DEVICEGRAY);
                             break;
@@ -199,8 +199,8 @@ public class PdfImage extends PdfStream {
                             }
                     }
                     put(PdfName.BITSPERCOMPONENT, new PdfNumber(8));
-                    if (image.getRawData() != null){
-                        bytes = image.getRawData();
+                    if (image.rawData() != null){
+                        bytes = image.rawData();
                         put(PdfName.LENGTH, new PdfNumber(bytes.length));
                         return;
                     }

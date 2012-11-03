@@ -1,6 +1,6 @@
 /*
- * $Id: RtfRow.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfRow.java,v 1.19 2006/09/24 18:41:47 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004, 2005 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.table;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import com.lowagie.text.Cell;
@@ -66,11 +65,10 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * The RtfRow wraps one Row for a RtfTable.
  * INTERNAL USE ONLY
  * 
- * @version $Id: RtfRow.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  * @author Steffen Stundzig
  * @author Lorenz Maierhofer
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfRow extends RtfElement {
 
@@ -211,7 +209,7 @@ public class RtfRow extends RtfElement {
         
         int cellRight = 0;
         int cellWidth = 0;
-        for(int i = 0; i < row.getColumns(); i++) {
+        for(int i = 0; i < row.columns(); i++) {
             cellWidth = (int) (this.width * this.parentTable.getProportionalWidths()[i] / 100);
             cellRight = cellRight + cellWidth;
             
@@ -280,124 +278,102 @@ public class RtfRow extends RtfElement {
      * Writes the row definition/settings.
      * 
      * @return A byte array with the row definitions/settings.
-     * @deprecated replaced by {@link #writeRowDefinitions(OutputStream)}
      */
     private byte[] writeRowDefinitions() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeRowDefinitions(result);
+            result.write(ROW_BEGIN);
+            result.write('\n');
+            result.write(ROW_WIDTH_STYLE);
+            result.write(ROW_WIDTH);
+            result.write(intToByteArray(this.width));
+            if(this.parentTable.getCellsFitToPage()) {
+                result.write(ROW_KEEP_TOGETHER);
+            }
+            if(this.rowNumber <= this.parentTable.getHeaderRows()) {
+                result.write(ROW_HEADER_ROW);
+            }
+            switch (this.parentTable.getAlignment()) {
+                case Element.ALIGN_LEFT:
+                	result.write(ROW_ALIGN_LEFT);
+                    break;
+                case Element.ALIGN_RIGHT:
+                    result.write(ROW_ALIGN_RIGHT);
+                    break;
+                case Element.ALIGN_CENTER:
+                    result.write(ROW_ALIGN_CENTER);
+                    break;
+                case Element.ALIGN_JUSTIFIED:
+                case Element.ALIGN_JUSTIFIED_ALL:
+                    result.write(ROW_ALIGN_JUSTIFIED);
+                    break;
+            }
+            result.write(ROW_GRAPH);
+            
+            result.write(this.parentTable.getBorders().write());
+            
+            if(this.parentTable.getCellSpacing() > 0) {
+                result.write(ROW_CELL_SPACING_LEFT);
+                result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
+                result.write(ROW_CELL_SPACING_LEFT_STYLE);
+                result.write(ROW_CELL_SPACING_TOP);
+                result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
+                result.write(ROW_CELL_SPACING_TOP_STYLE);
+                result.write(ROW_CELL_SPACING_RIGHT);
+                result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
+                result.write(ROW_CELL_SPACING_RIGHT_STYLE);
+                result.write(ROW_CELL_SPACING_BOTTOM);
+                result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
+                result.write(ROW_CELL_SPACING_BOTTOM_STYLE);
+            }
+            
+            result.write(ROW_CELL_PADDING_LEFT);
+            result.write(intToByteArray((int) (this.parentTable.getCellPadding() / 2)));
+            result.write(ROW_CELL_PADDING_RIGHT);
+            result.write(intToByteArray((int) (this.parentTable.getCellPadding() / 2)));
+            result.write(ROW_CELL_PADDING_LEFT_STYLE);
+            result.write(ROW_CELL_PADDING_RIGHT_STYLE);
+            
+            result.write('\n');
+            
+            for(int i = 0; i < this.cells.size(); i++) {
+                RtfCell rtfCell = (RtfCell) this.cells.get(i);
+                result.write(rtfCell.writeDefinition());
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
-    }
-    /**
-     * Writes the row definition/settings.
-     */
-    private void writeRowDefinitions(final OutputStream result) throws IOException
-    {
-        result.write(ROW_BEGIN);
-        result.write('\n');
-        result.write(ROW_WIDTH_STYLE);
-        result.write(ROW_WIDTH);
-        result.write(intToByteArray(this.width));
-        if(this.parentTable.getCellsFitToPage()) {
-            result.write(ROW_KEEP_TOGETHER);
-        }
-        if(this.rowNumber <= this.parentTable.getHeaderRows()) {
-            result.write(ROW_HEADER_ROW);
-        }
-        switch (this.parentTable.getAlignment()) {
-            case Element.ALIGN_LEFT:
-            	result.write(ROW_ALIGN_LEFT);
-                break;
-            case Element.ALIGN_RIGHT:
-                result.write(ROW_ALIGN_RIGHT);
-                break;
-            case Element.ALIGN_CENTER:
-                result.write(ROW_ALIGN_CENTER);
-                break;
-            case Element.ALIGN_JUSTIFIED:
-            case Element.ALIGN_JUSTIFIED_ALL:
-                result.write(ROW_ALIGN_JUSTIFIED);
-                break;
-        }
-        result.write(ROW_GRAPH);
-        
-        //.result.write(this.parentTable.getBorders().write());
-        this.parentTable.getBorders().writeContent(result);
-        
-        if(this.parentTable.getCellSpacing() > 0) {
-            result.write(ROW_CELL_SPACING_LEFT);
-            result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
-            result.write(ROW_CELL_SPACING_LEFT_STYLE);
-            result.write(ROW_CELL_SPACING_TOP);
-            result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
-            result.write(ROW_CELL_SPACING_TOP_STYLE);
-            result.write(ROW_CELL_SPACING_RIGHT);
-            result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
-            result.write(ROW_CELL_SPACING_RIGHT_STYLE);
-            result.write(ROW_CELL_SPACING_BOTTOM);
-            result.write(intToByteArray((int) (this.parentTable.getCellSpacing() / 2)));
-            result.write(ROW_CELL_SPACING_BOTTOM_STYLE);
-        }
-        
-        result.write(ROW_CELL_PADDING_LEFT);
-        result.write(intToByteArray((int) (this.parentTable.getCellPadding() / 2)));
-        result.write(ROW_CELL_PADDING_RIGHT);
-        result.write(intToByteArray((int) (this.parentTable.getCellPadding() / 2)));
-        result.write(ROW_CELL_PADDING_LEFT_STYLE);
-        result.write(ROW_CELL_PADDING_RIGHT_STYLE);
-        
-        result.write('\n');
-        
-        for(int i = 0; i < this.cells.size(); i++) {
-            RtfCell rtfCell = (RtfCell) this.cells.get(i);
-            //result.write(rtfCell.writeDefinition());
-            rtfCell.writeDefinition(result);
-        }    	
     }
     
     /**
      * Writes the content of this RtfRow
      * 
      * @return A byte array with the content of this RtfRow
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() 
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            result.write(writeRowDefinitions());
+            
+            for(int i = 0; i < this.cells.size(); i++) {
+                RtfCell rtfCell = (RtfCell) this.cells.get(i);
+                result.write(rtfCell.write());
+            }
+
+            result.write(DELIMITER);
+
+            if(this.document.getDocumentSettings().isOutputTableRowDefinitionAfter()) {
+                result.write(writeRowDefinitions());
+            }
+
+            result.write(ROW_END);
+            result.write("\n".getBytes());
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    /**
-     * Writes the content of this RtfRow
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        //.result.write(writeRowDefinitions());
-    	writeRowDefinitions(result);
-        
-        for(int i = 0; i < this.cells.size(); i++) {
-            RtfCell rtfCell = (RtfCell) this.cells.get(i);
-            //.result.write(rtfCell.write());
-            rtfCell.writeContent(result);
-        }
-
-        result.write(DELIMITER);
-
-        if(this.document.getDocumentSettings().isOutputTableRowDefinitionAfter()) {
-            //.result.write(writeRowDefinitions());
-        	writeRowDefinitions(result);
-        }
-
-        result.write(ROW_END);
-        result.write("\n".getBytes());
-    }        
     
     /**
      * Gets the parent RtfTable of this RtfRow

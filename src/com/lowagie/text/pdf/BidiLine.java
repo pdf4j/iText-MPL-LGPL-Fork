@@ -183,7 +183,7 @@ public class BidiLine {
                 orderLevels = new byte[pieceSize];
                 indexChars = new int[pieceSize];
             }
-            ArabicLigaturizer.processNumbers(text, 0, totalTextLength, arabicOptions);
+            //ArabicLigaturizer.processNumbers(text, 0, totalTextLength, arabicOptions);
             BidiOrder order = new BidiOrder(text, 0, totalTextLength, (byte)(runDirection == PdfWriter.RUN_DIRECTION_RTL ? 1 : 0));
             byte od[] = order.getLevels();
             for (int k = 0; k < totalTextLength; ++k) {
@@ -282,6 +282,7 @@ public class BidiLine {
     }
     
     public void doArabicShapping() {
+/*
         int src = 0;
         int dest = 0;
         for (;;) {
@@ -310,7 +311,7 @@ public class BidiLine {
                 ++src;
             }
             int arabicWordSize = src - startArabicIdx;
-            int size = ArabicLigaturizer.arabic_shape(text, startArabicIdx, arabicWordSize, text, dest, arabicWordSize, arabicOptions /*PangoArabicShapping.ar_novowel PangoArabicShapping.ar_lig | PangoArabicShapping.ar_composedtashkeel*/);
+            int size = ArabicLigaturizer.arabic_shape(text, startArabicIdx, arabicWordSize, text, dest, arabicWordSize, arabicOptions);
             if (startArabicIdx != dest) {
                 for (int k = 0; k < size; ++k) {
                     detailChunks[dest] = detailChunks[startArabicIdx];
@@ -320,6 +321,7 @@ public class BidiLine {
             else
                 dest += size;
         }
+    */
     }
        
     public PdfLine processLine(float width, int alignment, int runDirection, int arabicOptions) {

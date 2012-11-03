@@ -51,7 +51,8 @@ package com.lowagie.text;
  * A special-version of <CODE>LIST</CODE> whitch use zapfdingbats-numbers (1..10).
  * 
  * @see com.lowagie.text.List
- * @author Michael Niedermair and Bruno Lowagie
+ * @version 2003-06-22
+ * @author Michael Niedermair
  */
 
 public class ZapfDingbatsNumberList extends List {
@@ -64,23 +65,12 @@ public class ZapfDingbatsNumberList extends List {
 	/**
 	 * Creates a ZapdDingbatsNumberList
 	 * @param type the type of list
-	 */
-	public ZapfDingbatsNumberList(int type) {
-		super(true);
-		this.type = type;
-		float fontsize = symbol.getFont().getSize();
-		symbol.setFont(FontFactory.getFont(FontFactory.ZAPFDINGBATS, fontsize, Font.NORMAL));
-	}
-
-	/**
-	 * Creates a ZapdDingbatsNumberList
-	 * @param type the type of list
 	 * @param symbolIndent	indent
 	 */
 	public ZapfDingbatsNumberList(int type, int symbolIndent) {
 		super(true, symbolIndent);
 		this.type = type;
-		float fontsize = symbol.getFont().getSize();
+		float fontsize = symbol.font().size();
 		symbol.setFont(FontFactory.getFont(FontFactory.ZAPFDINGBATS, fontsize, Font.NORMAL));
 	}
 
@@ -114,25 +104,24 @@ public class ZapfDingbatsNumberList extends List {
 			Chunk chunk;
 			switch (type ) {
 				case 0:
-					chunk = new Chunk((char)(first + list.size() + 171), symbol.getFont());
+					chunk = new Chunk((char)(first + list.size() + 171), symbol.font());
 					break;
 				case 1:
-					chunk = new Chunk((char)(first + list.size() + 181), symbol.getFont());
+					chunk = new Chunk((char)(first + list.size() + 181), symbol.font());
 					break;
 				case 2:
-					chunk = new Chunk((char)(first + list.size() + 191), symbol.getFont());
+					chunk = new Chunk((char)(first + list.size() + 191), symbol.font());
 					break;
 				default:
-					chunk = new Chunk((char)(first + list.size() + 201), symbol.getFont());
+					chunk = new Chunk((char)(first + list.size() + 201), symbol.font());
 			}
-			chunk.append(" ");
 			item.setListSymbol(chunk);
-			item.setIndentationLeft(symbolIndent, autoindent);
+			item.setIndentationLeft(symbolIndent);
 			item.setIndentationRight(0);
 			list.add(item);
 		} else if (o instanceof List) {
 			List nested = (List) o;
-			nested.setIndentationLeft(nested.getIndentationLeft() + symbolIndent);
+			nested.setIndentationLeft(nested.indentationLeft() + symbolIndent);
 			first--;
 			return list.add(nested);
 		} else if (o instanceof String) {

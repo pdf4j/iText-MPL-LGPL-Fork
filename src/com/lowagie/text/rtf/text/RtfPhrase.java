@@ -1,6 +1,6 @@
 /*
- * $Id: RtfPhrase.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfPhrase.java,v 1.14 2006/02/09 17:13:35 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import com.lowagie.text.Chunk;
@@ -68,9 +67,8 @@ import com.lowagie.text.rtf.style.RtfFont;
 /**
  * The RtfPhrase contains multiple RtfChunks
  * 
- * @version $Id: RtfPhrase.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Id: RtfPhrase.java,v 1.14 2006/02/09 17:13:35 hallm Exp $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfPhrase extends RtfElement {
 
@@ -78,10 +76,6 @@ public class RtfPhrase extends RtfElement {
      * Constant for the resetting of the paragraph defaults
      */
     public static final byte[] PARAGRAPH_DEFAULTS = "\\pard".getBytes();
-    /**
-     * Constant for resetting of font settings to their defaults
-     */
-    public static final byte[] PLAIN = "\\plain".getBytes();
     /**
      * Constant for phrase in a table indication
      */
@@ -122,17 +116,17 @@ public class RtfPhrase extends RtfElement {
             return;
         }
         
-        if(phrase.hasLeading()) {
-            this.lineLeading = (int) (phrase.getLeading() * RtfElement.TWIPS_FACTOR);
+        if(phrase.leadingDefined()) {
+            this.lineLeading = (int) (phrase.leading() * RtfElement.TWIPS_FACTOR);
         } else {
             this.lineLeading = 0;
         }
         
-        RtfFont phraseFont = new RtfFont(null, phrase.getFont());
+        RtfFont phraseFont = new RtfFont(null, phrase.font());
         for(int i = 0; i < phrase.size(); i++) {
             Element chunk = (Element) phrase.get(i);
             if(chunk instanceof Chunk) {
-                ((Chunk) chunk).setFont(phraseFont.difference(((Chunk) chunk).getFont()));
+                ((Chunk) chunk).setFont(phraseFont.difference(((Chunk) chunk).font()));
             }
             try {
                 chunks.add(doc.getMapper().mapElement(chunk));
@@ -147,40 +141,26 @@ public class RtfPhrase extends RtfElement {
      * the RtfChunks of this RtfPhrase are written.
      * 
      * @return The content of this RtfPhrase
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write()
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            result.write(PARAGRAPH_DEFAULTS);
+            if(inTable) {
+                result.write(IN_TABLE);
+            }
+            if(this.lineLeading > 0) {
+                result.write(LINE_SPACING);
+                result.write(intToByteArray(this.lineLeading));
+            }
+            for(int i = 0; i < chunks.size(); i++) {
+                result.write(((RtfBasicElement) chunks.get(i)).write());
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    /**
-     * Write the content of this RtfPhrase. First resets to the paragraph defaults
-     * then if the RtfPhrase is in a RtfCell a marker for this is written and finally
-     * the RtfChunks of this RtfPhrase are written.
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        result.write(PARAGRAPH_DEFAULTS);
-        result.write(PLAIN);
-        if(inTable) {
-            result.write(IN_TABLE);
-        }
-        if(this.lineLeading > 0) {
-            result.write(LINE_SPACING);
-            result.write(intToByteArray(this.lineLeading));
-        }
-        for(int i = 0; i < chunks.size(); i++) {
-        	RtfBasicElement rbe = (RtfBasicElement) chunks.get(i);
-            //.result.write((rbe).write());
-        	rbe.writeContent(result);
-        }
-    }        
     
     /**
      * Sets whether this RtfPhrase is in a table. Sets the correct inTable setting for all

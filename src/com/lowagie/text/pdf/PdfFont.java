@@ -1,6 +1,6 @@
 /*
- * $Id: PdfFont.java 2742 2007-05-08 13:04:56Z blowagie $
- * $Name$
+ * $Id: PdfFont.java,v 1.65 2006/09/14 23:10:49 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -130,7 +130,7 @@ class PdfFont implements Comparable {
         if (image == null)
             return size;
         else {
-            return image.getScaledHeight();
+            return image.scaledHeight();
         }
     }
     
@@ -155,14 +155,14 @@ class PdfFont implements Comparable {
         if (image == null)
             return font.getWidthPoint(character, size) * hScale;
         else
-            return image.getScaledWidth();
+            return image.scaledWidth();
     }
     
     float width(String s) {
         if (image == null)
             return font.getWidthPoint(s, size) * hScale;
         else
-            return image.getScaledWidth();
+            return image.scaledWidth();
     }
     
     BaseFont getFont() {

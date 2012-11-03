@@ -1,6 +1,6 @@
 /*
- * $Id: RtfParagraphStyle.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfParagraphStyle.java,v 1.6 2006/09/16 03:38:45 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.style;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
@@ -67,9 +66,8 @@ import com.lowagie.text.rtf.text.RtfParagraph;
  * it needs to be set as the font of a Paragraph. Otherwise it will work like a
  * RtfFont. It also supports inheritance of styles.
  * 
- * @version $Id: RtfParagraphStyle.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Revision: 1.6 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfParagraphStyle extends RtfFont {
 
@@ -89,10 +87,6 @@ public class RtfParagraphStyle extends RtfFont {
      * Constant for justified alignment
      */
     public static final byte[] ALIGN_JUSTIFY = "\\qj".getBytes();
-    /**
-     * Constant for the first line indentation
-     */
-    public static final byte[] FIRST_LINE_INDENT = "\\fi".getBytes();
     /**
      * Constant for left indentation
      */
@@ -206,10 +200,6 @@ public class RtfParagraphStyle extends RtfFont {
      * The alignment of the paragraph.
      */
     private int alignment = Element.ALIGN_LEFT;
-    /**
-     * The indentation for the first line
-     */
-    private int firstLineIndent = 0;
     /**
      * The left indentation of the paragraph.
      */
@@ -349,25 +339,6 @@ public class RtfParagraphStyle extends RtfFont {
     public void setAlignment(int alignment) {
         this.modified = this.modified | MODIFIED_ALIGNMENT;
         this.alignment = alignment;
-    }
-    
-    /**
-     * Gets the first line indentation of this RtfParagraphStyle.
-     * 
-     * @return The first line indentation of this RtfParagraphStyle.
-     */
-    public int getFirstLineIndent() {
-        return this.firstLineIndent;
-    }
-    
-    /**
-     * Sets the first line indententation of this RtfParagraphStyle. It
-     * is relative to the left indentation.
-     * 
-     * @param firstLineIndent The first line indentation to use.
-     */
-    public void setFirstLineIndent(int firstLineIndent) {
-        this.firstLineIndent = firstLineIndent;
     }
     
     /**
@@ -581,7 +552,7 @@ public class RtfParagraphStyle extends RtfFont {
                 setStyle(this.baseStyle.getFontStyle());
             }
             if(!((this.modified & MODIFIED_FONT_COLOR) == MODIFIED_FONT_COLOR)) {
-                setColor(this.baseStyle.getColor());
+                setColor(this.baseStyle.color());
             }
             if(!((this.modified & MODIFIED_LINE_LEADING) == MODIFIED_LINE_LEADING)) {
                 setLineLeading(this.baseStyle.getLineLeading());
@@ -624,8 +595,6 @@ public class RtfParagraphStyle extends RtfFont {
                     result.write(RtfParagraphStyle.ALIGN_JUSTIFY);
                     break;
             }
-            result.write(FIRST_LINE_INDENT);
-            result.write(intToByteArray(this.firstLineIndent));
             result.write(RtfParagraphStyle.INDENT_LEFT);
             result.write(intToByteArray(indentLeft));
             result.write(RtfParagraphStyle.INDENT_RIGHT);
@@ -650,36 +619,28 @@ public class RtfParagraphStyle extends RtfFont {
     
     /**
      * Writes the definition of this RtfParagraphStyle for the stylesheet list.
-     * @deprecated replaced by {@link #writeDefinition(OutputStream)}
      */
     public byte[] writeDefinition() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeDefinition(result);
+            result.write("{".getBytes());
+            result.write("\\style".getBytes());
+            result.write("\\s".getBytes());
+            result.write(intToByteArray(this.styleNumber));
+            result.write(RtfBasicElement.DELIMITER);
+            result.write(writeParagraphSettings());
+            result.write(super.writeBegin());
+            result.write(RtfBasicElement.DELIMITER);
+            result.write(this.styleName.getBytes());
+            result.write(";".getBytes());
+            result.write("}".getBytes());
+            if(this.document.getDocumentSettings().isOutputDebugLineBreaks()) {
+                result.write('\n');
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
-    }
-    /**
-     * Writes the definition of this RtfParagraphStyle for the stylesheet list.
-     */
-    public void writeDefinition(final OutputStream result) throws IOException 
-    {
-        result.write("{".getBytes());
-        result.write("\\style".getBytes());
-        result.write("\\s".getBytes());
-        result.write(intToByteArray(this.styleNumber));
-        result.write(RtfBasicElement.DELIMITER);
-        result.write(writeParagraphSettings());
-        result.write(super.writeBegin());
-        result.write(RtfBasicElement.DELIMITER);
-        result.write(this.styleName.getBytes());
-        result.write(";".getBytes());
-        result.write("}".getBytes());
-        if(this.document.getDocumentSettings().isOutputDebugLineBreaks()) {
-            result.write('\n');
-        }    	
     }
     
     /**
@@ -706,18 +667,11 @@ public class RtfParagraphStyle extends RtfFont {
     }
     
     /**
-     * unused
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
+     * Unused
+     * @return An empty byte array.
      */
-    public byte[] write()
-    {
-    	return(new byte[0]);
-    }
-    /**
-     * unused
-     */
-    public void writeContent(final OutputStream out) throws IOException
-    {    	
+    public byte[] write() {
+        return new byte[0];
     }
     
     /**

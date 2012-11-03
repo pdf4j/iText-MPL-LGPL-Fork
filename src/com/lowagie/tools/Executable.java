@@ -1,6 +1,6 @@
 /*
- * $Id: Executable.java 2352 2006-09-12 08:27:37Z blowagie $
- * $Name$
+ * $Id: Executable.java,v 1.7 2006/09/12 08:27:37 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2005 by Bruno Lowagie / Roger Mistelli
  *

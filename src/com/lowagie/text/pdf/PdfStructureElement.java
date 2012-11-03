@@ -1,5 +1,5 @@
 /*
- * $Id: PdfStructureElement.java 2026 2005-11-01 12:27:05Z psoares33 $
+ * $Id: PdfStructureElement.java,v 1.3 2005/11/01 12:27:05 psoares33 Exp $
  *
  * Copyright 2005 by Paulo Soares.
  *

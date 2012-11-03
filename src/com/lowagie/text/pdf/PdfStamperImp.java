@@ -59,9 +59,6 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.collection.PdfCollection;
-import com.lowagie.text.pdf.interfaces.PdfViewerPreferences;
-import com.lowagie.text.pdf.internal.PdfViewerPreferencesImp;
 
 class PdfStamperImp extends PdfWriter {
     HashMap readers2intrefs = new HashMap();
@@ -82,7 +79,7 @@ class PdfStamperImp extends PdfWriter {
     protected List newBookmarks;
     protected HashSet partialFlattening = new HashSet();
     protected boolean useVp = false;
-    protected PdfViewerPreferencesImp viewerPreferences = new PdfViewerPreferencesImp();
+    protected int vp = 0;
     protected HashMap fieldTemplates = new HashMap();
     protected boolean fieldsAdded = false;
     protected int sigFlags = 0;
@@ -103,7 +100,7 @@ class PdfStamperImp extends PdfWriter {
     PdfStamperImp(PdfReader reader, OutputStream os, char pdfVersion, boolean append) throws DocumentException, IOException {
         super(new PdfDocument(), os);
         if (!reader.isOpenedWithFullPermissions())
-            throw new IllegalArgumentException("PdfReader not opened with owner password");
+            throw new DocumentException("PdfReader not opened with owner password");
         if (reader.isTampered())
             throw new DocumentException("The original document was reused. Read it again from file.");
         reader.setTampered(true);
@@ -115,7 +112,7 @@ class PdfStamperImp extends PdfWriter {
                 throw new DocumentException("Append mode requires a document without errors even if recovery was possible.");
             if (reader.isEncrypted())
                 crypto = new PdfEncryption(reader.getDecrypt());
-            pdf_version.setAppendmode(true);
+            HEADER = getISOBytes("\n");
             file.reOpen();
             byte buf[] = new byte[8192];
             int n;
@@ -148,7 +145,7 @@ class PdfStamperImp extends PdfWriter {
         if (closed)
             return;
         if (useVp) {
-            reader.setViewerPreferences(viewerPreferences);
+            reader.setViewerPreferences(vp);
             markUsed(reader.getTrailer().get(PdfName.ROOT));
         }
         if (flat)
@@ -252,8 +249,6 @@ class PdfStamperImp extends PdfWriter {
             }
             fileID = crypto.getFileID();
         }
-        else
-            fileID = PdfEncryption.createInfoId(PdfEncryption.createDocumentId());
         PRIndirectReference iRoot = (PRIndirectReference)reader.trailer.get(PdfName.ROOT);
         PdfIndirectReference root = new PdfIndirectReference(0, getNewObjectNumber(reader, iRoot.getNumber(), 0));
         PdfIndirectReference info = null;
@@ -318,20 +313,20 @@ class PdfStamperImp extends PdfWriter {
         switch (rotation) {
             case 90:
                 out.append(PdfContents.ROTATE90);
-                out.append(page.getTop());
+                out.append(page.top());
                 out.append(' ').append('0').append(PdfContents.ROTATEFINAL);
                 break;
             case 180:
                 out.append(PdfContents.ROTATE180);
-                out.append(page.getRight());
+                out.append(page.right());
                 out.append(' ');
-                out.append(page.getTop());
+                out.append(page.top());
                 out.append(PdfContents.ROTATEFINAL);
                 break;
             case 270:
                 out.append(PdfContents.ROTATE270);
                 out.append('0').append(' ');
-                out.append(page.getRight());
+                out.append(page.right());
                 out.append(PdfContents.ROTATEFINAL);
                 break;
         }
@@ -753,7 +748,7 @@ class PdfStamperImp extends PdfWriter {
                             app = new PdfAppearance((PdfIndirectReference)obj);
                         }
                         else {
-                            if (objReal != null && objReal.isDictionary()) {
+                            if (objReal.isDictionary()) {
                                 PdfName as = (PdfName)PdfReader.getPdfObject(merged.get(PdfName.AS));
                                 if (as != null) {
                                     PdfIndirectReference iref = (PdfIndirectReference)((PdfDictionary)objReal).get(as);
@@ -772,7 +767,7 @@ class PdfStamperImp extends PdfWriter {
                         Rectangle box = PdfReader.getNormalizedRectangle((PdfArray)PdfReader.getPdfObject(merged.get(PdfName.RECT)));
                         PdfContentByte cb = getOverContent(page);
                         cb.setLiteral("Q ");
-                        cb.addTemplate(app, box.getLeft(), box.getBottom());
+                        cb.addTemplate(app, box.left(), box.bottom());
                         cb.setLiteral("q ");
                     }
                 }
@@ -955,7 +950,7 @@ class PdfStamperImp extends PdfWriter {
 						Rectangle box = PdfReader.getNormalizedRectangle((PdfArray)PdfReader.getPdfObject(annDic.get(PdfName.RECT)));
 						PdfContentByte cb = getOverContent(page);
 						cb.setLiteral("Q ");
-						cb.addTemplate(app, box.getLeft(), box.getBottom());
+						cb.addTemplate(app, box.left(), box.bottom());
 						cb.setLiteral("q ");
 					}
 				}
@@ -1012,15 +1007,11 @@ class PdfStamperImp extends PdfWriter {
             acroForm.put(PdfName.FIELDS, fields);
             markUsed(acroForm);
         }
-        if (!acroForm.contains(PdfName.DA)) {
-            acroForm.put(PdfName.DA, new PdfString("/Helv 0 Tf 0 g "));
-            markUsed(acroForm);
-        }
         fields.add(ref);
         markUsed(fields);
     }
     
-    void addFieldResources() throws IOException {
+    void addFieldResources() {
         if (fieldTemplates.isEmpty())
             return;
         PdfDictionary catalog = reader.getCatalog();
@@ -1041,29 +1032,8 @@ class PdfStamperImp extends PdfWriter {
             PdfTemplate template = (PdfTemplate)it.next();
             PdfFormField.mergeResources(dr, (PdfDictionary)template.getResources(), this);
         }
-        if (dr.get(PdfName.ENCODING) == null)
-            dr.put(PdfName.ENCODING, PdfName.WIN_ANSI_ENCODING);
         PdfDictionary fonts = (PdfDictionary)PdfReader.getPdfObject(dr.get(PdfName.FONT));
-        if (fonts == null) {
-            fonts = new PdfDictionary();
-            dr.put(PdfName.FONT, fonts);
-        }
-        if (!fonts.contains(PdfName.HELV)) {
-            PdfDictionary dic = new PdfDictionary(PdfName.FONT);
-            dic.put(PdfName.BASEFONT, PdfName.HELVETICA);
-            dic.put(PdfName.ENCODING, PdfName.WIN_ANSI_ENCODING);
-            dic.put(PdfName.NAME, PdfName.HELV);
-            dic.put(PdfName.SUBTYPE, PdfName.TYPE1);
-            fonts.put(PdfName.HELV, addToBody(dic).getIndirectReference());
-        }
-        if (!fonts.contains(PdfName.ZADB)) {
-            PdfDictionary dic = new PdfDictionary(PdfName.FONT);
-            dic.put(PdfName.BASEFONT, PdfName.ZAPFDINGBATS);
-            dic.put(PdfName.NAME, PdfName.ZADB);
-            dic.put(PdfName.SUBTYPE, PdfName.TYPE1);
-            fonts.put(PdfName.ZADB, addToBody(dic).getIndirectReference());
-        }
-        if (acroForm.get(PdfName.DA) == null) {
+        if (fonts != null && acroForm.get(PdfName.DA) == null) {
             acroForm.put(PdfName.DA, new PdfString("/Helv 0 Tf 0 g "));
             markUsed(acroForm);
         }
@@ -1106,15 +1076,12 @@ class PdfStamperImp extends PdfWriter {
                         addDocumentField(field.getIndirectReference());
                 }
                 if (annot.isAnnotation()) {
-                    PdfObject pdfobj = PdfReader.getPdfObject(pageN.get(PdfName.ANNOTS), pageN);
-                    PdfArray annots = null;
-                    if (pdfobj == null || !pdfobj.isArray()) {
+                    PdfArray annots = (PdfArray)PdfReader.getPdfObject(pageN.get(PdfName.ANNOTS), pageN);
+                    if (annots == null) {
                         annots = new PdfArray();
                         pageN.put(PdfName.ANNOTS, annots);
                         markUsed(pageN);
                     }
-                    else 
-                       annots = (PdfArray)pdfobj;
                     annots.add(annot.getIndirectReference());
                     markUsed(annots);
                     if (!annot.isUsed()) {
@@ -1125,24 +1092,24 @@ class PdfStamperImp extends PdfWriter {
                             switch (rotation) {
                                 case 90:
                                     annot.put(PdfName.RECT, new PdfRectangle(
-                                    pageSize.getTop() - rect.bottom(),
+                                    pageSize.top() - rect.bottom(),
                                     rect.left(),
-                                    pageSize.getTop() - rect.top(),
+                                    pageSize.top() - rect.top(),
                                     rect.right()));
                                     break;
                                 case 180:
                                     annot.put(PdfName.RECT, new PdfRectangle(
-                                    pageSize.getRight() - rect.left(),
-                                    pageSize.getTop() - rect.bottom(),
-                                    pageSize.getRight() - rect.right(),
-                                    pageSize.getTop() - rect.top()));
+                                    pageSize.right() - rect.left(),
+                                    pageSize.top() - rect.bottom(),
+                                    pageSize.right() - rect.right(),
+                                    pageSize.top() - rect.top()));
                                     break;
                                 case 270:
                                     annot.put(PdfName.RECT, new PdfRectangle(
                                     rect.bottom(),
-                                    pageSize.getRight() - rect.left(),
+                                    pageSize.right() - rect.left(),
                                     rect.top(),
-                                    pageSize.getRight() - rect.right()));
+                                    pageSize.right() - rect.right()));
                                     break;
                             }
                         }
@@ -1241,13 +1208,12 @@ class PdfStamperImp extends PdfWriter {
         names.put(PdfName.EMBEDDEDFILES, addToBody(tree).getIndirectReference());
     }
 
-    /**
-     * Adds or replaces the Collection Dictionary in the Catalog.
-     * @param	collection	the new collection dictionary.
-     */
-    void makePackage( PdfCollection collection ) {
+    void makePackage( PdfName initialView ) {
         PdfDictionary catalog = reader.getCatalog();
-       	catalog.put( PdfName.COLLECTION, collection );
+    	PdfDictionary collections = new PdfDictionary();
+    	collections.put( PdfName.TYPE, PdfName.COLLECTION );
+       	collections.put( PdfName.VIEW, initialView );
+       	catalog.put( PdfName.COLLECTION, collections );
     }
  
     void setOutlines() throws IOException {
@@ -1279,17 +1245,7 @@ class PdfStamperImp extends PdfWriter {
      */
     public void setViewerPreferences(int preferences) {
         useVp = true;
-        this.viewerPreferences.setViewerPreferences(preferences);
-    }
-    
-    /** Adds a viewer preference
-     * @param key a key for a viewer preference
-     * @param value the value for the viewer preference
-     * @see PdfViewerPreferences#addViewerPreference
-     */
-    public void addViewerPreference(PdfName key, PdfObject value) {
-    	useVp = true;
-    	this.viewerPreferences.addViewerPreference(key, value);
+        vp |= preferences;
     }
     
     /**

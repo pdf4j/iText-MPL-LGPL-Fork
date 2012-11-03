@@ -1,6 +1,6 @@
 /*
- * $Id: CFFFontSubset.java 2671 2007-04-03 16:08:04Z psoares33 $
- * $Name$
+ * $Id: CFFFontSubset.java,v 1.7 2006/09/15 01:10:02 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2004 Oren Manor and Ygal Blum
  *
@@ -255,6 +255,7 @@ public class CFFFontSubset extends CFFFont {
 	/**
 	 * Read the FDSelect of the font and compute the array and its length
 	 * @param Font The index of the font being processed
+	 * @return The Processed FDSelect of the font
 	 */
 	protected void readFDSelect(int Font)
 	{

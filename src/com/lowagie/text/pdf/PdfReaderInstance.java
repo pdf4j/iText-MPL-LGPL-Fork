@@ -1,6 +1,6 @@
 /*
- * $Id: PdfReaderInstance.java 2761 2007-05-16 14:16:01Z psoares33 $
- * $Name$
+ * $Id: PdfReaderInstance.java,v 1.54 2006/10/27 17:23:21 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -81,8 +81,6 @@ class PdfReaderInstance {
     }
     
     PdfImportedPage getImportedPage(int pageNumber) {
-        if (!reader.isOpenedWithFullPermissions())
-            throw new IllegalArgumentException("PdfReader not opened with owner password");
         if (pageNumber < 1 || pageNumber > reader.getNumberOfPages())
             throw new IllegalArgumentException("Invalid page number");
         Integer i = new Integer(pageNumber);

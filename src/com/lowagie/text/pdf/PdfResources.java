@@ -1,6 +1,6 @@
 /*
- * $Id: PdfResources.java 1733 2005-05-04 14:33:54Z blowagie $
- * $Name$
+ * $Id: PdfResources.java,v 1.56 2005/05/04 14:31:53 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

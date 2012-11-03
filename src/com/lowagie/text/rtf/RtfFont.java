@@ -1,6 +1,6 @@
 /*
- * $Id: RtfFont.java 2739 2007-05-04 11:24:51Z blowagie $
- * $Name$
+ * $Id: RtfFont.java,v 1.27 2006/09/14 23:10:54 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Mark Hall
  *
@@ -138,23 +138,23 @@ public class RtfFont extends Font {
             dFamilyname = this.familyName;
         }
 
-        float dSize = font.getSize();
+        float dSize = font.size();
         if(dSize == Font.UNDEFINED) {
-            dSize = this.getSize();
+            dSize = this.size();
         }
 
         int dStyle = Font.UNDEFINED;
-        if(this.getStyle() != Font.UNDEFINED && font.getStyle() != Font.UNDEFINED) {
-            dStyle = this.getStyle() | font.getStyle();
-        } else if(this.getStyle() != Font.UNDEFINED) {
-            dStyle = this.getStyle();
-        } else if(font.getStyle() != Font.UNDEFINED) {
-            dStyle = font.getStyle();
+        if(this.style() != Font.UNDEFINED && font.style() != Font.UNDEFINED) {
+            dStyle = this.style() | font.style();
+        } else if(this.style() != Font.UNDEFINED) {
+            dStyle = this.style();
+        } else if(font.style() != Font.UNDEFINED) {
+            dStyle = font.style();
         }
 
-        Color dColor = font.getColor();
+        Color dColor = font.color();
         if(dColor == null) {
-            dColor = this.getColor();
+            dColor = this.color();
         }
 
         return new RtfFont(dFamilyname, dSize, dStyle, dColor);

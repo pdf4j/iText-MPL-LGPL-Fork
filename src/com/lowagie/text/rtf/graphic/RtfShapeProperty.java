@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Point;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.rtf.RtfAddableElement;
 
@@ -27,9 +26,8 @@ import com.lowagie.text.rtf.RtfAddableElement;
  *   <li>Point[]</li>
  * </ul>
  * 
- * @version $Id: RtfShapeProperty.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Revision: 1.2 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfShapeProperty extends RtfAddableElement {
     /**
@@ -211,83 +209,70 @@ public class RtfShapeProperty extends RtfAddableElement {
     /**
      * Writes the property definition. How the property
      * is written depends on the property type.
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-	public byte[] write() 
-	{
+	public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+        	result.write(OPEN_GROUP);
+        	result.write("\\sp".getBytes());
+        	result.write(OPEN_GROUP);
+        	result.write("\\sn".getBytes());
+        	result.write(DELIMITER);
+        	result.write(this.name.getBytes());
+        	result.write(CLOSE_GROUP);
+        	result.write(OPEN_GROUP);
+        	result.write("\\sv".getBytes());
+        	result.write(DELIMITER);
+        	switch(this.type) {
+        	case PROPERTY_TYPE_LONG: 
+        	case PROPERTY_TYPE_DOUBLE:
+        		result.write(this.value.toString().getBytes());
+        		break;
+        	case PROPERTY_TYPE_BOOLEAN:
+        		if(((Boolean) this.value).booleanValue()) {
+        			result.write("1".getBytes());
+        		} else {
+        			result.write("0".getBytes());
+        		}
+        		break;
+        	case PROPERTY_TYPE_COLOR:
+        		result.write(intToByteArray(((Color) this.value).getRGB()));
+        		break;
+        	case PROPERTY_TYPE_ARRAY:
+        	    if(this.value instanceof int[]) {
+        	        int[] values = (int[]) this.value;
+        	        result.write("4;".getBytes());
+        	        result.write(intToByteArray(values.length));
+        	        result.write(COMMA_DELIMITER);
+        	        for(int i = 0; i < values.length; i++) {
+        	            result.write(intToByteArray(values[i]));
+        	            if(i < values.length - 1) {
+        	                result.write(COMMA_DELIMITER);
+        	            }
+        	        }
+        	    } else if(this.value instanceof Point[]) {
+        	        Point[] values = (Point[]) this.value;
+                    result.write("8;".getBytes());
+                    result.write(intToByteArray(values.length));
+                    result.write(COMMA_DELIMITER);
+                    for(int i = 0; i < values.length; i++) {
+                        result.write("(".getBytes());
+                        result.write(intToByteArray(values[i].x));
+                        result.write(",".getBytes());
+                        result.write(intToByteArray(values[i].y));
+                        result.write(")".getBytes());
+                        if(i < values.length - 1) {
+                            result.write(COMMA_DELIMITER);
+                        }
+                    }
+                }
+        		break;
+        	}
+        	result.write(CLOSE_GROUP);
+        	result.write(CLOSE_GROUP);
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
 	}
-	
-    /**
-     * Writes the property definition. How the property
-     * is written depends on the property type.
-     */
-    public void writeContent(final OutputStream result) throws IOException
-    {    	
-    	result.write(OPEN_GROUP);
-    	result.write("\\sp".getBytes());
-    	result.write(OPEN_GROUP);
-    	result.write("\\sn".getBytes());
-    	result.write(DELIMITER);
-    	result.write(this.name.getBytes());
-    	result.write(CLOSE_GROUP);
-    	result.write(OPEN_GROUP);
-    	result.write("\\sv".getBytes());
-    	result.write(DELIMITER);
-    	switch(this.type) {
-    	case PROPERTY_TYPE_LONG: 
-    	case PROPERTY_TYPE_DOUBLE:
-    		result.write(this.value.toString().getBytes());
-    		break;
-    	case PROPERTY_TYPE_BOOLEAN:
-    		if(((Boolean) this.value).booleanValue()) {
-    			result.write("1".getBytes());
-    		} else {
-    			result.write("0".getBytes());
-    		}
-    		break;
-    	case PROPERTY_TYPE_COLOR:
-            Color color = (Color) this.value;
-            result.write(intToByteArray(color.getRed() | (color.getGreen() << 8) | (color.getBlue() << 16)));
-    		break;
-    	case PROPERTY_TYPE_ARRAY:
-    	    if(this.value instanceof int[]) {
-    	        int[] values = (int[]) this.value;
-    	        result.write("4;".getBytes());
-    	        result.write(intToByteArray(values.length));
-    	        result.write(COMMA_DELIMITER);
-    	        for(int i = 0; i < values.length; i++) {
-    	            result.write(intToByteArray(values[i]));
-    	            if(i < values.length - 1) {
-    	                result.write(COMMA_DELIMITER);
-    	            }
-    	        }
-    	    } else if(this.value instanceof Point[]) {
-    	        Point[] values = (Point[]) this.value;
-                result.write("8;".getBytes());
-                result.write(intToByteArray(values.length));
-                result.write(COMMA_DELIMITER);
-                for(int i = 0; i < values.length; i++) {
-                    result.write("(".getBytes());
-                    result.write(intToByteArray(values[i].x));
-                    result.write(",".getBytes());
-                    result.write(intToByteArray(values[i].y));
-                    result.write(")".getBytes());
-                    if(i < values.length - 1) {
-                        result.write(COMMA_DELIMITER);
-                    }
-                }
-            }
-    		break;
-    	}
-    	result.write(CLOSE_GROUP);
-    	result.write(CLOSE_GROUP);
-    }
-	
 }

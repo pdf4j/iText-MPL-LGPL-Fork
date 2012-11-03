@@ -1,6 +1,6 @@
 /**
- * $Id: RtfDirectContent.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfDirectContent.java,v 1.3 2006/08/28 11:21:15 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2006 by Mark Hall
  *
@@ -49,9 +49,6 @@
  */
 package com.lowagie.text.rtf.direct;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import com.lowagie.text.rtf.RtfAddableElement;
 
 /**
@@ -66,9 +63,8 @@ import com.lowagie.text.rtf.RtfAddableElement;
  * constant that makes it possible to easily add soft line-breaks anywhere in
  * the RTF document.
  * 
- * @version $Id: RtfDirectContent.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Revision: 1.3 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfDirectContent extends RtfAddableElement {
 	/**
@@ -87,28 +83,14 @@ public class RtfDirectContent extends RtfAddableElement {
 	 * 
 	 * @param directContent The content to add.
 	 */
-	public RtfDirectContent(String directContent)
-	{
+	public RtfDirectContent(String directContent) {
 		this.directContent = directContent;
 	}
 	
 	/**
 	 * Writes the direct content.
-	 * @deprecated replaced by {@link #writeContent(OutputStream)}
 	 */
-	public byte[] write() 
-	{
+	public byte[] write() {
 		return this.directContent.getBytes();
 	}
-	
-    /**
-     * Writes the element content to the given output stream.
-     */    
-    public void writeContent(final OutputStream out) throws IOException
-    {
-    	final byte[] contentBytes = this.directContent.getBytes();
-   		out.write(contentBytes);
-    }        
-	
-	
 }

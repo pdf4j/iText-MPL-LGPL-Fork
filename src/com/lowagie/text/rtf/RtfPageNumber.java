@@ -1,5 +1,5 @@
 /**
- * $Id: RtfPageNumber.java 2623 2007-02-23 22:28:28Z xlv $
+ * $Id: RtfPageNumber.java,v 1.28 2006/09/12 13:12:54 blowagie Exp $
  *
  * Copyright 2002 by 
  * <a href="http://www.smb-tec.com">SMB</a> 
@@ -64,10 +64,10 @@ import com.lowagie.text.Font;
  * This class is based on the RtfWriter-package from Mark Hall.
  * @author Steffen.Stundzig (Steffen.Stundzig@smb-tec.com)
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @version $Revision: 2623 $Date: 2006/09/12 13:12:54 $
+ * @version $Revision: 1.28 $Date: 2006/09/12 13:12:54 $
  * @deprecated Please move to the RtfWriter2 and associated classes. com.lowagie.text.rtf.field.RtfPageNumber replaces the functionality of this class.
  */
-public class RtfPageNumber extends GenericRtfField {
+public class RtfPageNumber extends GenericRtfField implements RtfField {
     private String content;
 
     /**

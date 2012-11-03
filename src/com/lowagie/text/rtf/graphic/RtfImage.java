@@ -1,6 +1,6 @@
 /*
- * $Id: RtfImage.java 2784 2007-05-24 15:43:40Z hallm $
- * $Name$
+ * $Id: RtfImage.java,v 1.23 2005/12/24 13:14:28 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -50,11 +50,10 @@
 
 package com.lowagie.text.rtf.graphic;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -62,17 +61,16 @@ import com.lowagie.text.Image;
 import com.lowagie.text.pdf.codec.wmf.MetaDo;
 import com.lowagie.text.rtf.RtfElement;
 import com.lowagie.text.rtf.document.RtfDocument;
-import com.lowagie.text.rtf.document.output.RtfByteArrayBuffer;
 import com.lowagie.text.rtf.style.RtfParagraphStyle;
 import com.lowagie.text.rtf.text.RtfParagraph;
+
 
 /**
  * The RtfImage contains one image. Supported image types are jpeg, png, wmf, bmp.
  * 
- * @version $Id: RtfImage.java 2784 2007-05-24 15:43:40Z hallm $
+ * @version $Revision: 1.23 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  * @author Paulo Soares
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfImage extends RtfElement {
     
@@ -116,31 +114,15 @@ public class RtfImage extends RtfElement {
      * Constant for the picture height scale
      */
     private static final byte[] PICTURE_SCALED_HEIGHT = "\\pichgoal".getBytes();
-    /**
-     * Constant for horizontal picture scaling
-     */
-    private static final byte[] PICTURE_SCALE_X = "\\picscalex".getBytes();
-    /**
-     * Constant for vertical picture scaling
-     */
-    private static final byte[] PICTURE_SCALE_Y = "\\picscaley".getBytes();
-    /**
-     * "\bin" constant
-     */
-    private static final byte[] PICTURE_BINARY_DATA = "\\bin".getBytes();
-    /**
-     * Constant for converting pixels to twips
-     */
-    private static final int PIXEL_TWIPS_FACTOR = 15;
     
     /**
      * The type of image this is.
      */
-    private final int imageType;
+    private int imageType = Image.ORIGINAL_NONE;
     /**
-     * Binary image data.
+     * The actual image. Already formated for direct inclusion in the rtf document
      */
-    private final byte[][] imageData;
+    private byte[] image = new byte[0];
     /**
      * The alignment of this picture
      */
@@ -174,231 +156,133 @@ public class RtfImage extends RtfElement {
      * @param image The Image that this RtfImage wraps
      * @throws DocumentException If an error occured accessing the image content
      */
-    public RtfImage(RtfDocument doc, Image image) throws DocumentException
-    {
+    public RtfImage(RtfDocument doc, Image image) throws DocumentException {
         super(doc);
         imageType = image.getOriginalType();
         if (!(imageType == Image.ORIGINAL_JPEG || imageType == Image.ORIGINAL_BMP
-                || imageType == Image.ORIGINAL_PNG || imageType == Image.ORIGINAL_WMF || imageType == Image.ORIGINAL_GIF)) {
-            throw new DocumentException("Only BMP, PNG, WMF, GIF and JPEG images are supported by the RTF Writer");
+                || imageType == Image.ORIGINAL_PNG || imageType == Image.ORIGINAL_WMF)) {
+            throw new DocumentException("Only BMP, PNG, WMF and JPEG images are supported by the RTF Writer");
         }
-        alignment = image.getAlignment();
-        width = image.getWidth();
-        height = image.getHeight();
-        plainWidth = image.getPlainWidth();
-        plainHeight = image.getPlainHeight();
-        this.imageData = getImageData(image);
+        alignment = image.alignment();
+        width = image.width();
+        height = image.height();
+        plainWidth = image.plainWidth();
+        plainHeight = image.plainHeight();
+        this.image = getImage(image);
     }
     
     /**
-     * Extracts the image data from the Image.
+     * Extracts the image data from the Image. The data is formated for direct inclusion
+     * in a rtf document
      * 
-     * @param image The image for which to extract the content
-     * @return The raw image data, not formated
+     * @param image The Image for which to extract the content
+     * @return The image data formated for the rtf document
      * @throws DocumentException If an error occurs accessing the image content
      */
-    private byte[][] getImageData(Image image) throws DocumentException 
-    {
-    	final int WMF_PLACEABLE_HEADER_SIZE = 22;
-        final RtfByteArrayBuffer bab = new RtfByteArrayBuffer();
-        
+    private byte[] getImage(Image image) throws DocumentException {
+        ByteArrayOutputStream imageTemp = new ByteArrayOutputStream();
         try {
-            if(imageType == Image.ORIGINAL_BMP) {
-            	bab.append(MetaDo.wrapBMP(image));
-            } else {            	
-            	final byte[] iod = image.getOriginalData();
-            	if(iod == null) {
-            		
-                	final InputStream imageIn = image.getUrl().openStream();
-                    if(imageType == Image.ORIGINAL_WMF) { //remove the placeable header first
-                    	for(int k = 0; k < WMF_PLACEABLE_HEADER_SIZE; k++) {
-							if(imageIn.read() < 0) throw(new EOFException("while removing wmf placeable header"));
-						}
-                    }
-                    bab.write(imageIn);
-                	imageIn.close();
-                    
+            InputStream imageIn;
+            if (imageType == Image.ORIGINAL_BMP) {
+                imageIn = new ByteArrayInputStream(MetaDo.wrapBMP(image));
+            } else {
+                if (image.getOriginalData() == null) {
+                    imageIn = image.url().openStream();
                 } else {
-                	
-                	if(imageType == Image.ORIGINAL_WMF) {
-                		//remove the placeable header                		
-                		bab.write(iod, WMF_PLACEABLE_HEADER_SIZE, iod.length - WMF_PLACEABLE_HEADER_SIZE);
-                	} else {
-                		bab.append(iod);
+                    imageIn = new ByteArrayInputStream(image.getOriginalData());
+                }
+                if (imageType == Image.ORIGINAL_WMF) { //remove the placeable header
+                    long skipLength = 22;
+                	while(skipLength > 0) {
+                	    skipLength = skipLength - imageIn.skip(skipLength);
                 	}
-                	
                 }
             }
-            
-            return(bab.toByteArrayArray());
-            
+            int buffer = 0;
+            int count = 0;
+            while((buffer = imageIn.read()) != -1) {
+                String helperStr = Integer.toHexString(buffer);
+                if (helperStr.length() < 2) helperStr = "0" + helperStr;
+                imageTemp.write(helperStr.getBytes());
+                count++;
+                if (count == 64) {
+                    imageTemp.write((byte) '\n');
+                    count = 0;
+                }
+            }
         } catch(IOException ioe) {
             throw new DocumentException(ioe.getMessage());
         }
-    }
-    
-    
-    /**
-     * lookup table used for converting bytes to hex chars.
-     * TODO Should probably be refactored into a helper class
-     */
-    public final static byte[] byte2charLUT = new byte[512]; //'0001020304050607 ... fafbfcfdfeff'
-    static {
-    	char c = '0';
-    	for(int k = 0; k < 16; k++) {
-    		for(int x = 0; x < 16; x++) {
-				byte2charLUT[((k*16)+x)*2] = byte2charLUT[(((x*16)+k)*2)+1] = (byte)c;
-			}
-    		if(++c == ':') c = 'a';
-		}
-    }
-    /**
-     * Writes the image data to the given buffer as hex encoded text.
-     * 
-     * @param binary
-     * @param bab
-     * @throws IOException
-     */
-    private void writeImageDataHexEncoded(final OutputStream bab) throws IOException
-    {
-    	int cnt = 0;
-    	for(int k = 0; k < imageData.length; k++) {
-    		final byte[] chunk = imageData[k];
-			for(int x = 0; x < chunk.length; x++) {
-				bab.write(byte2charLUT, (chunk[x]&0xff)*2, 2);
-				if(++cnt == 64) {
-					bab.write('\n');
-					cnt = 0;
-				}
-			}
-		}    	
-   		if(cnt > 0) bab.write('\n');
-    }
-    /**
-     * Returns the image raw data size in bytes.
-     * 
-     * @return
-     */
-    private int imageDataSize()
-    {
-		int size = 0;
-    	for(int k = 0; k < imageData.length; k++) {
-    		size += imageData[k].length;
-    	}   
-    	return(size);
+        return imageTemp.toByteArray();
     }
     
     /**
      * Writes the RtfImage content
      * 
      * @return the RtfImage content
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write()
-    {
-    	final ByteArrayOutputStream result = new ByteArrayOutputStream();
+    public byte[] write() {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
-        } catch(Exception ioe) {
+            if(this.topLevelElement) {
+                result.write(RtfParagraph.PARAGRAPH_DEFAULTS);
+            }
+            switch(alignment) {
+            	case Element.ALIGN_LEFT:
+            		result.write(RtfParagraphStyle.ALIGN_LEFT);
+            		break;
+            	case Element.ALIGN_RIGHT:
+            		result.write(RtfParagraphStyle.ALIGN_RIGHT);
+            		break;
+            	case Element.ALIGN_CENTER:
+            		result.write(RtfParagraphStyle.ALIGN_CENTER);
+            		break;
+            	case Element.ALIGN_JUSTIFIED:
+            		result.write(RtfParagraphStyle.ALIGN_JUSTIFY);
+            		break;
+            }
+            result.write(OPEN_GROUP);
+            result.write(PICTURE_GROUP);
+            result.write(OPEN_GROUP);
+            result.write(PICTURE);
+            switch(imageType) {
+            	case Image.ORIGINAL_JPEG:
+            	    result.write(PICTURE_JPEG);
+            		break;
+            	case Image.ORIGINAL_PNG:
+            	    result.write(PICTURE_PNG);
+            		break;
+            	case Image.ORIGINAL_WMF:
+            	case Image.ORIGINAL_BMP:
+            	    result.write(PICTURE_WMF);
+            		break;
+            }
+            result.write(PICTURE_WIDTH);
+            result.write(intToByteArray((int) width));
+            result.write(PICTURE_HEIGHT);
+            result.write(intToByteArray((int) height));
+            if(width != plainWidth || this.imageType == Image.ORIGINAL_BMP) {
+                result.write(PICTURE_SCALED_WIDTH);
+                result.write(intToByteArray((int) (plainWidth * RtfElement.TWIPS_FACTOR)));
+            }
+            if(height != plainHeight || this.imageType == Image.ORIGINAL_BMP) {
+                result.write(PICTURE_SCALED_HEIGHT);
+                result.write(intToByteArray((int) (plainHeight * RtfElement.TWIPS_FACTOR)));
+            }
+            result.write(DELIMITER);
+            result.write((byte) '\n');
+            result.write(image);
+            result.write(CLOSE_GROUP);
+            result.write(CLOSE_GROUP);
+            if(this.topLevelElement) {
+                result.write(RtfParagraph.PARAGRAPH);
+                result.write(RtfParagraph.PARAGRAPH);
+            }
+            result.write((byte) '\n');
+        } catch(IOException ioe) {
             ioe.printStackTrace();
         }
-
-        return(result.toByteArray());        
-    }
-    /**
-     * Writes the RtfImage content
-     */ 
-    public void writeContent(final OutputStream result) throws IOException
-    {
-    	//new RuntimeException("info").printStackTrace();
-    	
-        if(this.topLevelElement) {
-            result.write(RtfParagraph.PARAGRAPH_DEFAULTS);
-            switch(alignment) {
-                case Element.ALIGN_LEFT:
-                    result.write(RtfParagraphStyle.ALIGN_LEFT);
-                    break;
-                case Element.ALIGN_RIGHT:
-                    result.write(RtfParagraphStyle.ALIGN_RIGHT);
-                    break;
-                case Element.ALIGN_CENTER:
-                    result.write(RtfParagraphStyle.ALIGN_CENTER);
-                    break;
-                case Element.ALIGN_JUSTIFIED:
-                    result.write(RtfParagraphStyle.ALIGN_JUSTIFY);
-                    break;
-            }
-        }
-        result.write(OPEN_GROUP);
-        result.write(PICTURE_GROUP);
-        result.write(OPEN_GROUP);
-        result.write(PICTURE);
-        switch(imageType) {
-        	case Image.ORIGINAL_JPEG:
-        	    result.write(PICTURE_JPEG);
-        		break;
-        	case Image.ORIGINAL_PNG:
-            case Image.ORIGINAL_GIF:
-        	    result.write(PICTURE_PNG);
-        		break;
-        	case Image.ORIGINAL_WMF:
-        	case Image.ORIGINAL_BMP:
-        	    result.write(PICTURE_WMF);
-        		break;
-        }
-        result.write(PICTURE_WIDTH);
-        result.write(intToByteArray((int) width));
-        result.write(PICTURE_HEIGHT);
-        result.write(intToByteArray((int) height));
-        if(this.document.getDocumentSettings().isWriteImageScalingInformation()) {
-            result.write(PICTURE_SCALE_X);
-            result.write(intToByteArray((int)(100 * plainWidth / width)));
-            result.write(PICTURE_SCALE_Y);
-            result.write(intToByteArray((int)(100 * plainHeight / height)));
-        }
-        if(this.document.getDocumentSettings().isImagePDFConformance()) {
-            result.write(PICTURE_SCALED_WIDTH);
-            result.write(intToByteArray((int) (plainWidth * RtfElement.TWIPS_FACTOR)));
-            result.write(PICTURE_SCALED_HEIGHT);
-            result.write(intToByteArray((int) (plainHeight * RtfElement.TWIPS_FACTOR)));
-        } else {
-            if(this.width != this.plainWidth || this.imageType == Image.ORIGINAL_BMP) {
-                result.write(PICTURE_SCALED_WIDTH);
-                result.write(intToByteArray((int) (plainWidth * PIXEL_TWIPS_FACTOR)));
-            }
-            if(this.height != this.plainHeight || this.imageType == Image.ORIGINAL_BMP) {
-                result.write(PICTURE_SCALED_HEIGHT);
-                result.write(intToByteArray((int) (plainHeight * PIXEL_TWIPS_FACTOR)));
-            }
-        }
-
-        if(true) {
-        	//binary
-        	result.write('\n');
-        	result.write(PICTURE_BINARY_DATA);
-        	result.write(intToByteArray(imageDataSize()));
-            result.write(DELIMITER);
-            if(result instanceof RtfByteArrayBuffer) {
-            	((RtfByteArrayBuffer)result).append(imageData);
-            } else {
-            	for(int k = 0; k < imageData.length; k++) {
-					result.write(imageData[k]);
-				}
-            }
-        } else {
-        	//hex encoded
-            result.write(DELIMITER);
-        	result.write('\n');
-        	writeImageDataHexEncoded(result);
-        }
-        
-        result.write(CLOSE_GROUP);
-        result.write(CLOSE_GROUP);
-        if(this.topLevelElement) {
-            result.write(RtfParagraph.PARAGRAPH);
-            result.write(RtfParagraph.PARAGRAPH);
-        }
-        result.write('\n');    	
+        return result.toByteArray();
     }
     
     /**
@@ -419,6 +303,4 @@ public class RtfImage extends RtfElement {
     public void setTopLevelElement(boolean topLevelElement) {
         this.topLevelElement = topLevelElement;
     }
-    
-    
 }

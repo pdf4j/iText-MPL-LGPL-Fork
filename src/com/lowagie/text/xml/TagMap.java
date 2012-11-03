@@ -1,6 +1,6 @@
 /*
- * $Id: TagMap.java 2478 2006-11-23 11:42:17Z blowagie $
- * $Name$
+ * $Id: TagMap.java,v 1.13 2006/11/23 11:42:17 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *

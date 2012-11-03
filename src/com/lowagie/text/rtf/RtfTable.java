@@ -1,6 +1,6 @@
 /**
- * $Id: RtfTable.java 2748 2007-05-12 15:11:48Z blowagie $
- * $Name$
+ * $Id: RtfTable.java,v 1.33 2006/09/14 23:10:54 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Mark Hall
  *
@@ -105,24 +105,24 @@ public class RtfTable {
         Iterator rows = table.iterator();
         Row row = null;
 
-        int tableWidth = (int) table.getWidth();
-        int cellpadding = (int) (table.getPadding() * RtfWriter.TWIPSFACTOR);
-        int cellspacing = (int) (table.getSpacing() * RtfWriter.TWIPSFACTOR);
+        int tableWidth = (int) table.widthPercentage();
+        int cellpadding = (int) (table.cellpadding() * RtfWriter.TWIPSFACTOR);
+        int cellspacing = (int) (table.cellspacing() * RtfWriter.TWIPSFACTOR);
         float[] propWidths = table.getProportionalWidths();
 
-        int borders = table.getBorder();
-        java.awt.Color borderColor = table.getBorderColor();
-        float borderWidth = table.getBorderWidth();
+        int borders = table.border();
+        java.awt.Color borderColor = table.borderColor();
+        float borderWidth = table.borderWidth();
 
         for (int i = 0; i < table.size(); i++) {
             RtfRow rtfRow = new RtfRow(writer, this);
-            rtfRow.pregenerateRows(table.getColumns());
+            rtfRow.pregenerateRows(table.columns());
             rowsList.add(rtfRow);
         }
         int i = 0;
         while (rows.hasNext()) {
             row = (Row) rows.next();
-            row.setHorizontalAlignment(table.getAlignment());
+            row.setHorizontalAlignment(table.alignment());
             RtfRow rtfRow = (RtfRow) rowsList.get(i);
             rtfRow.importRow(row, propWidths, tableWidth, pageWidth, cellpadding, cellspacing, borders, borderColor, borderWidth, i);
             i++;
@@ -158,7 +158,7 @@ public class RtfTable {
             os.write(RtfWriter.paragraphDefaults);
             os.write(RtfWriter.escape);
             os.write(RtfWriter.paragraph);
-            switch (origTable.getAlignment()) {
+            switch (origTable.alignment()) {
                 case Element.ALIGN_LEFT:
                     os.write(RtfWriter.escape);
                 	os.write(RtfWriter.alignLeft);

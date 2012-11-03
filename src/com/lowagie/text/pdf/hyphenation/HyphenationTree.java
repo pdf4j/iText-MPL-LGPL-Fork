@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-/* $Id: HyphenationTree.java 2623 2007-02-23 22:28:28Z xlv $ */
+/* $Id: HyphenationTree.java,v 1.42 2006/09/14 23:39:20 xlv Exp $ */
  
 package com.lowagie.text.pdf.hyphenation;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,7 +31,7 @@ import java.util.HashMap;
  * @author Carlos Villegas <cav@uniscope.co.jp>
  */
 public class HyphenationTree extends TernaryTree 
-            implements PatternConsumer {
+            implements PatternConsumer, Serializable {
 
     private static final long serialVersionUID = -7763254239309429432L;
 

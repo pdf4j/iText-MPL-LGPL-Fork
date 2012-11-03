@@ -1,6 +1,6 @@
 /*
- * $Id: PdfIndirectReference.java 2057 2005-11-29 21:05:22Z blowagie $
- * $Name$
+ * $Id: PdfIndirectReference.java,v 1.55 2005/11/29 21:05:02 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

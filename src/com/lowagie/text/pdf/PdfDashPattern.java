@@ -1,6 +1,6 @@
 /*
- * $Id: PdfDashPattern.java 2671 2007-04-03 16:08:04Z psoares33 $
- * $Name$
+ * $Id: PdfDashPattern.java,v 1.57 2005/05/04 14:33:09 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -121,6 +121,8 @@ public class PdfDashPattern extends PdfArray {
     
 /**
  * Returns the PDF representation of this <CODE>PdfArray</CODE>.
+ *
+ * @return		an array of <CODE>byte</CODE>s
  */
     
     public void toPdf(PdfWriter writer, OutputStream os) throws IOException {

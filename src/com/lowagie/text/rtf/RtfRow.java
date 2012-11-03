@@ -1,6 +1,6 @@
 /**
- * $Id: RtfRow.java 2748 2007-05-12 15:11:48Z blowagie $
- * $Name$
+ * $Id: RtfRow.java,v 1.40 2006/09/24 18:41:47 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Mark Hall
  *
@@ -231,7 +231,7 @@ public class RtfRow {
         if (this.borderWidth > 2) this.borderWidth = 2;
 
         int cellLeft = 0;
-        for (int i = 0; i < row.getColumns(); i++) {
+        for (int i = 0; i < row.columns(); i++) {
             Element cell = (Element) row.getCell(i);
 
             // cellWidth is an absolute argument
@@ -254,13 +254,13 @@ public class RtfRow {
         // col + row spanning cells are also handled by this loop, because the real cell of
         // the upper left corner in such an col, row matrix is copied as first cell
         // in each row in this matrix
-        int columns = row.getColumns();
+        int columns = row.columns();
         for (int i = 0; i < columns; i++) {
             RtfCell firstCell = (RtfCell) cells.get(i);
             Cell cell = firstCell.getStore();
             int cols = 0;
             if(cell != null) {
-                cols = cell.getColspan();
+                cols = cell.colspan();
             }
             if (cols > 1) {
                 RtfCell lastCell = (RtfCell) cells.get(i + cols - 1);
@@ -300,17 +300,17 @@ public class RtfRow {
         writeInt(os, width);
 //        os.write(RtfWriter.escape);
 //        os.write(rowAutofit);
-        if (mainTable.getOriginalTable().isCellsFitPage()) {
+        if (mainTable.getOriginalTable().hasToFitPageCells()) {
             os.write(RtfWriter.escape);
             os.write(rowKeep);
         }
         // check if this row is a header row
-        if (rowNum < table.getLastHeaderRow() + 1) {
+        if (rowNum < table.firstDataRow()) {
             os.write(RtfWriter.escape);
             os.write(rowHeader);
         }
         os.write(RtfWriter.escape);
-        switch (this.origRow.getHorizontalAlignment()) {
+        switch (this.origRow.horizontalAlignment()) {
             case Element.ALIGN_LEFT:
                 os.write(rowAlignLeft);
                 break;

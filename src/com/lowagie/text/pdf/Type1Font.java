@@ -1,6 +1,6 @@
 /*
- * $Id: Type1Font.java 2509 2006-12-21 16:26:19Z psoares33 $
- * $Name$
+ * $Id: Type1Font.java,v 1.74 2006/12/21 16:26:19 psoares33 Exp $
+ * $Name:  $
  *
  * Copyright 2001-2006 Paulo Soares
  *

@@ -1,6 +1,6 @@
 /*
- * $Id: RtfWriter2.java 2623 2007-02-23 22:28:28Z xlv $
- * $Name$
+ * $Id: RtfWriter2.java,v 1.16 2006/09/14 23:10:55 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -54,12 +54,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 
+import com.lowagie.text.DocListener;
 import com.lowagie.text.DocWriter;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.Watermark;
 import com.lowagie.text.rtf.direct.RtfImportMappings;
 import com.lowagie.text.rtf.direct.RtfParser;
 import com.lowagie.text.rtf.document.RtfDocument;
@@ -69,10 +71,10 @@ import com.lowagie.text.rtf.text.RtfNewPage;
 /**
  * The RtfWriter allows the creation of rtf documents via the iText system
  *
- * Version: $Id: RtfWriter2.java 2623 2007-02-23 22:28:28Z xlv $
+ * Version: $Id: RtfWriter2.java,v 1.16 2006/09/14 23:10:55 xlv Exp $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  */
-public class RtfWriter2 extends DocWriter {
+public class RtfWriter2 extends DocWriter implements DocListener {
     /**
      * The RtfDocument this RtfWriter is creating
      */
@@ -147,6 +149,19 @@ public class RtfWriter2 extends DocWriter {
 
     /**
      * This method is not supported in the RtfWriter
+     *
+     * @param wm Unused
+     * @return <code>false</code>
+     */
+    public boolean add(Watermark wm) { return false; }
+    
+    /**
+     * This method is not supported in the RtfWriter
+     */
+    public void removeWatermark() {}
+
+    /**
+     * This method is not supported in the RtfWriter
      */
     public void clearTextWrap() {}
 
@@ -164,11 +179,16 @@ public class RtfWriter2 extends DocWriter {
      * to the specified OutputStream
      */
     public void close() {
-        if (open) {
+        try {
             rtfDoc.writeDocument(os);
-            super.close();
-            this.rtfDoc = new RtfDocument();
+            if(this.closeStream) {
+                os.close();
+            }
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
         }
+        this.rtfDoc = new RtfDocument();
+    	super.close();
     }
 
     /**

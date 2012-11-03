@@ -1,5 +1,5 @@
 /*
- * $Id: PdfSignatureAppearance.java 2752 2007-05-15 14:58:33Z blowagie $
+ * $Id: PdfSignatureAppearance.java,v 1.24 2006/09/21 16:58:38 xlv Exp $
  *
  * Copyright 2004-2006 by Paulo Soares.
  *
@@ -108,11 +108,6 @@ public class PdfSignatureAppearance {
      */
     public static final PdfName WINCER_SIGNED = PdfName.ADOBE_PPKMS;
 
-    public static final int NOT_CERTIFIED = 0;
-    public static final int CERTIFIED_NO_CHANGES_ALLOWED = 1;
-    public static final int CERTIFIED_FORM_FILLING = 2;
-    public static final int CERTIFIED_FORM_FILLING_AND_ANNOTATIONS = 3;
-    
     private static final float TOP_SECTION = 0.3f;
     private static final float MARGIN = 2;
     private Rectangle rect;
@@ -242,7 +237,7 @@ public class PdfSignatureAppearance {
      * @return the visibility status of the signature
      */    
     public boolean isInvisible() {
-        return (rect == null || rect.getWidth() == 0 || rect.getHeight() == 0);
+        return (rect == null || rect.width() == 0 || rect.height() == 0);
     }
     
     /**
@@ -279,7 +274,7 @@ public class PdfSignatureAppearance {
             throw new IllegalArgumentException("Invalid page number: " + page);
         this.pageRect = new Rectangle(pageRect);
         this.pageRect.normalize();
-        rect = new Rectangle(this.pageRect.getWidth(), this.pageRect.getHeight());
+        rect = new Rectangle(this.pageRect.width(), this.pageRect.height());
         this.page = page;
         newField = true;
     }
@@ -311,29 +306,29 @@ public class PdfSignatureAppearance {
         switch (rotation) {
             case 90:
                 pageRect = new Rectangle(
-                pageRect.getBottom(),
-                pageSize.getTop() - pageRect.getLeft(),
-                pageRect.getTop(),
-                pageSize.getTop() - pageRect.getRight());
+                pageRect.bottom(),
+                pageSize.top() - pageRect.left(),
+                pageRect.top(),
+                pageSize.top() - pageRect.right());
                 break;
             case 180:
                 pageRect = new Rectangle(
-                pageSize.getRight() - pageRect.getLeft(),
-                pageSize.getTop() - pageRect.getBottom(),
-                pageSize.getRight() - pageRect.getRight(),
-                pageSize.getTop() - pageRect.getTop());
+                pageSize.right() - pageRect.left(),
+                pageSize.top() - pageRect.bottom(),
+                pageSize.right() - pageRect.right(),
+                pageSize.top() - pageRect.top());
                 break;
             case 270:
                 pageRect = new Rectangle(
-                pageSize.getRight() - pageRect.getBottom(),
-                pageRect.getLeft(),
-                pageSize.getRight() - pageRect.getTop(),
-                pageRect.getRight());
+                pageSize.right() - pageRect.bottom(),
+                pageRect.left(),
+                pageSize.right() - pageRect.top(),
+                pageRect.right());
                 break;
         }
         if (rotation != 0)
             pageRect.normalize();
-        rect = new Rectangle(this.pageRect.getWidth(), this.pageRect.getHeight());
+        rect = new Rectangle(this.pageRect.width(), this.pageRect.height());
     }
     
     /**
@@ -381,12 +376,6 @@ public class PdfSignatureAppearance {
      * @throws DocumentException on error
      */    
     public PdfTemplate getAppearance() throws DocumentException {
-        if (isInvisible()) {
-            PdfTemplate t = new PdfTemplate(writer);
-            t.setBoundingBox(new Rectangle(0, 0));
-            writer.addDirectTemplateSimple(t, null);
-            return t;
-        }
         if (app[0] == null) {
             PdfTemplate t = app[0] = new PdfTemplate(writer);
             t.setBoundingBox(new Rectangle(100, 100));
@@ -419,16 +408,16 @@ public class PdfSignatureAppearance {
             writer.addDirectTemplateSimple(t, new PdfName("n2"));
             if (image != null) {
                 if (imageScale == 0) {
-                    t.addImage(image, rect.getWidth(), 0, 0, rect.getHeight(), 0, 0);
+                    t.addImage(image, rect.width(), 0, 0, rect.height(), 0, 0);
                 }
                 else {
                     float usableScale = imageScale;
                     if (imageScale < 0)
-                        usableScale = Math.min(rect.getWidth() / image.getWidth(), rect.getHeight() / image.getHeight());
-                    float w = image.getWidth() * usableScale;
-                    float h = image.getHeight() * usableScale;
-                    float x = (rect.getWidth() - w) / 2;
-                    float y = (rect.getHeight() - h) / 2;
+                        usableScale = Math.min(rect.width() / image.width(), rect.height() / image.height());
+                    float w = image.width() * usableScale;
+                    float h = image.height() * usableScale;
+                    float x = (rect.width() - w) / 2;
+                    float y = (rect.height() - h) / 2;
                     t.addImage(image, w, 0, 0, h, x, y);
                 }
             }
@@ -437,7 +426,7 @@ public class PdfSignatureAppearance {
                 font = new Font();
             else
                 font = new Font(layer2Font);
-            float size = font.getSize();
+            float size = font.size();
 
             Rectangle dataRect = null;
             Rectangle signatureRect = null;
@@ -448,75 +437,75 @@ public class PdfSignatureAppearance {
                 signatureRect = new Rectangle(
                     MARGIN, 
                     MARGIN, 
-                    rect.getWidth() / 2 - MARGIN,
-                    rect.getHeight() - MARGIN);
+                    rect.width() / 2 - MARGIN,
+                    rect.height() - MARGIN);
                 dataRect = new Rectangle(
-                    rect.getWidth() / 2 +  MARGIN / 2, 
+                    rect.width() / 2 +  MARGIN / 2, 
                     MARGIN, 
-                    rect.getWidth() - MARGIN / 2,
-                    rect.getHeight() - MARGIN);
+                    rect.width() - MARGIN / 2,
+                    rect.height() - MARGIN);
 
-                if (rect.getHeight() > rect.getWidth()) {
+                if (rect.height() > rect.width()) {
                     signatureRect = new Rectangle(
                         MARGIN, 
-                        rect.getHeight() / 2, 
-                        rect.getWidth() - MARGIN,
-                        rect.getHeight());
+                        rect.height() / 2, 
+                        rect.width() - MARGIN,
+                        rect.height());
                     dataRect = new Rectangle(
                         MARGIN, 
                         MARGIN, 
-                        rect.getWidth() - MARGIN,
-                        rect.getHeight() / 2 - MARGIN);
+                        rect.width() - MARGIN,
+                        rect.height() / 2 - MARGIN);
                 }
             }
             else {
                 dataRect = new Rectangle(
                     MARGIN, 
                     MARGIN, 
-                    rect.getWidth() - MARGIN,
-                    rect.getHeight() * (1 - TOP_SECTION) - MARGIN);
+                    rect.width() - MARGIN,
+                    rect.height() * (1 - TOP_SECTION) - MARGIN);
             }
 
             if (render == SignatureRenderNameAndDescription) {
                 String signedBy = PdfPKCS7.getSubjectFields((X509Certificate)certChain[0]).getField("CN");
-                Rectangle sr2 = new Rectangle(signatureRect.getWidth() - MARGIN, signatureRect.getHeight() - MARGIN );
+                Rectangle sr2 = new Rectangle(signatureRect.width() - MARGIN, signatureRect.height() - MARGIN );
                 float signedSize = fitText(font, signedBy, sr2, -1, runDirection);
 
                 ColumnText ct2 = new ColumnText(t);
                 ct2.setRunDirection(runDirection);
-                ct2.setSimpleColumn(new Phrase(signedBy, font), signatureRect.getLeft(), signatureRect.getBottom(), signatureRect.getRight(), signatureRect.getTop(), signedSize, Element.ALIGN_LEFT);
+                ct2.setSimpleColumn(new Phrase(signedBy, font), signatureRect.left(), signatureRect.bottom(), signatureRect.right(), signatureRect.top(), signedSize, Element.ALIGN_LEFT);
 
                 ct2.go();
             }
             else if (render == SignatureRenderGraphicAndDescription) {
                 ColumnText ct2 = new ColumnText(t);
                 ct2.setRunDirection(runDirection);
-                ct2.setSimpleColumn(signatureRect.getLeft(), signatureRect.getBottom(), signatureRect.getRight(), signatureRect.getTop(), 0, Element.ALIGN_RIGHT);
+                ct2.setSimpleColumn(signatureRect.left(), signatureRect.bottom(), signatureRect.right(), signatureRect.top(), 0, Element.ALIGN_RIGHT);
 
                 Image im = Image.getInstance(signatureGraphic);
-                im.scaleToFit(signatureRect.getWidth(), signatureRect.getHeight());
+                im.scaleToFit(signatureRect.width(), signatureRect.height());
 
                 Paragraph p = new Paragraph();
                 // must calculate the point to draw from to make image appear in middle of column
                 float x = 0;
                 // experimentation found this magic number to counteract Adobe's signature graphic, which
                 // offsets the y co-ordinate by 15 units
-                float y = -im.getScaledHeight() + 15;
+                float y = -im.scaledHeight() + 15;
 
-                x = x + (signatureRect.getWidth() - im.getScaledWidth()) / 2;
-                y = y - (signatureRect.getHeight() - im.getScaledHeight()) / 2;
-                p.add(new Chunk(im, x + (signatureRect.getWidth() - im.getScaledWidth()) / 2, y, false));
+                x = x + (signatureRect.width() - im.scaledWidth()) / 2;
+                y = y - (signatureRect.height() - im.scaledHeight()) / 2;
+                p.add(new Chunk(im, x + (signatureRect.width() - im.scaledWidth()) / 2, y, false));
                 ct2.addElement(p);
                 ct2.go();
             }
             
             if (size <= 0) {
-                Rectangle sr = new Rectangle(dataRect.getWidth(), dataRect.getHeight());
+                Rectangle sr = new Rectangle(dataRect.width(), dataRect.height());
                 size = fitText(font, text, sr, 12, runDirection);
             }
             ColumnText ct = new ColumnText(t);
             ct.setRunDirection(runDirection);
-            ct.setSimpleColumn(new Phrase(text, font), dataRect.getLeft(), dataRect.getBottom(), dataRect.getRight(), dataRect.getTop(), size, Element.ALIGN_LEFT);
+            ct.setSimpleColumn(new Phrase(text, font), dataRect.left(), dataRect.bottom(), dataRect.right(), dataRect.top(), size, Element.ALIGN_LEFT);
             ct.go();
         }
         if (app[3] == null && !acro6Layers) {
@@ -527,22 +516,22 @@ public class PdfSignatureAppearance {
         }
         if (app[4] == null && !acro6Layers) {
             PdfTemplate t = app[4] = new PdfTemplate(writer);
-            t.setBoundingBox(new Rectangle(0, rect.getHeight() * (1 - TOP_SECTION), rect.getRight(), rect.getTop()));
+            t.setBoundingBox(new Rectangle(0, rect.height() * (1 - TOP_SECTION), rect.right(), rect.top()));
             writer.addDirectTemplateSimple(t, new PdfName("n4"));
             Font font;
             if (layer2Font == null)
                 font = new Font();
             else
                 font = new Font(layer2Font);
-            float size = font.getSize();
+            float size = font.size();
             String text = "Signature Not Verified";
             if (layer4Text != null)
                 text = layer4Text;
-            Rectangle sr = new Rectangle(rect.getWidth() - 2 * MARGIN, rect.getHeight() * TOP_SECTION - 2 * MARGIN);
+            Rectangle sr = new Rectangle(rect.width() - 2 * MARGIN, rect.height() * TOP_SECTION - 2 * MARGIN);
             size = fitText(font, text, sr, 15, runDirection);
             ColumnText ct = new ColumnText(t);
             ct.setRunDirection(runDirection);
-            ct.setSimpleColumn(new Phrase(text, font), MARGIN, 0, rect.getWidth() - MARGIN, rect.getHeight() - MARGIN, size, Element.ALIGN_LEFT);
+            ct.setSimpleColumn(new Phrase(text, font), MARGIN, 0, rect.width() - MARGIN, rect.height() - MARGIN, size, Element.ALIGN_LEFT);
             ct.go();
         }
         int rotation = writer.reader.getPageRotation(page);
@@ -556,16 +545,16 @@ public class PdfSignatureAppearance {
             frm = new PdfTemplate(writer);
             frm.setBoundingBox(rotated);
             writer.addDirectTemplateSimple(frm, new PdfName("FRM"));
-            float scale = Math.min(rect.getWidth(), rect.getHeight()) * 0.9f;
-            float x = (rect.getWidth() - scale) / 2;
-            float y = (rect.getHeight() - scale) / 2;
+            float scale = Math.min(rect.width(), rect.height()) * 0.9f;
+            float x = (rect.width() - scale) / 2;
+            float y = (rect.height() - scale) / 2;
             scale /= 100;
             if (rotation == 90)
-                frm.concatCTM(0, 1, -1, 0, rect.getHeight(), 0);
+                frm.concatCTM(0, 1, -1, 0, rect.height(), 0);
             else if (rotation == 180)
-                frm.concatCTM(-1, 0, 0, -1, rect.getWidth(), rect.getHeight());
+                frm.concatCTM(-1, 0, 0, -1, rect.width(), rect.height());
             else if (rotation == 270)
-                frm.concatCTM(0, -1, 1, 0, 0, rect.getWidth());
+                frm.concatCTM(0, -1, 1, 0, 0, rect.width());
             frm.addTemplate(app[0], 0, 0);
             if (!acro6Layers)
                 frm.addTemplate(app[1], scale, 0, 0, scale, x, y);
@@ -606,12 +595,12 @@ public class PdfSignatureAppearance {
                         ++cr;
                 }
                 int minLines = Math.max(cr, lf) + 1;
-                maxFontSize = Math.abs(rect.getHeight()) / minLines - 0.001f;
+                maxFontSize = Math.abs(rect.height()) / minLines - 0.001f;
             }
             font.setSize(maxFontSize);
             Phrase ph = new Phrase(text, font);
             ct = new ColumnText(null);
-            ct.setSimpleColumn(ph, rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), maxFontSize, Element.ALIGN_LEFT);
+            ct.setSimpleColumn(ph, rect.left(), rect.bottom(), rect.right(), rect.top(), maxFontSize, Element.ALIGN_LEFT);
             ct.setRunDirection(runDirection);
             status = ct.go(true);
             if ((status & ColumnText.NO_MORE_TEXT) != 0)
@@ -624,7 +613,7 @@ public class PdfSignatureAppearance {
                 size = (min + max) / 2;
                 ct = new ColumnText(null);
                 font.setSize(size);
-                ct.setSimpleColumn(new Phrase(text, font), rect.getLeft(), rect.getBottom(), rect.getRight(), rect.getTop(), size, Element.ALIGN_LEFT);
+                ct.setSimpleColumn(new Phrase(text, font), rect.left(), rect.bottom(), rect.right(), rect.top(), size, Element.ALIGN_LEFT);
                 ct.setRunDirection(runDirection);
                 status = ct.go(true);
                 if ((status & ColumnText.NO_MORE_TEXT) != 0) {
@@ -880,35 +869,40 @@ public class PdfSignatureAppearance {
         AcroFields af = writer.getAcroFields();
         String name = getFieldName();
         boolean fieldExists = !(isInvisible() || isNewField());
-        int flags = PdfAnnotation.FLAGS_PRINT | PdfAnnotation.FLAGS_LOCKED;
+        int flags = 132;
         PdfIndirectReference refSig = writer.getPdfIndirectReference();
-        writer.setSigFlags(3);
-        if (fieldExists) {
+        if (fieldExists && name.indexOf('.') >= 0) {
             ArrayList widgets = af.getFieldItem(name).widgets;
             PdfDictionary widget = (PdfDictionary)widgets.get(0);
             writer.markUsed(widget);
             widget.put(PdfName.P, writer.getPageReference(getPage()));
             widget.put(PdfName.V, refSig);
-            PdfObject obj = PdfReader.getPdfObjectRelease(widget.get(PdfName.F));
-            if (obj != null && obj.isNumber())
-                flags = ((PdfNumber)obj).intValue() | PdfAnnotation.FLAGS_LOCKED;
-            widget.put(PdfName.F, new PdfNumber(flags));
             PdfDictionary ap = new PdfDictionary();
             ap.put(PdfName.N, getAppearance().getIndirectReference());
             widget.put(PdfName.AP, ap);
         }
         else {
+            if (fieldExists) {
+                flags = 0;
+                ArrayList merged = af.getFieldItem(name).merged;
+                PdfObject obj = PdfReader.getPdfObjectRelease(((PdfDictionary)merged.get(0)).get(PdfName.F));
+                if (obj != null && obj.isNumber())
+                    flags = ((PdfNumber)obj).intValue();
+                af.removeField(name);
+            }
+            writer.setSigFlags(3);
             PdfFormField sigField = PdfFormField.createSignature(writer);
             sigField.setFieldName(name);
             sigField.put(PdfName.V, refSig);
             sigField.setFlags(flags);
 
             int pagen = getPage();
-            if (!isInvisible())
+            if (!isInvisible()) {
                 sigField.setWidget(getPageRect(), null);
+                sigField.setAppearance(PdfAnnotation.APPEARANCE_NORMAL, getAppearance());
+            }
             else
                 sigField.setWidget(new Rectangle(0, 0), null);
-            sigField.setAppearance(PdfAnnotation.APPEARANCE_NORMAL, getAppearance());
             sigField.setPage(pagen);
             writer.addAnnotation(sigField, pagen);
         }
@@ -939,9 +933,8 @@ public class PdfSignatureAppearance {
             lit = new PdfLiteral(80);
             exclusionLocations.put(PdfName.BYTERANGE, lit);
             sigStandard.put(PdfName.BYTERANGE, lit);
-            if (certificationLevel > 0) {
+            if (certified)
                 addDocMDP(sigStandard);
-            }
             if (signatureEvent != null)
                 signatureEvent.getSignatureDictionary(sigStandard);
             writer.addToBody(sigStandard, refSig, false);
@@ -958,13 +951,13 @@ public class PdfSignatureAppearance {
                 exclusionLocations.put(key, lit);
                 cryptoDictionary.put(key, lit);
             }
-            if (certificationLevel > 0)
+            if (certified)
                 addDocMDP(cryptoDictionary);
             if (signatureEvent != null)
                 signatureEvent.getSignatureDictionary(cryptoDictionary);
             writer.addToBody(cryptoDictionary, refSig, false);
         }
-        if (certificationLevel > 0) {
+        if (certified) {
           // add DocMDP entry to root
              PdfDictionary docmdp = new PdfDictionary();
              docmdp.put(new PdfName("DocMDP"), refSig);
@@ -1083,24 +1076,17 @@ public class PdfSignatureAppearance {
     }
     
     private void addDocMDP(PdfDictionary crypto) {
-        PdfDictionary reference = new PdfDictionary();
-        PdfDictionary transformParams = new PdfDictionary();
-        transformParams.put(PdfName.P, new PdfNumber(certificationLevel));
-        transformParams.put(PdfName.V, new PdfName("1.2"));
-        transformParams.put(PdfName.TYPE, PdfName.TRANSFORMPARAMS);
-        reference.put(PdfName.TRANSFORMMETHOD, PdfName.DOCMDP);
-        reference.put(PdfName.TYPE, PdfName.SIGREF);
-        reference.put(PdfName.TRANSFORMPARAMS, transformParams);
-        reference.put(new PdfName("DigestValue"), new PdfString("aa"));
-        PdfArray loc = new PdfArray();
-        loc.add(new PdfNumber(0));
-        loc.add(new PdfNumber(0));
-        reference.put(new PdfName("DigestLocation"), loc);
-        reference.put(new PdfName("DigestMethod"), new PdfName("MD5"));
-        reference.put(PdfName.DATA, writer.reader.getTrailer().get(PdfName.ROOT));
-        PdfArray types = new PdfArray();
-        types.add(reference);
-        crypto.put(PdfName.REFERENCE, types);
+         PdfDictionary reference = new PdfDictionary();
+         PdfDictionary transformParams = new PdfDictionary();
+         transformParams.put(PdfName.P, new PdfNumber(1));
+         transformParams.put(PdfName.V, new PdfName("1.2"));
+         transformParams.put(PdfName.TYPE, new PdfName("TransformParams"));
+         reference.put(new PdfName("TransformMethod"), new PdfName("DocMDP"));
+         reference.put(PdfName.TYPE, new PdfName("SigRef"));
+         reference.put(new PdfName("TransformParams"), transformParams);
+         PdfArray types = new PdfArray();
+         types.add(reference);
+         crypto.put(new PdfName("Reference"), types);
     }
     
     /**
@@ -1436,22 +1422,24 @@ public class PdfSignatureAppearance {
         public void getSignatureDictionary(PdfDictionary sig);
     }
 
-    private int certificationLevel = NOT_CERTIFIED;
+    /**
+     * Holds value of property certified.
+     */
+    private boolean certified;
 
     /**
      * Gets the certified status of this document.
      * @return the certified status
      */
-    public int getCertificationLevel() {
-        return this.certificationLevel;
+    public boolean isCertified() {
+        return this.certified;
     }
 
     /**
-     * Sets the document type to certified instead of simply signed.
-     * @param certificationLevel the values can be: <code>NOT_CERTIFIED</code>, <code>CERTIFIED_NO_CHANGES_ALLOWED</code>,
-     * <code>CERTIFIED_FORM_FILLING</code> and <code>CERTIFIED_FORM_FILLING_AND_ANNOTATIONS</code>
+     * Sets the document type to certified instead of simply signed. The certified document doesn't allow any changes.
+     * @param certified <code>true</code> to certify the document, <code>false</code> to just apply a simple signature
      */
-    public void setCertificationLevel(int certificationLevel) {
-        this.certificationLevel = certificationLevel;
+    public void setCertified(boolean certified) {
+        this.certified = certified;
     }
 }

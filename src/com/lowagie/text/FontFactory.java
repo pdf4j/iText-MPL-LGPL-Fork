@@ -1,6 +1,6 @@
 /*
- * $Id: FontFactory.java 2366 2006-09-14 23:10:58Z xlv $
- * $Name$
+ * $Id: FontFactory.java,v 1.74 2006/09/14 23:10:40 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2002 by Bruno Lowagie.
  *

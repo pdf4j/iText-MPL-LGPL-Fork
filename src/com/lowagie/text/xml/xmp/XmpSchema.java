@@ -1,6 +1,6 @@
 /*
- * $Id: XmpSchema.java 2749 2007-05-15 12:09:43Z blowagie $
- * $Name$
+ * $Id: XmpSchema.java,v 1.6 2006/09/15 23:37:37 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2005 by Bruno Lowagie.
  *
@@ -126,18 +126,6 @@ public abstract class XmpSchema extends Properties {
 	public synchronized Object setProperty(String key, XmpArray value) {
 		return super.setProperty(key, value.toString());
 	}
-	
-	/**
-	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)
-	 * 
-	 * @param key
-	 * @param value
-	 * @return the previous property (null if there wasn't one)
-	 */
-	public synchronized Object setProperty(String key, LangAlt value) {
-		return super.setProperty(key, value.toString());
-	 }
-	
 	/**
 	 * @param content
 	 * @return an escaped string

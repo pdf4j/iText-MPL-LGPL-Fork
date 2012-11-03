@@ -1,6 +1,6 @@
 /*
- * $Id: HtmlPeer.java 2280 2006-08-02 11:50:21Z blowagie $
- * $Name$
+ * $Id: HtmlPeer.java,v 1.10 2006/08/02 11:50:21 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *

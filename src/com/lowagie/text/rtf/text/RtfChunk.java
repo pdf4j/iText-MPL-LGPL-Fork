@@ -1,6 +1,6 @@
 /*
- * $Id: RtfChunk.java 2784 2007-05-24 15:43:40Z hallm $
- * $Name$
+ * $Id: RtfChunk.java,v 1.12 2005/07/23 10:57:32 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -53,7 +53,6 @@ package com.lowagie.text.rtf.text;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.rtf.RtfElement;
@@ -66,9 +65,8 @@ import com.lowagie.text.rtf.style.RtfFont;
  * The RtfChunk contains one piece of text. The smallest text element available
  * in iText.
  * 
- * @version $Id: RtfChunk.java 2784 2007-05-24 15:43:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfChunk extends RtfElement {
 
@@ -129,8 +127,8 @@ public class RtfChunk extends RtfElement {
         if(chunk.getAttributes() != null && chunk.getAttributes().get(Chunk.BACKGROUND) != null) {
             this.background = new RtfColor(this.document, (Color) ((Object[]) chunk.getAttributes().get(Chunk.BACKGROUND))[0]);
         }
-        font = new RtfFont(doc, chunk.getFont());
-        content = chunk.getContent();
+        font = new RtfFont(doc, chunk.font());
+        content = chunk.content();
     }
     
     /**
@@ -138,49 +136,40 @@ public class RtfChunk extends RtfElement {
      * is written, then the content, and then more font information
      * 
      * @return A byte array with the content of this RtfChunk
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
     public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            if(this.background != null) {
+                result.write(OPEN_GROUP);
+            }
+            
+            result.write(font.writeBegin());
+            if(superSubScript < 0) {
+                result.write(FONT_SUBSCRIPT);
+            } else if(superSubScript > 0) {
+                result.write(FONT_SUPERSCRIPT);
+            }
+            if(this.background != null) {
+                result.write(HIGHLIGHT);
+                result.write(intToByteArray(this.background.getColorNumber()));
+            }
+            result.write(DELIMITER);
+            
+            result.write(document.filterSpecialChar(content, false, softLineBreaks || this.document.getDocumentSettings().isAlwaysGenerateSoftLinebreaks()).getBytes());
+            
+            if(superSubScript != 0) {
+                result.write(FONT_END_SUPER_SUBSCRIPT);
+            }
+            result.write(font.writeEnd());
+            
+            if(this.background != null) {
+                result.write(CLOSE_GROUP);
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
-    }
-    /**
-     * Writes the content of this RtfChunk. First the font information
-     * is written, then the content, and then more font information
-     */ 
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        if(this.background != null) {
-            result.write(OPEN_GROUP);
-        }
-        
-        result.write(font.writeBegin());
-        if(superSubScript < 0) {
-            result.write(FONT_SUBSCRIPT);
-        } else if(superSubScript > 0) {
-            result.write(FONT_SUPERSCRIPT);
-        }
-        if(this.background != null) {
-            result.write(HIGHLIGHT);
-            result.write(intToByteArray(this.background.getColorNumber()));
-        }
-        result.write(DELIMITER);
-       	//.result.write(document.filterSpecialChar(content, false, softLineBreaks || this.document.getDocumentSettings().isAlwaysGenerateSoftLinebreaks()).getBytes());
-        document.filterSpecialChar(result, content, false, softLineBreaks || this.document.getDocumentSettings().isAlwaysGenerateSoftLinebreaks());
-        
-        if(superSubScript != 0) {
-            result.write(FONT_END_SUPER_SUBSCRIPT);
-        }
-        result.write(font.writeEnd());
-        
-        if(this.background != null) {
-            result.write(CLOSE_GROUP);
-        }    	
     }
     
     /**

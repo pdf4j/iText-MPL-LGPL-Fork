@@ -1,6 +1,6 @@
 /*
- * $Id: PdfException.java 2367 2006-09-14 23:39:21Z xlv $
- * $Name$
+ * $Id: PdfException.java,v 1.55 2006/09/14 23:39:20 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

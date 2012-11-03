@@ -1,6 +1,6 @@
 /*
- * $Id: ImgTemplate.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: ImgTemplate.java,v 1.53 2006/09/14 23:10:40 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2000, 2001, 2002 by Paulo Soares.
  *
@@ -63,7 +63,7 @@ import com.lowagie.text.pdf.PdfTemplate;
  * @author  Paulo Soares
  */
 
-public class ImgTemplate extends Image {
+public class ImgTemplate extends Image implements Element {
     
     ImgTemplate(Image image) {
         super(image);
@@ -86,7 +86,7 @@ public class ImgTemplate extends Image {
         scaledWidth = template.getWidth();
         setRight(scaledWidth);
         setTemplateData(template);
-        plainWidth = getWidth();
-        plainHeight = getHeight();
+        plainWidth = width();
+        plainHeight = height();
     }
 }

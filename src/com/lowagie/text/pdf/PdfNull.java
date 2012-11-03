@@ -1,6 +1,6 @@
 /*
- * $Id: PdfNull.java 2739 2007-05-04 11:24:51Z blowagie $
- * $Name$
+ * $Id: PdfNull.java,v 1.55 2005/11/29 21:05:02 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -53,8 +53,8 @@ package com.lowagie.text.pdf;
 /**
  * <CODE>PdfNull</CODE> is the Null object represented by the keyword <VAR>null</VAR>.
  * <P>
- * This object is described in the 'Portable Document Format Reference Manual version 1.7'
- * section 3.2.8 (page 63).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.3'
+ * section 4.9 (page 53).
  *
  * @see		PdfObject
  */

@@ -222,7 +222,7 @@ public class RadioCheckField extends BaseField {
             return app;
         BaseFont ufont = getRealFont();
         boolean borderExtra = borderStyle == PdfBorderDictionary.STYLE_BEVELED || borderStyle == PdfBorderDictionary.STYLE_INSET;
-        float h = box.getHeight() - borderWidth * 2;
+        float h = box.height() - borderWidth * 2;
         float bw2 = borderWidth;
         if (borderExtra) {
             h -= borderWidth * 2;
@@ -231,8 +231,8 @@ public class RadioCheckField extends BaseField {
         float offsetX = (borderExtra ? 2 * borderWidth : borderWidth);
         offsetX = Math.max(offsetX, 1);
         float offX = Math.min(bw2, offsetX);
-        float wt = box.getWidth() - 2 * offX;
-        float ht = box.getHeight() - 2 * offX;
+        float wt = box.width() - 2 * offX;
+        float ht = box.height() - 2 * offX;
         float fsize = fontSize;
         if (fsize == 0) {
             float bw = ufont.getWidthPoint(text, 1);
@@ -253,8 +253,8 @@ public class RadioCheckField extends BaseField {
             app.setColorFill(textColor);
         app.beginText();
         app.setFontAndSize(ufont, fsize);
-        app.setTextMatrix((box.getWidth() - ufont.getWidthPoint(text, fsize)) / 2, 
-            (box.getHeight() - ufont.getAscentPoint(text, fsize)) / 2);
+        app.setTextMatrix((box.width() - ufont.getWidthPoint(text, fsize)) / 2, 
+            (box.height() - ufont.getAscentPoint(text, fsize)) / 2);
         app.showText(text);
         app.endText();
         app.restoreState();
@@ -268,22 +268,22 @@ public class RadioCheckField extends BaseField {
      * @return the appearance
      */    
     public PdfAppearance getAppearanceRadioCircle(boolean on) {
-        PdfAppearance app = PdfAppearance.createAppearance(writer, box.getWidth(), box.getHeight());
+        PdfAppearance app = new PdfContentByte(writer).createAppearance(box.width(), box.height());
         switch (rotation) {
             case 90:
-                app.setMatrix(0, 1, -1, 0, box.getHeight(), 0);
+                app.setMatrix(0, 1, -1, 0, box.height(), 0);
                 break;
             case 180:
-                app.setMatrix(-1, 0, 0, -1, box.getWidth(), box.getHeight());
+                app.setMatrix(-1, 0, 0, -1, box.width(), box.height());
                 break;
             case 270:
-                app.setMatrix(0, -1, 1, 0, 0, box.getWidth());
+                app.setMatrix(0, -1, 1, 0, 0, box.width());
                 break;
         }
         Rectangle box = new Rectangle(app.getBoundingBox());
-        float cx = box.getWidth() / 2;
-        float cy = box.getHeight() / 2;
-        float r = (Math.min(box.getWidth(), box.getHeight()) - borderWidth) / 2;
+        float cx = box.width() / 2;
+        float cy = box.height() / 2;
+        float r = (Math.min(box.width(), box.height()) - borderWidth) / 2;
         if (r <= 0)
             return app;
         if (backgroundColor != null) {

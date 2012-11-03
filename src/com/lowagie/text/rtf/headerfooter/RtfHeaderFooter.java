@@ -1,6 +1,6 @@
 /*
- * $Id: RtfHeaderFooter.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfHeaderFooter.java,v 1.11 2006/08/07 10:42:34 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.headerfooter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -70,9 +69,8 @@ import com.lowagie.text.rtf.field.RtfPageNumber;
  * The RtfHeaderFooter represents one header or footer. This class can be used
  * directly.
  * 
- * @version $Id: RtfHeaderFooter.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Id: RtfHeaderFooter.java,v 1.11 2006/08/07 10:42:34 blowagie Exp $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfHeaderFooter extends HeaderFooter implements RtfBasicElement {
 
@@ -296,55 +294,44 @@ public class RtfHeaderFooter extends HeaderFooter implements RtfBasicElement {
      * Writes the content of this RtfHeaderFooter
      * 
      * @return A byte array with the content of this RtfHeaderFooter
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() 
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            result.write(OPEN_GROUP);
+            if(this.type == TYPE_HEADER) {
+                if(this.displayAt == DISPLAY_ALL_PAGES) {
+                    result.write(HEADER_ALL);
+                } else if(this.displayAt == DISPLAY_FIRST_PAGE) {
+                    result.write(HEADER_FIRST);
+                } else if(this.displayAt == DISPLAY_LEFT_PAGES) {
+                    result.write(HEADER_LEFT);
+                } else if(this.displayAt == DISPLAY_RIGHT_PAGES) {
+                    result.write(HEADER_RIGHT);
+                }
+            } else {
+                if(this.displayAt == DISPLAY_ALL_PAGES) {
+                    result.write(FOOTER_ALL);
+                } else if(this.displayAt == DISPLAY_FIRST_PAGE) {
+                    result.write(FOOTER_FIRST);
+                } else if(this.displayAt == DISPLAY_LEFT_PAGES) {
+                    result.write(FOOTER_LEFT);
+                } else if(this.displayAt == DISPLAY_RIGHT_PAGES) {
+                    result.write(FOOTER_RIGHT);
+                }
+            }
+            result.write(DELIMITER);
+            for(int i = 0; i < this.content.length; i++) {
+                if(this.content[i] instanceof RtfBasicElement) {
+                    result.write(((RtfBasicElement) this.content[i]).write());
+                }
+            }
+            result.write(CLOSE_GROUP);
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    /**
-     * Writes the content of this RtfHeaderFooter
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        result.write(OPEN_GROUP);
-        if(this.type == TYPE_HEADER) {
-            if(this.displayAt == DISPLAY_ALL_PAGES) {
-                result.write(HEADER_ALL);
-            } else if(this.displayAt == DISPLAY_FIRST_PAGE) {
-                result.write(HEADER_FIRST);
-            } else if(this.displayAt == DISPLAY_LEFT_PAGES) {
-                result.write(HEADER_LEFT);
-            } else if(this.displayAt == DISPLAY_RIGHT_PAGES) {
-                result.write(HEADER_RIGHT);
-            }
-        } else {
-            if(this.displayAt == DISPLAY_ALL_PAGES) {
-                result.write(FOOTER_ALL);
-            } else if(this.displayAt == DISPLAY_FIRST_PAGE) {
-                result.write(FOOTER_FIRST);
-            } else if(this.displayAt == DISPLAY_LEFT_PAGES) {
-                result.write(FOOTER_LEFT);
-            } else if(this.displayAt == DISPLAY_RIGHT_PAGES) {
-                result.write(FOOTER_RIGHT);
-            }
-        }
-        result.write(DELIMITER);
-        for(int i = 0; i < this.content.length; i++) {
-            if(this.content[i] instanceof RtfBasicElement) {
-                //result.write(((RtfBasicElement) this.content[i]).write());
-            	RtfBasicElement rbe = (RtfBasicElement)this.content[i];
-            	rbe.writeContent(result);
-            }
-        }
-        result.write(CLOSE_GROUP);
-    }        
     
     
     /**

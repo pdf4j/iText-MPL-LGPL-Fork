@@ -1,6 +1,6 @@
 /*
- * $Id: ImgCCITT.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: ImgCCITT.java,v 1.47 2005/05/04 14:31:06 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2000, 2001, 2002 by Paulo Soares.
  *
@@ -61,7 +61,7 @@ import java.net.URL;
  * @author  Paulo Soares
  */
 
-public class ImgCCITT extends Image {
+public class ImgCCITT extends Image implements Element {
     /** A table to do fast bit reversal.
      */    
     static final byte bitReversal[] = {
@@ -140,7 +140,7 @@ public class ImgCCITT extends Image {
         colorspace = parameters;
         bpc = typeCCITT;
         rawData = data;
-        plainWidth = getWidth();
-        plainHeight = getHeight();
+        plainWidth = width();
+        plainHeight = height();
     }
 }

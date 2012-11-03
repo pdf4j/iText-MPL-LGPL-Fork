@@ -1,6 +1,6 @@
 /*
- * $Id: SAXmyHandler.java 2377 2006-09-15 07:51:05Z xlv $
- * $Name$
+ * $Id: SAXmyHandler.java,v 1.15 2006/09/15 07:51:05 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *

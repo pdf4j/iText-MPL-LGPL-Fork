@@ -1,6 +1,6 @@
 /*
- * $Id: MetaDo.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: MetaDo.java,v 1.6 2006/10/27 17:23:24 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -560,8 +560,8 @@ public class MetaDo {
                         cb.rectangle(xDest, yDest, destWidth, destHeight);
                         cb.clip();
                         cb.newPath();
-                        bmp.scaleAbsolute(destWidth * bmp.getWidth() / srcWidth, -destHeight * bmp.getHeight() / srcHeight);
-                        bmp.setAbsolutePosition(xDest - destWidth * xSrc / srcWidth, yDest + destHeight * ySrc / srcHeight - bmp.getScaledHeight());
+                        bmp.scaleAbsolute(destWidth * bmp.width() / srcWidth, -destHeight * bmp.height() / srcHeight);
+                        bmp.setAbsolutePosition(xDest - destWidth * xSrc / srcWidth, yDest + destHeight * ySrc / srcHeight - bmp.scaledHeight());
                         cb.addImage(bmp);
                         cb.restoreState();
                     }
@@ -685,7 +685,7 @@ public class MetaDo {
         InputStream imgIn;
         byte data[] = null;
         if (image.getOriginalData() == null) {
-            imgIn = image.getUrl().openStream();
+            imgIn = image.url().openStream();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             int b = 0;
             while ((b = imgIn.read()) != -1)
@@ -717,18 +717,18 @@ public class MetaDo {
 
         writeDWord(os, 5);
         writeWord(os, META_SETWINDOWEXT);
-        writeWord(os, (int)image.getHeight());
-        writeWord(os, (int)image.getWidth());
+        writeWord(os, (int)image.height());
+        writeWord(os, (int)image.width());
 
         writeDWord(os, 13 + sizeBmpWords);
         writeWord(os, META_DIBSTRETCHBLT);
         writeDWord(os, 0x00cc0020);
-        writeWord(os, (int)image.getHeight());
-        writeWord(os, (int)image.getWidth());
+        writeWord(os, (int)image.height());
+        writeWord(os, (int)image.width());
         writeWord(os, 0);
         writeWord(os, 0);
-        writeWord(os, (int)image.getHeight());
-        writeWord(os, (int)image.getWidth());
+        writeWord(os, (int)image.height());
+        writeWord(os, (int)image.width());
         writeWord(os, 0);
         writeWord(os, 0);
         os.write(data, 14, data.length - 14);

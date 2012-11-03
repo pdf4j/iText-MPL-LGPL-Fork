@@ -1,6 +1,6 @@
 /*
- * $Id: RtfBorderGroup.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfBorderGroup.java,v 1.8 2004/12/14 12:51:39 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -53,7 +53,6 @@ package com.lowagie.text.rtf.table;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -66,9 +65,8 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * The RtfBorderGroup represents a collection of RtfBorders to use in a RtfCell
  * or RtfTable.
  * 
- * @version $Id: RtfBorderGroup.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfBorderGroup extends RtfElement {
     /**
@@ -208,30 +206,20 @@ public class RtfBorderGroup extends RtfElement {
      * Writes the borders of this RtfBorderGroup
      * 
      * @return A byte array with the borders of this RtfBorderGroup
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() 
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            Enumeration borderEnum = this.borders.keys();
+            while(borderEnum.hasMoreElements()) {
+                result.write(((RtfBorder) this.borders.get(borderEnum.nextElement())).write());
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
-        }        
+        }
+        
         return result.toByteArray();
     }
-    /**
-     * Writes the borders of this RtfBorderGroup
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        Enumeration borderEnum = this.borders.keys();
-        while(borderEnum.hasMoreElements()) {
-        	RtfBorder rb = (RtfBorder)this.borders.get(borderEnum.nextElement());
-            //.result.write(rb.write());
-        	rb.writeContent(result);
-        }
-    }        
     
     /**
      * Gets the RtfBorders of this RtfBorderGroup

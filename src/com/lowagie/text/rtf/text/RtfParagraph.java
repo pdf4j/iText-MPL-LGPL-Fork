@@ -1,6 +1,6 @@
 /*
- * $Id: RtfParagraph.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfParagraph.java,v 1.20 2005/12/24 13:12:43 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.DocumentException;
@@ -70,9 +69,8 @@ import com.lowagie.text.rtf.style.RtfParagraphStyle;
  * The RtfParagraph is an extension of the RtfPhrase that adds alignment and
  * indentation properties. It wraps a Paragraph.
  * 
- * @version $Id: RtfParagraph.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Revision: 1.20 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfParagraph extends RtfPhrase {
 
@@ -96,20 +94,19 @@ public class RtfParagraph extends RtfPhrase {
         super(doc);
         
         RtfFont baseFont = null;
-        if(paragraph.getFont() instanceof RtfParagraphStyle) {
-            this.paragraphStyle = this.document.getDocumentHeader().getRtfParagraphStyle(((RtfParagraphStyle) paragraph.getFont()).getStyleName());
+        if(paragraph.font() instanceof RtfParagraphStyle) {
+            this.paragraphStyle = this.document.getDocumentHeader().getRtfParagraphStyle(((RtfParagraphStyle) paragraph.font()).getStyleName());
             baseFont = this.paragraphStyle;
         } else {
-            baseFont = new RtfFont(this.document, paragraph.getFont());
+            baseFont = new RtfFont(this.document, paragraph.font());
             this.paragraphStyle = new RtfParagraphStyle(this.document, this.document.getDocumentHeader().getRtfParagraphStyle("Normal"));
-            this.paragraphStyle.setAlignment(paragraph.getAlignment());
-            this.paragraphStyle.setFirstLineIndent((int) (paragraph.getFirstLineIndent() * RtfElement.TWIPS_FACTOR));
-            this.paragraphStyle.setIndentLeft((int) (paragraph.getIndentationLeft() * RtfElement.TWIPS_FACTOR));
-            this.paragraphStyle.setIndentRight((int) (paragraph.getIndentationRight() * RtfElement.TWIPS_FACTOR));
+            this.paragraphStyle.setAlignment(paragraph.alignment());
+            this.paragraphStyle.setIndentLeft((int) (paragraph.indentationLeft() * RtfElement.TWIPS_FACTOR));
+            this.paragraphStyle.setIndentRight((int) (paragraph.indentationRight() * RtfElement.TWIPS_FACTOR));
             this.paragraphStyle.setSpacingBefore((int) (paragraph.spacingBefore() * RtfElement.TWIPS_FACTOR));
             this.paragraphStyle.setSpacingAfter((int) (paragraph.spacingAfter() * RtfElement.TWIPS_FACTOR));
-            if(paragraph.hasLeading()) {
-                this.paragraphStyle.setLineLeading((int) (paragraph.getLeading() * RtfElement.TWIPS_FACTOR));
+            if(paragraph.leadingDefined()) {
+                this.paragraphStyle.setLineLeading((int) (paragraph.leading() * RtfElement.TWIPS_FACTOR));
             }
             this.paragraphStyle.setKeepTogether(paragraph.getKeepTogether());
         }
@@ -117,7 +114,7 @@ public class RtfParagraph extends RtfPhrase {
         for(int i = 0; i < paragraph.size(); i++) {
             Element chunk = (Element) paragraph.get(i);
             if(chunk instanceof Chunk) {
-                ((Chunk) chunk).setFont(baseFont.difference(((Chunk) chunk).getFont()));
+                ((Chunk) chunk).setFont(baseFont.difference(((Chunk) chunk).font()));
             } else if(chunk instanceof RtfImage) {
                 ((RtfImage) chunks.get(i)).setAlignment(this.paragraphStyle.getAlignment());
             }
@@ -142,52 +139,39 @@ public class RtfParagraph extends RtfPhrase {
      * and then the RtfChunks of this RtfParagraph are added.
      * 
      * @return The content of this RtfParagraph
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
     public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            result.write(PARAGRAPH_DEFAULTS);
+
+            if(inTable) {
+                result.write(IN_TABLE);
+            }
+            
+            if(this.paragraphStyle != null) {
+                result.write(this.paragraphStyle.writeBegin());
+            }
+            
+            for(int i = 0; i < chunks.size(); i++) {
+                result.write(((RtfBasicElement) chunks.get(i)).write());
+            }
+            
+            if(this.paragraphStyle != null) {
+                result.write(this.paragraphStyle.writeEnd());
+            }
+            
+            if(!inTable) {
+                result.write(PARAGRAPH);
+            }
+            if(this.document.getDocumentSettings().isOutputDebugLineBreaks()) {
+                result.write('\n');
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    /**
-     * Writes the content of this RtfParagraph. First paragraph specific data is written
-     * and then the RtfChunks of this RtfParagraph are added.
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        result.write(PARAGRAPH_DEFAULTS);
-        result.write(PLAIN);
-
-        if(inTable) {
-            result.write(IN_TABLE);
-        }
-        
-        if(this.paragraphStyle != null) {
-            result.write(this.paragraphStyle.writeBegin());
-        }
-        result.write("\\plain".getBytes());
-        
-        for(int i = 0; i < chunks.size(); i++) {
-        	RtfBasicElement rbe = (RtfBasicElement)chunks.get(i);
-            //.result.write((rbe).write());
-        	rbe.writeContent(result);
-        }
-        
-        if(this.paragraphStyle != null) {
-            result.write(this.paragraphStyle.writeEnd());
-        }
-        
-        if(!inTable) {
-            result.write(PARAGRAPH);
-        }
-        if(this.document.getDocumentSettings().isOutputDebugLineBreaks()) {
-            result.write('\n');
-        }
-    }        
     
     /**
      * Gets the left indentation of this RtfParagraph.

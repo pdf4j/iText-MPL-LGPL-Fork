@@ -1,6 +1,6 @@
 /*
- * $Id: PdfRectangle.java 2742 2007-05-08 13:04:56Z blowagie $
- * $Name$
+ * $Id: PdfRectangle.java,v 1.59 2006/01/16 13:46:20 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -141,11 +141,11 @@ public class PdfRectangle extends PdfArray {
  */
     
     public PdfRectangle(Rectangle rectangle, int rotation) {
-        this(rectangle.getLeft(), rectangle.getBottom(), rectangle.getRight(), rectangle.getTop(), rotation);
+        this(rectangle.left(), rectangle.bottom(), rectangle.right(), rectangle.top(), rotation);
     }
     
     public PdfRectangle(Rectangle rectangle) {
-        this(rectangle.getLeft(), rectangle.getBottom(), rectangle.getRight(), rectangle.getTop(), 0);
+        this(rectangle.left(), rectangle.bottom(), rectangle.right(), rectangle.top(), 0);
     }
     
     // methods

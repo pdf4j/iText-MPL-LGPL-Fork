@@ -1,6 +1,6 @@
 /*
- * $Id: RtfPageSetting.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfPageSetting.java,v 1.15 2005/02/23 16:57:45 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Rectangle;
@@ -64,9 +63,8 @@ import com.lowagie.text.rtf.RtfExtendedElement;
  * The RtfPageSetting stores the page size / page margins for a RtfDocument.
  * INTERNAL CLASS - NOT TO BE USED DIRECTLY
  *  
- * @version $Id: RtfPageSetting.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfPageSetting extends RtfElement implements RtfExtendedElement {
 
@@ -162,30 +160,26 @@ public class RtfPageSetting extends RtfElement implements RtfExtendedElement {
     }
     
     /**
-     * unused
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
-     */
-    public byte[] write()
-    {
-    	return(new byte[0]);
-    }
-    /**
-     * unused
-     */
-    public void writeContent(final OutputStream out) throws IOException
-    {    	
-    }
-    
-    /**
      * Writes the page size / page margin definition
      * 
      * @return A byte array with the page size / page margin definition
-     * @deprecated replaced by {@link #writeDefinition(OutputStream)}
      */
     public byte[] writeDefinition() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeDefinition(result);
+            result.write(PAGE_WIDTH);
+            result.write(intToByteArray(pageWidth));
+            result.write(PAGE_HEIGHT);
+            result.write(intToByteArray(pageHeight));
+            result.write(MARGIN_LEFT);
+            result.write(intToByteArray(marginLeft));
+            result.write(MARGIN_RIGHT);
+            result.write(intToByteArray(marginRight));
+            result.write(MARGIN_TOP);
+            result.write(intToByteArray(marginTop));
+            result.write(MARGIN_BOTTOM);
+            result.write(intToByteArray(marginBottom));
+            result.write((byte)'\n');
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
@@ -193,69 +187,39 @@ public class RtfPageSetting extends RtfElement implements RtfExtendedElement {
     }
     
     /**
-     * Writes the page size / page margin definition
-     */
-    public void writeDefinition(final OutputStream result) throws IOException
-    {
-        result.write(PAGE_WIDTH);
-        result.write(intToByteArray(pageWidth));
-        result.write(PAGE_HEIGHT);
-        result.write(intToByteArray(pageHeight));
-        result.write(MARGIN_LEFT);
-        result.write(intToByteArray(marginLeft));
-        result.write(MARGIN_RIGHT);
-        result.write(intToByteArray(marginRight));
-        result.write(MARGIN_TOP);
-        result.write(intToByteArray(marginTop));
-        result.write(MARGIN_BOTTOM);
-        result.write(intToByteArray(marginBottom));
-        result.write((byte)'\n');    	
-    }
-    
-    /**
      * Writes the definition part for a new section
      * 
      * @return A byte array containing the definition for a new section
-     * @deprecated replaced by {@link #writeSectionDefinition(OutputStream)}
      */
     public byte[] writeSectionDefinition() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeSectionDefinition(result);
+            if(landscape) {
+                result.write(LANDSCAPE);
+                result.write(SECTION_PAGE_WIDTH);
+                result.write(intToByteArray(pageWidth));
+                result.write(SECTION_PAGE_HEIGHT);
+                result.write(intToByteArray(pageHeight));
+                result.write((byte)'\n');
+            } else {
+                result.write(SECTION_PAGE_WIDTH);
+                result.write(intToByteArray(pageWidth));
+                result.write(SECTION_PAGE_HEIGHT);
+                result.write(intToByteArray(pageHeight));
+                result.write((byte)'\n');
+            }
+            result.write(SECTION_MARGIN_LEFT);
+            result.write(intToByteArray(marginLeft));
+            result.write(SECTION_MARGIN_RIGHT);
+            result.write(intToByteArray(marginRight));
+            result.write(SECTION_MARGIN_TOP);
+            result.write(intToByteArray(marginTop));
+            result.write(SECTION_MARGIN_BOTTOM);
+            result.write(intToByteArray(marginBottom));
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
-    }
-    /**
-     * Writes the definition part for a new section
-     * 
-     * @return A byte array containing the definition for a new section
-     */
-    public void writeSectionDefinition(final OutputStream result) throws IOException
-    {
-        if(landscape) {
-            result.write(LANDSCAPE);
-            result.write(SECTION_PAGE_WIDTH);
-            result.write(intToByteArray(pageWidth));
-            result.write(SECTION_PAGE_HEIGHT);
-            result.write(intToByteArray(pageHeight));
-            result.write((byte)'\n');
-        } else {
-            result.write(SECTION_PAGE_WIDTH);
-            result.write(intToByteArray(pageWidth));
-            result.write(SECTION_PAGE_HEIGHT);
-            result.write(intToByteArray(pageHeight));
-            result.write((byte)'\n');
-        }
-        result.write(SECTION_MARGIN_LEFT);
-        result.write(intToByteArray(marginLeft));
-        result.write(SECTION_MARGIN_RIGHT);
-        result.write(intToByteArray(marginRight));
-        result.write(SECTION_MARGIN_TOP);
-        result.write(intToByteArray(marginTop));
-        result.write(SECTION_MARGIN_BOTTOM);
-        result.write(intToByteArray(marginBottom));    	
     }
 
     /**
@@ -375,8 +339,8 @@ public class RtfPageSetting extends RtfElement implements RtfExtendedElement {
      */
     public void setPageSize(Rectangle pageSize) {
         if(!guessFormat(pageSize, false)) {
-            this.pageWidth = (int) (pageSize.getWidth() * RtfElement.TWIPS_FACTOR);
-            this.pageHeight = (int) (pageSize.getHeight() * RtfElement.TWIPS_FACTOR);
+            this.pageWidth = (int) (pageSize.width() * RtfElement.TWIPS_FACTOR);
+            this.pageHeight = (int) (pageSize.height() * RtfElement.TWIPS_FACTOR);
             this.landscape = pageWidth > pageHeight;
         }
     }
@@ -466,6 +430,6 @@ public class RtfPageSetting extends RtfElement implements RtfExtendedElement {
      * @return <code>True</code> if the Rectangles equal, <code>false</code> otherwise
      */
     private boolean rectEquals(Rectangle rect1, Rectangle rect2) {
-        return (rect1.getWidth() == rect2.getWidth()) && (rect1.getHeight() == rect2.getHeight());
+        return (rect1.width() == rect2.width()) && (rect1.height() == rect2.height());
     }
 }

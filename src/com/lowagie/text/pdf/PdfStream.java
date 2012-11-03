@@ -1,6 +1,6 @@
 /*
- * $Id: PdfStream.java 2739 2007-05-04 11:24:51Z blowagie $
- * $Name$
+ * $Id: PdfStream.java,v 1.62 2006/11/11 17:04:30 psoares33 Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -76,8 +76,8 @@ import java.util.ArrayList;
  * object. The keyword <B>stream</B> that follows the stream dictionary should be followed by
  * a carriage return and linefeed or just a linefeed.<BR>
  * Remark: In this version only the FLATEDECODE-filter is supported.<BR>
- * This object is described in the 'Portable Document Format Reference Manual version 1.7'
- * section 3.2.7 (page 60-63).<BR>
+ * This object is described in the 'Portable Document Format Reference Manual version 1.3'
+ * section 4.8 (page 41-53).<BR>
  *
  * @see		PdfObject
  * @see		PdfDictionary
@@ -261,7 +261,7 @@ public class PdfStream extends PdfDictionary {
                     crypto = null;
                 else if (filter.isArray()) {
                     ArrayList af = ((PdfArray)filter).getArrayList();
-                    if (!af.isEmpty() && PdfName.CRYPT.equals(af.get(0)))
+                    if (af.size() > 0 && PdfName.CRYPT.equals(af.get(0)))
                         crypto = null;
                 }
             }
