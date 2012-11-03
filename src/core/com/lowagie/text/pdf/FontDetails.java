@@ -1,5 +1,5 @@
 /*
- * $Id: FontDetails.java 4024 2009-07-12 00:33:57Z xlv $
+ * $Id: FontDetails.java 3989 2009-06-18 02:22:54Z xlv $
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *
@@ -91,7 +91,7 @@ class FontDetails {
      * The map used with double byte encodings. The key is Integer(glyph) and
      * the value is int[]{glyph, width, Unicode code}
      */    
-    HashMap longTag;
+    HashMap<Integer, int[]> longTag;
     /**
      * IntHashtable with CIDs of CJK glyphs that are used in the text.
      */
@@ -133,7 +133,7 @@ class FontDetails {
                 cjkFont = (CJKFont)baseFont;
                 break;
             case BaseFont.FONT_TYPE_TTUNI:
-                longTag = new HashMap();
+                longTag = new HashMap<Integer, int[]>();
                 ttu = (TrueTypeFontUnicode)baseFont;
                 symbolic = baseFont.isFontSpecific();
                 break;

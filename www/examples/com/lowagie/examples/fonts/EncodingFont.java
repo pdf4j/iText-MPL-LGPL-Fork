@@ -1,5 +1,5 @@
 /*
- * $Id: EncodingFont.java 3428 2008-05-24 18:33:09Z xlv $
+ * $Id: EncodingFont.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * This code is part of the 'iText Tutorial'.
  * You can find the complete tutorial at the following address:

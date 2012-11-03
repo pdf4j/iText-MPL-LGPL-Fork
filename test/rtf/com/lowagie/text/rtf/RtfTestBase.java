@@ -1,5 +1,5 @@
 /*
- * $Id: RtfTestBase.java 3664 2009-01-26 22:11:53Z xlv $
+ * $Id: RtfTestBase.java 3787 2009-03-17 01:25:12Z xlv $
  *
  * Copyright 2007 by Mark Hall
  *
@@ -64,7 +64,7 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * The <code>RtfTestBase</code> is a junit test case that provides
  * helper methods for the actual RTF test cases.
  * 
- * @version $Id: RtfTestBase.java 3664 2009-01-26 22:11:53Z xlv $
+ * @version $Id: RtfTestBase.java 3787 2009-03-17 01:25:12Z xlv $
  * @author Mark Hall (Mark.Hall@mail.room3b.eu)
  * @since 2.0.8
  */

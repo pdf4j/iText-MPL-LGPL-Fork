@@ -1,5 +1,5 @@
 /*
- * $Id: PdfSignatureAppearance.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: PdfSignatureAppearance.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2004-2006 by Paulo Soares.
  *
@@ -63,7 +63,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import com.lowagie.text.error_messages.MessageLocalization;
 
@@ -146,7 +145,7 @@ public class PdfSignatureAppearance {
     private byte externalDigest[];
     private byte externalRSAdata[];
     private String digestEncryptionAlgorithm;
-    private HashMap exclusionLocations;
+    private HashMap<PdfName, PdfLiteral> exclusionLocations;
         
     PdfSignatureAppearance(PdfStamperImp writer) {
         this.writer = writer;
@@ -831,8 +830,7 @@ public class PdfSignatureAppearance {
                 continue;
             n1 += ".";
             found = true;
-            for (Iterator it = af.getFields().keySet().iterator(); it.hasNext();) {
-                String fn = (String)it.next();
+            for (String fn: af.getFields().keySet()) {
                 if (fn.startsWith(n1)) {
                     found = false;
                     break;
@@ -872,7 +870,7 @@ public class PdfSignatureAppearance {
      * @throws IOException on error
      * @throws DocumentException on error
      */    
-    public void preClose(HashMap exclusionSizes) throws IOException, DocumentException {
+    public void preClose(HashMap<PdfName, Integer> exclusionSizes) throws IOException, DocumentException {
         if (preClosed)
             throw new DocumentException(MessageLocalization.getComposedMessage("document.already.pre.closed"));
         preClosed = true;
@@ -912,7 +910,7 @@ public class PdfSignatureAppearance {
             writer.addAnnotation(sigField, pagen);
         }
 
-        exclusionLocations = new HashMap();
+        exclusionLocations = new HashMap<PdfName, PdfLiteral>();
         if (cryptoDictionary == null) {
             if (PdfName.ADOBE_PPKLITE.equals(getFilter()))
                 sigStandard = new PdfSigGenericPKCS.PPKLite(getProvider());
@@ -949,10 +947,9 @@ public class PdfSignatureAppearance {
             PdfLiteral lit = new PdfLiteral(80);
             exclusionLocations.put(PdfName.BYTERANGE, lit);
             cryptoDictionary.put(PdfName.BYTERANGE, lit);
-            for (Iterator it = exclusionSizes.entrySet().iterator(); it.hasNext();) {
-                Map.Entry entry = (Map.Entry)it.next();
-                PdfName key = (PdfName)entry.getKey();
-                Integer v = (Integer)entry.getValue();
+            for (Map.Entry<PdfName, Integer> entry: exclusionSizes.entrySet()) {
+                PdfName key = entry.getKey();
+                Integer v = entry.getValue();
                 lit = new PdfLiteral(v.intValue());
                 exclusionLocations.put(key, lit);
                 cryptoDictionary.put(key, lit);
@@ -972,11 +969,10 @@ public class PdfSignatureAppearance {
         writer.close(stamper.getMoreInfo());
         
         range = new int[exclusionLocations.size() * 2];
-        int byteRangePosition = ((PdfLiteral)exclusionLocations.get(PdfName.BYTERANGE)).getPosition();
+        int byteRangePosition = exclusionLocations.get(PdfName.BYTERANGE).getPosition();
         exclusionLocations.remove(PdfName.BYTERANGE);
         int idx = 1;
-        for (Iterator it = exclusionLocations.values().iterator(); it.hasNext();) {
-            PdfLiteral lit = (PdfLiteral)it.next();
+        for (PdfLiteral lit: exclusionLocations.values()) {
             int n = lit.getPosition();
             range[idx++] = n;
             range[idx++] = lit.getPosLength() + n;
@@ -1033,10 +1029,9 @@ public class PdfSignatureAppearance {
             if (!preClosed)
                 throw new DocumentException(MessageLocalization.getComposedMessage("preclose.must.be.called.first"));
             ByteBuffer bf = new ByteBuffer();
-            for (Iterator it = update.getKeys().iterator(); it.hasNext();) {
-                PdfName key = (PdfName)it.next();
+            for (PdfName key: update.getKeys()) {
                 PdfObject obj = update.get(key);
-                PdfLiteral lit = (PdfLiteral)exclusionLocations.get(key);
+                PdfLiteral lit = exclusionLocations.get(key);
                 if (lit == null)
                     throw new IllegalArgumentException(MessageLocalization.getComposedMessage("the.key.1.didn.t.reserve.space.in.preclose", key.toString()));
                 bf.reset();

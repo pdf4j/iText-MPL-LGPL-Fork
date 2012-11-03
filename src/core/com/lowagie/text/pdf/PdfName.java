@@ -1,5 +1,5 @@
 /*
- * $Id: PdfName.java 4082 2009-10-25 14:18:28Z psoares33 $
+ * $Id: PdfName.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999-2006 Bruno Lowagie
  *
@@ -72,7 +72,7 @@ import com.lowagie.text.error_messages.MessageLocalization;
  * @see		BadPdfFormatException
  */
 
-public class PdfName extends PdfObject implements Comparable{
+public class PdfName extends PdfObject implements Comparable<PdfName>{
 
     // CLASS CONSTANTS (a variety of standard names used in PDF))
     /**
@@ -1726,7 +1726,7 @@ public class PdfName extends PdfObject implements Comparable{
      * map strings to all known static names
      * @since 2.1.6
      */
-    public static Map staticNames;
+    public static Map<String, PdfName> staticNames;
 
     /**
      * Use reflection to cache all the static public final names so
@@ -1738,7 +1738,7 @@ public class PdfName extends PdfObject implements Comparable{
 
     static {
         Field fields[] = PdfName.class.getDeclaredFields();
-        staticNames = new HashMap( fields.length );
+        staticNames = new HashMap<String, PdfName>( fields.length );
         final int flags = Modifier.STATIC | Modifier.PUBLIC | Modifier.FINAL;
         try {
             for (int fldIdx = 0; fldIdx < fields.length; ++fldIdx) {
@@ -1799,14 +1799,13 @@ public class PdfName extends PdfObject implements Comparable{
      * Returns a negative integer, zero, or a positive integer as this object
      * is less than, equal to, or greater than the specified object.<p>
      *
-     * @param object the Object to be compared.
+     * @param name the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this object
      * is less than, equal to, or greater than the specified object.
      * @throws ClassCastException if the specified object's type prevents it
      * from being compared to this Object.
      */
-    public int compareTo(Object object) {
-        PdfName name = (PdfName) object;
+    public int compareTo(PdfName name) {
         byte myBytes[] = bytes;
         byte objBytes[] = name.bytes;
         int len = Math.min(myBytes.length, objBytes.length);
@@ -1834,7 +1833,7 @@ public class PdfName extends PdfObject implements Comparable{
         if (this == obj)
             return true;
         if (obj instanceof PdfName)
-            return compareTo(obj) == 0;
+            return compareTo((PdfName)obj) == 0;
         return false;
     }
 

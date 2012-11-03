@@ -1,5 +1,5 @@
 /*
- * $Id: Jpeg.java 4074 2009-10-05 17:17:26Z psoares33 $
+ * $Id: Jpeg.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *

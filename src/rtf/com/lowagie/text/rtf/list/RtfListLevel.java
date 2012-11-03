@@ -1,5 +1,5 @@
 /*
- * $Id: RtfListLevel.java 3580 2008-08-06 15:52:00Z howard_s $
+ * $Id: RtfListLevel.java 3626 2008-11-11 19:27:25Z xlv $
  *
  * Copyright 2008 by Howard Shank (hgshank@yahoo.com)
  *
@@ -68,7 +68,7 @@ import com.lowagie.text.rtf.text.RtfParagraph;
 /**
  * The RtfListLevel is a listlevel object in a list.
  * 
- * @version $Id: RtfListLevel.java 3580 2008-08-06 15:52:00Z howard_s $
+ * @version $Id: RtfListLevel.java 3626 2008-11-11 19:27:25Z xlv $
  * @author Howard Shank (hgshank@yahoo.com)
  * @since 2.1.3
  */

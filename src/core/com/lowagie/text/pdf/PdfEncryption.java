@@ -1,5 +1,5 @@
 /*
- * $Id: PdfEncryption.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: PdfEncryption.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2001-2006 Paulo Soares
  *
@@ -145,12 +145,12 @@ public class PdfEncryption {
 
 	public PdfEncryption(PdfEncryption enc) {
 		this();
-		mkey = (byte[]) enc.mkey.clone();
-		ownerKey = (byte[]) enc.ownerKey.clone();
-		userKey = (byte[]) enc.userKey.clone();
+		mkey = enc.mkey.clone();
+		ownerKey = enc.ownerKey.clone();
+		userKey = enc.userKey.clone();
 		permissions = enc.permissions;
 		if (enc.documentID != null)
-			documentID = (byte[]) enc.documentID.clone();
+			documentID = enc.documentID.clone();
 		revision = enc.revision;
 		keyLength = enc.keyLength;
 		encryptMetadata = enc.encryptMetadata;

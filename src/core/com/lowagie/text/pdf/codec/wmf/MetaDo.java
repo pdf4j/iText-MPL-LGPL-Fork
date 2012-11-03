@@ -1,5 +1,5 @@
 /*
- * $Id: MetaDo.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: MetaDo.java 4167 2009-12-13 04:05:50Z xlv $
  * $Name$
  *
  * Copyright 2001, 2002 Paulo Soares
@@ -366,14 +366,14 @@ public class MetaDo {
                     arc2 -= arc1;
                     if (arc2 <= 0)
                         arc2 += 360;
-                    ArrayList ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
+                    ArrayList<float[]> ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
                     if (ar.isEmpty())
                         break;
-                    float pt[] = (float [])ar.get(0);
+                    float pt[] = ar.get(0);
                     cb.moveTo(cx, cy);
                     cb.lineTo(pt[0], pt[1]);
                     for (int k = 0; k < ar.size(); ++k) {
-                        pt = (float [])ar.get(k);
+                        pt = ar.get(k);
                         cb.curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
                     }
                     cb.lineTo(cx, cy);
@@ -399,15 +399,15 @@ public class MetaDo {
                     arc2 -= arc1;
                     if (arc2 <= 0)
                         arc2 += 360;
-                    ArrayList ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
+                    ArrayList<float[]> ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
                     if (ar.isEmpty())
                         break;
-                    float pt[] = (float [])ar.get(0);
+                    float pt[] = ar.get(0);
                     cx = pt[0];
                     cy = pt[1];
                     cb.moveTo(cx, cy);
                     for (int k = 0; k < ar.size(); ++k) {
-                        pt = (float [])ar.get(k);
+                        pt = ar.get(k);
                         cb.curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
                     }
                     cb.lineTo(cx, cy);

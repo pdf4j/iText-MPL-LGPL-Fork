@@ -1,5 +1,5 @@
 /*
- * $Id: PdfAnnotation.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: PdfAnnotation.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -52,6 +52,7 @@ package com.lowagie.text.pdf;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import com.lowagie.text.error_messages.MessageLocalization;
 
 import com.lowagie.text.Rectangle;
@@ -134,7 +135,7 @@ public class PdfAnnotation extends PdfDictionary {
      * @since	2.1.6; was removed in 2.1.5, but restored in 2.1.6
      */
     protected PdfIndirectReference reference;
-    protected HashMap templates;
+    protected HashSet<PdfTemplate> templates;
     protected boolean form = false;
     protected boolean annotation = true;
 
@@ -526,8 +527,8 @@ public class PdfAnnotation extends PdfDictionary {
         if (!form)
             return;
         if (templates == null)
-            templates = new HashMap();
-        templates.put(template, null);
+            templates = new HashSet<PdfTemplate>();
+        templates.add(template);
     }
 
     public void setAppearance(PdfName ap, String state, PdfTemplate template) {
@@ -547,8 +548,8 @@ public class PdfAnnotation extends PdfDictionary {
         if (!form)
             return;
         if (templates == null)
-            templates = new HashMap();
-        templates.put(template, null);
+            templates = new HashSet<PdfTemplate>();
+        templates.add(template);
     }
 
     public void setAppearanceState(String state) {
@@ -604,7 +605,7 @@ public class PdfAnnotation extends PdfDictionary {
         used = true;
     }
 
-    public HashMap getTemplates() {
+    public HashSet<PdfTemplate> getTemplates() {
         return templates;
     }
 
@@ -815,7 +816,7 @@ public class PdfAnnotation extends PdfDictionary {
      */
     public static class PdfImportedLink {
     	float llx, lly, urx, ury;
-    	HashMap parameters = new HashMap();
+    	HashMap<PdfName, PdfObject> parameters = new HashMap<PdfName, PdfObject>();
     	PdfArray destination = null;
     	int newPage=0;
 

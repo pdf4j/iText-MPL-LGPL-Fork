@@ -1,5 +1,5 @@
 /*
- * $Id: TSAClientBouncyCastle.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: TSAClientBouncyCastle.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2009 Martin Brunecky, Aiken Sam
  *
@@ -194,7 +194,7 @@ public class TSAClientBouncyCastle implements TSAClient {
         // Setup the TSA connection
         URL url = new URL(tsaURL);
         URLConnection tsaConnection;
-        tsaConnection = (URLConnection) url.openConnection();
+        tsaConnection = url.openConnection();
         
         tsaConnection.setDoInput(true);
         tsaConnection.setDoOutput(true);

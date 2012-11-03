@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPRow.java 3999 2009-06-30 11:52:55Z blowagie $
+ * $Id: PdfPRow.java 4023 2009-07-11 23:41:19Z xlv $
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -656,7 +656,7 @@ public class PdfPRow {
 		}
 		calculateHeights();
 		PdfPRow split = new PdfPRow(newCells);
-		split.widths = (float[]) widths.clone();
+		split.widths = widths.clone();
 		split.calculateHeights();
 		return split;
 	}

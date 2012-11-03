@@ -1,5 +1,5 @@
 /*
- * $Id: VerticalPositionMark.java 3373 2008-05-12 16:21:24Z xlv $
+ * $Id: VerticalPositionMark.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * Copyright 2008 by Bruno Lowagie
  *
@@ -134,8 +134,8 @@ public class VerticalPositionMark implements DrawInterface, Element {
     /**
      * @see com.lowagie.text.Element#getChunks()
      */
-    public ArrayList getChunks() {
-    	ArrayList list = new ArrayList();
+    public ArrayList<Chunk> getChunks() {
+    	ArrayList<Chunk> list = new ArrayList<Chunk>();
     	list.add(new Chunk(this, true));
         return list;
     }

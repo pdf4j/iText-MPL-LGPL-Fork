@@ -1,5 +1,5 @@
 /*
- * $Id: CJKFont.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: CJKFont.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2000, 2001, 2002 by Paulo Soares.
  *
@@ -77,8 +77,8 @@ class CJKFont extends BaseFont {
         
     static Properties cjkFonts = new Properties();
     static Properties cjkEncodings = new Properties();
-    static Hashtable allCMaps = new Hashtable();
-    static Hashtable allFonts = new Hashtable();
+    static Hashtable<String, char[]> allCMaps = new Hashtable<String, char[]>();
+    static Hashtable<String, HashMap<String, Object>> allFonts = new Hashtable<String, HashMap<String, Object>>();
     private static boolean propertiesLoaded = false;
     
     /** The font name */
@@ -93,7 +93,7 @@ class CJKFont extends BaseFont {
     private char[] translationMap;
     private IntHashtable vMetrics;
     private IntHashtable hMetrics;
-    private HashMap fontDesc;
+    private HashMap<String, Object> fontDesc;
     private boolean vertical = false;
     
     private static void loadProperties() {
@@ -142,7 +142,7 @@ class CJKFont extends BaseFont {
             cidDirect = true;
             String s = cjkFonts.getProperty(fontName);
             s = s.substring(0, s.indexOf('_'));
-            char c[] = (char[])allCMaps.get(s);
+            char c[] = allCMaps.get(s);
             if (c == null) {
                 c = readCMap(s);
                 if (c == null)
@@ -153,14 +153,14 @@ class CJKFont extends BaseFont {
             translationMap = c;
         }
         else {
-            char c[] = (char[])allCMaps.get(enc);
+            char c[] = allCMaps.get(enc);
             if (c == null) {
                 String s = cjkEncodings.getProperty(enc);
                 if (s == null)
                     throw new DocumentException(MessageLocalization.getComposedMessage("the.resource.cjkencodings.properties.does.not.contain.the.encoding.1", enc));
                 StringTokenizer tk = new StringTokenizer(s);
                 String nt = tk.nextToken();
-                c = (char[])allCMaps.get(nt);
+                c = allCMaps.get(nt);
                 if (c == null) {
                     c = readCMap(nt);
                     allCMaps.put(nt, c);
@@ -178,7 +178,7 @@ class CJKFont extends BaseFont {
             }
             translationMap = c;
         }
-        fontDesc = (HashMap)allFonts.get(fontName);
+        fontDesc = allFonts.get(fontName);
         if (fontDesc == null) {
             fontDesc = readFontProperties(fontName);
             allFonts.put(fontName, fontDesc);
@@ -581,7 +581,7 @@ class CJKFont extends BaseFont {
         return buf.toString();
     }
     
-    static HashMap readFontProperties(String name) {
+    static HashMap<String, Object> readFontProperties(String name) {
         try {
             name += ".properties";
             InputStream is = getResourceStream(RESOURCE_PATH + name);
@@ -592,10 +592,10 @@ class CJKFont extends BaseFont {
             p.remove("W");
             IntHashtable W2 = createMetric(p.getProperty("W2"));
             p.remove("W2");
-            HashMap map = new HashMap();
-            for (Enumeration e = p.keys(); e.hasMoreElements();) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            for (Enumeration<Object> e = p.keys(); e.hasMoreElements();) {
                 Object obj = e.nextElement();
-                map.put(obj, p.getProperty((String)obj));
+                map.put((String)obj, p.getProperty((String)obj));
             }
             map.put("W", W);
             map.put("W2", W2);

@@ -1,5 +1,5 @@
 /*
- * $Id: ImagesURL.java 3998 2009-06-28 13:22:47Z blowagie $
+ * $Id: ImagesURL.java 4023 2009-07-11 23:41:19Z xlv $
  *
  * This code is part of the 'iText Tutorial'.
  * You can find the complete tutorial at the following address:

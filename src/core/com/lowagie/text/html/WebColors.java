@@ -1,5 +1,5 @@
 /*
- * $Id: WebColors.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: WebColors.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2001, 2002 by Bruno Lowagie.
  *
@@ -61,7 +61,7 @@ import com.lowagie.text.error_messages.MessageLocalization;
  * 
  * @author blowagie
  */
-public class WebColors extends HashMap {
+public class WebColors extends HashMap<String, int[]> {
     
 	private static final long serialVersionUID = 3542523100813372896L;
 	/** HashMap containing all the names and corresponding color values. */
@@ -257,7 +257,7 @@ public class WebColors extends HashMap {
 		if (!NAMES.containsKey(name))
 			throw new IllegalArgumentException("Color '" + name
 					+ "' not found.");
-		c = (int[]) NAMES.get(name);
+		c = NAMES.get(name);
 		return new Color(c[0], c[1], c[2], c[3]);
 	}
 }

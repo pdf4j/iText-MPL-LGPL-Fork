@@ -1,5 +1,5 @@
 /*
- * $Id: EnumerateTTC.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: EnumerateTTC.java 4167 2009-12-13 04:05:50Z xlv $
  * $Name$
  *
  * Copyright 2001, 2002 by Paulo Soares.
@@ -76,7 +76,7 @@ class EnumerateTTC extends TrueTypeFont{
     }
     
     void findNames() throws DocumentException, IOException {
-        tables = new HashMap();
+        tables = new HashMap<String, int[]>();
         
         try {
             String mainTag = readStandardString(4);

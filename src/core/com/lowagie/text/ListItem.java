@@ -1,5 +1,5 @@
 /*
- * $Id: ListItem.java 4052 2009-08-28 13:54:31Z blowagie $
+ * $Id: ListItem.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *

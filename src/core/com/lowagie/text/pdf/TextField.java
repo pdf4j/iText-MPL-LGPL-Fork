@@ -75,7 +75,7 @@ public class TextField extends BaseField {
     private String[] choiceExports;
     
     /** Holds value of property choiceSelection. */
-    private ArrayList choiceSelections = new ArrayList();
+    private ArrayList<Integer> choiceSelections = new ArrayList<Integer>();
     
     private int topFirst;
     
@@ -121,7 +121,7 @@ public class TextField extends BaseField {
                 fs.addFont(new Font(extensionFont, fontSize, 0, color));
             if (substitutionFonts != null) {
                 for (int k = 0; k < substitutionFonts.size(); ++k)
-                    fs.addFont(new Font((BaseFont)substitutionFonts.get(k), fontSize, 0, color));
+                    fs.addFont(new Font(substitutionFonts.get(k), fontSize, 0, color));
             }
             phrase = fs.process(text);
         }
@@ -364,7 +364,7 @@ public class TextField extends BaseField {
         // background boxes for selected value[s]
         app.setColorFill(new Color(10, 36, 106));
         for (int curVal = 0; curVal < choiceSelections.size(); ++curVal) {
-        	int curChoice = ((Integer)choiceSelections.get( curVal )).intValue();
+        	int curChoice = choiceSelections.get( curVal ).intValue();
         	// only draw selections within our display range... not strictly necessary with 
         	// that clipping rect from above, but it certainly doesn't hurt either 
         	if (curChoice >= first && curChoice <= last) {
@@ -489,7 +489,7 @@ public class TextField extends BaseField {
     		return 0;
     	}
     	
-    	Integer firstValue = (Integer)choiceSelections.get(0);
+    	Integer firstValue = choiceSelections.get(0);
     	
     	if (firstValue == null) {
     		return 0;
@@ -614,7 +614,7 @@ public class TextField extends BaseField {
 		PdfArray indexes = new PdfArray();
 		PdfArray values = new PdfArray();
 		for (int i = 0; i < choiceSelections.size(); ++i) {
-			int idx = ((Integer)choiceSelections.get( i )).intValue();
+			int idx = choiceSelections.get( i ).intValue();
 			indexes.add( new PdfNumber( idx ) );
 			
 			if (mix != null) 
@@ -686,7 +686,7 @@ public class TextField extends BaseField {
     	return getTopChoice();
     }
     
-    public ArrayList gteChoiceSelections() {
+    public ArrayList<Integer> gteChoiceSelections() {
     	return choiceSelections;
     }
 
@@ -695,7 +695,7 @@ public class TextField extends BaseField {
      * @param choiceSelection the zero based index of the selected item
      */
     public void setChoiceSelection(int choiceSelection) {
-        choiceSelections = new ArrayList();
+        choiceSelections = new ArrayList<Integer>();
         choiceSelections.add( new Integer( choiceSelection ) );
     }
     
@@ -715,9 +715,9 @@ public class TextField extends BaseField {
      * list, all but the first element will be removed.
      * @param selections new selections.  If null, it clear()s the underlying ArrayList.
      */
-    public void setChoiceSelections( ArrayList selections ) {
+    public void setChoiceSelections( ArrayList<Integer> selections ) {
     	if (selections != null) {
-    		choiceSelections = new ArrayList( selections );
+    		choiceSelections = new ArrayList<Integer>( selections );
     		if (choiceSelections.size() > 1 && (options & BaseField.MULTISELECT) == 0 ) {
     			// can't have multiple selections in a single-select field
     			while (choiceSelections.size() > 1) {
@@ -747,14 +747,14 @@ public class TextField extends BaseField {
     /**
      * Holds value of property substitutionFonts.
      */
-    private ArrayList substitutionFonts;
+    private ArrayList<BaseFont> substitutionFonts;
 
     /**
      * Gets the list of substitution fonts. The list is composed of <CODE>BaseFont</CODE> and can be <CODE>null</CODE>. The fonts in this list will be used if the original
      * font doesn't contain the needed glyphs.
      * @return the list
      */
-    public ArrayList getSubstitutionFonts() {
+    public ArrayList<BaseFont> getSubstitutionFonts() {
         return this.substitutionFonts;
     }
 
@@ -763,7 +763,7 @@ public class TextField extends BaseField {
      * font doesn't contain the needed glyphs.
      * @param substitutionFonts the list
      */
-    public void setSubstitutionFonts(ArrayList substitutionFonts) {
+    public void setSubstitutionFonts(ArrayList<BaseFont> substitutionFonts) {
         this.substitutionFonts = substitutionFonts;
     }
 

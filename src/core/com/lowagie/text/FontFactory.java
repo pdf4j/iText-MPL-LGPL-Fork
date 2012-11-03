@@ -1,5 +1,5 @@
 /*
- * $Id: FontFactory.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: FontFactory.java 4167 2009-12-13 04:05:50Z xlv $
  * $Name$
  *
  * Copyright 2002 by Bruno Lowagie.
@@ -394,7 +394,7 @@ public final class FontFactory {
  * @return a set of registered fonts
  */
     
-    public static Set getRegisteredFonts() {
+    public static Set<String> getRegisteredFonts() {
         return fontImp.getRegisteredFonts();
     }
     
@@ -403,7 +403,7 @@ public final class FontFactory {
  * @return a set of registered font families
  */
     
-    public static Set getRegisteredFamilies() {
+    public static Set<String> getRegisteredFamilies() {
         return fontImp.getRegisteredFamilies();
     }
     

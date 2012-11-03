@@ -1,5 +1,5 @@
 /*
- * $Id: SpotColors.java 4079 2009-10-21 17:04:41Z blowagie $
+ * $Id: SpotColors.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * This code is part of the 'iText Tutorial'.
  * You can find the complete tutorial at the following address:

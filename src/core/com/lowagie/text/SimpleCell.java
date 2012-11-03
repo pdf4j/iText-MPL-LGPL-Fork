@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleCell.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: SimpleCell.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2005 by Bruno Lowagie.
  *
@@ -49,7 +49,6 @@
 package com.lowagie.text;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import com.lowagie.text.error_messages.MessageLocalization;
 
 import com.lowagie.text.pdf.PdfContentByte;
@@ -71,7 +70,7 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 	
 	// member variables
 	/** the content of the Cell. */
-	private ArrayList content = new ArrayList();
+	private ArrayList<Element> content = new ArrayList<Element>();
 	/** the width of the Cell. */
 	private float width = 0f;
 	/** the widthpercentage of the Cell. */
@@ -177,9 +176,7 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 		cell.setUseAscender(useAscender);
 		cell.setUseBorderPadding(useBorderPadding);
 		cell.setUseDescender(useDescender);
-		Element element;
-		for (Iterator i = content.iterator(); i.hasNext(); ) {
-			element = (Element)i.next();
+		for (Element element: content) {
 			cell.addElement(element);
 		}
 		return cell;
@@ -238,9 +235,7 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 		p = padding_bottom;
 		if (Float.isNaN(p)) p = 0f; 
 		cell.setPaddingBottom(p + sp_bottom);
-		Element element;
-		for (Iterator i = content.iterator(); i.hasNext(); ) {
-			element = (Element)i.next();
+		for (Element element: content) {
 			cell.addElement(element);
 		}
 		return cell;
@@ -506,16 +501,32 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 	/**
 	 * @return Returns the content.
 	 */
-	ArrayList getContent() {
+	ArrayList<Element> getContent() {
 		return content;
 	}
 
 	/**
-	 * @see com.lowagie.text.TextElementArray#add(java.lang.Object)
+	 * @see com.lowagie.text.TextElementArray#addObject(java.lang.Object)
 	 */
-	public boolean add(Object o) {
+	public boolean addObject(Object o) {
 		try {
 			addElement((Element)o);
+			return true;
+		}
+		catch(ClassCastException e) {
+			return false;
+		}
+		catch(BadElementException e) {
+			throw new ExceptionConverter(e);
+		}
+	}
+
+	/**
+	 * @see com.lowagie.text.TextElementArray#add(Element)
+	 */
+	public boolean add(Element element) {
+		try {
+			addElement(element);
 			return true;
 		}
 		catch(ClassCastException e) {

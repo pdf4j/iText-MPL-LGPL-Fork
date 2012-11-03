@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPCell.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: PdfPCell.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -894,7 +894,7 @@ public class PdfPCell extends Rectangle{
      * @return	a List object.
      * @since	2.1.1
      */
-    public List getCompositeElements() {
+    public List<Element> getCompositeElements() {
     	return getColumn().compositeElements;
     }
     

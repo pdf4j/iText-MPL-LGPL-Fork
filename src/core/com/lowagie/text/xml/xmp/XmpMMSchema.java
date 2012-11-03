@@ -1,5 +1,5 @@
 /*
- * $Id: XmpMMSchema.java 3373 2008-05-12 16:21:24Z xlv $
+ * $Id: XmpMMSchema.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * Copyright 2005 by Bruno Lowagie.
  *

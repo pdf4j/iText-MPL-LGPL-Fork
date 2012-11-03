@@ -42,7 +42,7 @@
  *
  * Contributions by:
  * Lubos Strapko
- * 
+ *
  * If you didn't download this code from the following link, you should check if
  * you aren't using an obsolete version:
  * http://www.lowagie.com/iText/
@@ -52,7 +52,6 @@ package com.lowagie.text.html.simpleparser;
 
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -63,8 +62,8 @@ import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.ListItem;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.html.Markup;
 import com.lowagie.text.html.HtmlTags;
+import com.lowagie.text.html.Markup;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.HyphenationAuto;
 import com.lowagie.text.pdf.HyphenationEvent;
@@ -215,8 +214,8 @@ public class FactoryProperties {
 	 * @return	a HyphenationEvent
 	 * @since	2.1.2
 	 */
-	public static HyphenationEvent getHyphenation(HashMap props) {
-		return getHyphenation((String) props.get("hyphenation"));
+	public static HyphenationEvent getHyphenation(HashMap<String, String> props) {
+		return getHyphenation(props.get("hyphenation"));
 	}
 
 	/**
@@ -265,13 +264,13 @@ public class FactoryProperties {
 	 * @param	h	a HashMap that should have at least a key named
 	 * style. After this method is invoked, more keys could be added.
 	 */
-	public static void insertStyle(HashMap h) {
-		String style = (String) h.get("style");
+	public static void insertStyle(HashMap<String, String> h) {
+		String style = h.get("style");
 		if (style == null)
 			return;
 		Properties prop = Markup.parseAttributes(style);
-		for (Iterator it = prop.keySet().iterator(); it.hasNext();) {
-			String key = (String) it.next();
+		for (Object element : prop.keySet()) {
+			String key = (String) element;
 			if (key.equals(Markup.CSS_KEY_FONTFAMILY)) {
 				h.put("face", prop.getProperty(key));
 			} else if (key.equals(Markup.CSS_KEY_FONTSIZE)) {
@@ -304,7 +303,7 @@ public class FactoryProperties {
 				String ss = prop.getProperty(key).trim();
 				float v = Markup.parseLength(prop.getProperty(key));
 				if (ss.endsWith("%")) {
-					h.put("leading", "0," + (v / 100));
+					h.put("leading", "0," + v / 100);
 				} else if ("normal".equalsIgnoreCase(ss)) {
 					h.put("leading", "0,1.5");
 				}
@@ -324,13 +323,13 @@ public class FactoryProperties {
 	 * @param cprops
 	 * @since 2.1.3
 	 */
-	public static void insertStyle(HashMap h, ChainedProperties cprops) {
-		String style = (String) h.get("style");
+	public static void insertStyle(HashMap<String, String> h, ChainedProperties cprops) {
+		String style = h.get("style");
 		if (style == null)
 			return;
 		Properties prop = Markup.parseAttributes(style);
-		for (Iterator it = prop.keySet().iterator(); it.hasNext();) {
-			String key = (String) it.next();
+		for (Object element : prop.keySet()) {
+			String key = (String) element;
 			if (key.equals(Markup.CSS_KEY_FONTFAMILY)) {
 				h.put(ElementTags.FACE, prop.getProperty(key));
 			} else if (key.equals(Markup.CSS_KEY_FONTSIZE)) {
@@ -374,7 +373,7 @@ public class FactoryProperties {
 				float v = Markup.parseLength(prop.getProperty(key),
 						actualFontSize);
 				if (ss.endsWith("%")) {
-					h.put("leading", "0," + (v / 100));
+					h.put("leading", "0," + v / 100);
 					return;
 				}
 				if ("normal".equalsIgnoreCase(ss)) {
@@ -400,7 +399,7 @@ public class FactoryProperties {
 		this.fontImp = fontImp;
 	}
 
-	public static HashMap followTags = new HashMap();
+	public static HashMap<String, String> followTags = new HashMap<String, String>();
 	static {
 		followTags.put("i", "i");
 		followTags.put("b", "b");

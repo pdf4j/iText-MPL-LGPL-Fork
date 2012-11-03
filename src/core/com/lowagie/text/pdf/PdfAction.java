@@ -1,5 +1,5 @@
 /*
- * $Id: PdfAction.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: PdfAction.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2000 by Bruno Lowagie.
  *
@@ -555,7 +555,7 @@ public class PdfAction extends PdfDictionary {
      * If <CODE>false</CODE>, radio-button state relationships, if any, are ignored
      * @return the action
      */    
-    public static PdfAction setOCGstate(ArrayList state, boolean preserveRB) {
+    public static PdfAction setOCGstate(ArrayList<Object> state, boolean preserveRB) {
         PdfAction action = new PdfAction();
         action.put(PdfName.S, PdfName.SETOCGSTATE);
         PdfArray a = new PdfArray();

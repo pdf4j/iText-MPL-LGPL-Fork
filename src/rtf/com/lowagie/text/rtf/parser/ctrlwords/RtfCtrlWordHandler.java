@@ -1,4 +1,4 @@
-/* $Id: RtfCtrlWordHandler.java 3427 2008-05-24 18:32:31Z xlv $
+/* $Id: RtfCtrlWordHandler.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * Copyright 2007 by Howard Shank (hgshank@yahoo.com)
  *

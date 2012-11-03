@@ -1,5 +1,5 @@
 /*
- * $Id: ReversePages.java 3271 2008-04-18 20:39:42Z xlv $
+ * $Id: ReversePages.java 3307 2008-05-01 19:55:48Z xlv $
  * Copyright (c) 2005-2007 Bruno Lowagie, Carsten Hammer
  *
  * Permission is hereby granted, free of charge, to any person
@@ -54,7 +54,7 @@ public class ReversePages
 
   static {
     addVersion(
-        "$Id: ReversePages.java 3271 2008-04-18 20:39:42Z xlv $");
+        "$Id: ReversePages.java 3307 2008-05-01 19:55:48Z xlv $");
   }
 
   FileArgument destfile = null;

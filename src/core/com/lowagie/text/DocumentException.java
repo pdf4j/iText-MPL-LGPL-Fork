@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentException.java 3831 2009-04-01 16:31:17Z blowagie $
+ * $Id: DocumentException.java 3989 2009-06-18 02:22:54Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *

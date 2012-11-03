@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleTable.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: SimpleTable.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2005 by Bruno Lowagie.
  *
@@ -63,7 +63,7 @@ import com.lowagie.text.pdf.PdfPTableEvent;
 public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElementArray {
 
 	/** the content of a Table. */
-	private ArrayList content = new ArrayList();
+	private ArrayList<SimpleCell> content = new ArrayList<SimpleCell>();
 	/** the width of the Table. */
 	private float width = 0f;
 	/** the widthpercentage of the Table. */
@@ -104,10 +104,10 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElemen
 	 */
 	public Table createTable() throws BadElementException {
 		if (content.isEmpty()) throw new BadElementException(MessageLocalization.getComposedMessage("trying.to.create.a.table.without.rows"));
-		SimpleCell row = (SimpleCell)content.get(0);
+		SimpleCell row = content.get(0);
 		SimpleCell cell;
 		int columns = 0;
-		for (Iterator i = row.getContent().iterator(); i.hasNext(); ) {
+		for (Iterator<Element> i = row.getContent().iterator(); i.hasNext(); ) {
 			cell = (SimpleCell)i.next();
 			columns += cell.getColspan();
 		}
@@ -119,10 +119,10 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElemen
 		table.setPadding(cellpadding);
 		table.cloneNonPositionParameters(this);
 		int pos;
-		for (Iterator rows = content.iterator(); rows.hasNext(); ) {
-			row = (SimpleCell)rows.next();
+		for (Iterator<SimpleCell> rows = content.iterator(); rows.hasNext(); ) {
+			row = rows.next();
 			pos = 0;
-			for (Iterator cells = row.getContent().iterator(); cells.hasNext(); ) {
+			for (Iterator<Element> cells = row.getContent().iterator(); cells.hasNext(); ) {
 				cell = (SimpleCell)cells.next();
 				table.addCell(cell.createCell(row));
 				if (cell.getColspan() == 1) {
@@ -174,10 +174,10 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElemen
 	 */
 	public PdfPTable createPdfPTable() throws DocumentException {
 		if (content.isEmpty()) throw new BadElementException(MessageLocalization.getComposedMessage("trying.to.create.a.table.without.rows"));
-		SimpleCell row = (SimpleCell)content.get(0);
+		SimpleCell row = content.get(0);
 		SimpleCell cell;
 		int columns = 0;
-		for (Iterator i = row.getContent().iterator(); i.hasNext(); ) {
+		for (Iterator<Element> i = row.getContent().iterator(); i.hasNext(); ) {
 			cell = (SimpleCell)i.next();
 			columns += cell.getColspan();
 		}
@@ -187,10 +187,10 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElemen
 		table.setTableEvent(this);
 		table.setHorizontalAlignment(alignment);
 		int pos;
-		for (Iterator rows = content.iterator(); rows.hasNext(); ) {
-			row = (SimpleCell)rows.next();
+		for (Iterator<SimpleCell> rows = content.iterator(); rows.hasNext(); ) {
+			row = rows.next();
 			pos = 0;
-			for (Iterator cells = row.getContent().iterator(); cells.hasNext(); ) {
+			for (Iterator<Element> cells = row.getContent().iterator(); cells.hasNext(); ) {
 				cell = (SimpleCell)cells.next();
 				if (Float.isNaN(cell.getSpacing_left()))	{
 					cell.setSpacing_left(cellspacing / 2f);
@@ -338,9 +338,25 @@ public class SimpleTable extends Rectangle implements PdfPTableEvent, TextElemen
 	}
 
 	/**
-	 * @see com.lowagie.text.TextElementArray#add(java.lang.Object)
+	 * @see com.lowagie.text.TextElementArray#addObject(java.lang.Object)
 	 */
-	public boolean add(Object o) {
+	public boolean addObject(Object o) {
+		try {
+			addElement((SimpleCell)o);
+			return true;
+		}
+		catch(ClassCastException e) {
+			return false;
+		}
+		catch(BadElementException e) {
+			throw new ExceptionConverter(e);
+		}
+	}
+
+	/**
+	 * @see com.lowagie.text.TextElementArray#add(Element)
+	 */
+	public boolean add(Element o) {
 		try {
 			addElement((SimpleCell)o);
 			return true;

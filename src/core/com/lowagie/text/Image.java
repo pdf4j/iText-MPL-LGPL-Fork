@@ -1,5 +1,5 @@
 /*
- * $Id: Image.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: Image.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -963,10 +963,10 @@ public abstract class Image extends Rectangle {
 		if (image == null)
 			return null;
 		try {
-			Class cs = image.getClass();
-			Constructor constructor = cs
+			Class<? extends Image> cs = image.getClass();
+			Constructor<? extends Image> constructor = cs
 					.getDeclaredConstructor(new Class[] { Image.class });
-			return (Image) constructor.newInstance(new Object[] { image });
+			return constructor.newInstance(new Object[] { image });
 		} catch (Exception e) {
 			throw new ExceptionConverter(e);
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: ElementFactory.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: ElementFactory.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2007 by Bruno Lowagie.
  *
@@ -330,14 +330,14 @@ public class ElementFactory {
 			value = attributes.getProperty(ElementTags.WIDTHS);
 			if (value != null) {
 				StringTokenizer widthTokens = new StringTokenizer(value, ";");
-				ArrayList values = new ArrayList();
+				ArrayList<String> values = new ArrayList<String>();
 				while (widthTokens.hasMoreTokens()) {
 					values.add(widthTokens.nextToken());
 				}
 				table = new Table(values.size());
 				float[] widths = new float[table.getColumns()];
 				for (int i = 0; i < values.size(); i++) {
-					value = (String) values.get(i);
+					value = values.get(i);
 					widths[i] = Float.parseFloat(value + "f");
 				}
 				table.setWidths(widths);

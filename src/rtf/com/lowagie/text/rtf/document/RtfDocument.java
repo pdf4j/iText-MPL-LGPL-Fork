@@ -1,5 +1,5 @@
 /*
- * $Id: RtfDocument.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: RtfDocument.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2003, 2004, 2005 by Mark Hall
  *
@@ -68,7 +68,7 @@ import com.lowagie.text.rtf.graphic.RtfImage;
  * The RtfDocument stores all document related data and also the main data stream.
  * INTERNAL CLASS - NOT TO BE USED DIRECTLY
  *
- * @version $Id: RtfDocument.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * @version $Id: RtfDocument.java 4167 2009-12-13 04:05:50Z xlv $
  * @author Mark Hall (Mark.Hall@mail.room3b.eu)
  * @author Todd Bush [Tab support]
  * @author Thomas Bickel (tmb99@inode.at)
@@ -90,7 +90,7 @@ public class RtfDocument extends RtfElement {
     /**
      * Stores integers that have been generated as unique random numbers
      */
-    private ArrayList previousRandomInts = null;
+    private ArrayList<Integer> previousRandomInts = null;
     /**
      * Whether to automatically generate TOC entries for Chapters and Sections. Defaults to false
      */
@@ -127,7 +127,7 @@ public class RtfDocument extends RtfElement {
         this.mapper = new RtfMapper(this);
         this.documentHeader = new RtfDocumentHeader(this);
         this.documentHeader.init();
-        this.previousRandomInts = new ArrayList();
+        this.previousRandomInts = new ArrayList<Integer>();
         this.documentSettings = new RtfDocumentSettings(this);
     }
 

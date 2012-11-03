@@ -1,5 +1,5 @@
 /*
- * $Id: Console.java 3242 2008-04-13 23:00:20Z xlv $
+ * $Id: Console.java 3307 2008-05-01 19:55:48Z xlv $
  *
  * Copyright 2007 Bruno Lowagie.
  *

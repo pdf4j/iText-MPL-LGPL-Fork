@@ -1,5 +1,5 @@
 /*
- * $Id: PdfContentByte.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: PdfContentByte.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -179,10 +179,10 @@ public class PdfContentByte {
     protected GraphicState state = new GraphicState();
 
     /** The list were we save/restore the state */
-    protected ArrayList stateList = new ArrayList();
+    protected ArrayList<GraphicState> stateList = new ArrayList<GraphicState>();
 
     /** The list were we save/restore the layer depth */
-    protected ArrayList layerDepth;
+    protected ArrayList<Integer> layerDepth;
 
     /** The separator between commands.
      */
@@ -191,7 +191,7 @@ public class PdfContentByte {
     private int mcDepth = 0;
     private boolean inText = false;
 
-    private static HashMap abrev = new HashMap();
+    private static HashMap<PdfName, String> abrev = new HashMap<PdfName, String>();
 
     static {
         abrev.put(PdfName.BITSPERCOMPONENT, "/BPC ");
@@ -1177,10 +1177,10 @@ public class PdfContentByte {
                     		pimage.put(PdfName.DECODEPARMS, decodeparms);
                     	}
                     }
-                    for (Iterator it = pimage.getKeys().iterator(); it.hasNext();) {
-                        PdfName key = (PdfName)it.next();
+                    for (Iterator<PdfName> it = pimage.getKeys().iterator(); it.hasNext();) {
+                        PdfName key = it.next();
                         PdfObject value = pimage.get(key);
-                        String s = (String)abrev.get(key);
+                        String s = abrev.get(key);
                         if (s == null)
                             continue;
                         content.append(s);
@@ -1327,7 +1327,7 @@ public class PdfContentByte {
         int idx = stateList.size() - 1;
         if (idx < 0)
             throw new IllegalPdfSyntaxException(MessageLocalization.getComposedMessage("unbalanced.save.restore.state.operators"));
-        state = (GraphicState)stateList.get(idx);
+        state = stateList.get(idx);
         stateList.remove(idx);
     }
 
@@ -1800,7 +1800,7 @@ public class PdfContentByte {
      * @param extent angle extent in degrees
      * @return a list of float[] with the bezier curves
      */
-    public static ArrayList bezierArc(float x1, float y1, float x2, float y2, float startAng, float extent) {
+    public static ArrayList<float[]> bezierArc(float x1, float y1, float x2, float y2, float startAng, float extent) {
         float tmp;
         if (x1 > x2) {
             tmp = x1;
@@ -1829,7 +1829,7 @@ public class PdfContentByte {
         float ry = (y2-y1)/2f;
         float halfAng = (float)(fragAngle * Math.PI / 360.);
         float kappa = (float)(Math.abs(4. / 3. * (1. - Math.cos(halfAng)) / Math.sin(halfAng)));
-        ArrayList pointList = new ArrayList();
+        ArrayList<float[]> pointList = new ArrayList<float[]>();
         for (int i = 0; i < Nfrag; ++i) {
             float theta0 = (float)((startAng + i*fragAngle) * Math.PI / 180.);
             float theta1 = (float)((startAng + (i+1)*fragAngle) * Math.PI / 180.);
@@ -1874,13 +1874,13 @@ public class PdfContentByte {
      * @param extent angle extent in degrees
      */
     public void arc(float x1, float y1, float x2, float y2, float startAng, float extent) {
-        ArrayList ar = bezierArc(x1, y1, x2, y2, startAng, extent);
+        ArrayList<float[]> ar = bezierArc(x1, y1, x2, y2, startAng, extent);
         if (ar.isEmpty())
             return;
-        float pt[] = (float [])ar.get(0);
+        float pt[] = ar.get(0);
         moveTo(pt[0], pt[1]);
         for (int k = 0; k < ar.size(); ++k) {
-            pt = (float [])ar.get(k);
+            pt = ar.get(k);
             curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
         }
     }
@@ -2471,7 +2471,7 @@ public class PdfContentByte {
         if (state.fontDetails == null)
             throw new NullPointerException(MessageLocalization.getComposedMessage("font.and.size.must.be.set.before.writing.any.text"));
         content.append("[");
-        ArrayList arrayList = text.getArrayList();
+        ArrayList<Object> arrayList = text.getArrayList();
         boolean lastWasNumber = false;
         for (int k = 0; k < arrayList.size(); ++k) {
             Object obj = arrayList.get(k);
@@ -2943,7 +2943,7 @@ public class PdfContentByte {
         if ((layer instanceof PdfLayer) && ((PdfLayer)layer).getTitle() != null)
             throw new IllegalArgumentException(MessageLocalization.getComposedMessage("a.title.is.not.a.layer"));
         if (layerDepth == null)
-            layerDepth = new ArrayList();
+            layerDepth = new ArrayList<Integer>();
         if (layer instanceof PdfLayerMembership) {
             layerDepth.add(new Integer(1));
             beginLayer2(layer);
@@ -2974,7 +2974,7 @@ public class PdfContentByte {
     public void endLayer() {
         int n = 1;
         if (layerDepth != null && !layerDepth.isEmpty()) {
-            n = ((Integer)layerDepth.get(layerDepth.size() - 1)).intValue();
+            n = layerDepth.get(layerDepth.size() - 1).intValue();
             layerDepth.remove(layerDepth.size() - 1);
         } else {
         	throw new IllegalPdfSyntaxException(MessageLocalization.getComposedMessage("unbalanced.layer.operators"));

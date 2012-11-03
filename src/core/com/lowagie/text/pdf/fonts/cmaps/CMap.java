@@ -46,9 +46,9 @@ import java.util.Map;
  */
 public class CMap
 {
-    private List codeSpaceRanges = new ArrayList();
-    private Map singleByteMappings = new HashMap();
-    private Map doubleByteMappings = new HashMap();
+    private List<CodespaceRange> codeSpaceRanges = new ArrayList<CodespaceRange>();
+    private Map<Integer, String> singleByteMappings = new HashMap<Integer, String>();
+    private Map<Integer, String> doubleByteMappings = new HashMap<Integer, String>();
 
     /**
      * Creates a new instance of CMap.
@@ -96,7 +96,7 @@ public class CMap
         {
             
             key = new Integer( code[offset] & 0xff );
-            result = (String)singleByteMappings.get( key );
+            result = singleByteMappings.get( key );
         }
         else if( length == 2 )
         {
@@ -105,7 +105,7 @@ public class CMap
             intKey += code[offset+1] & 0xff;
             key = new Integer( intKey );
 
-            result = (String)doubleByteMappings.get( key );
+            result = doubleByteMappings.get( key );
         }
 
         return result;
@@ -154,7 +154,7 @@ public class CMap
      *
      * @return Value of property codeSpaceRanges.
      */
-    public List getCodeSpaceRanges()
+    public List<CodespaceRange> getCodeSpaceRanges()
     {
         return codeSpaceRanges;
     }

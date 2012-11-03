@@ -1,5 +1,5 @@
 /*
- * $Id: LargeElement.java 3514 2008-06-27 09:26:36Z blowagie $
+ * $Id: LargeElement.java 3561 2008-07-15 22:17:57Z xlv $
  *
  * Copyright 2007 by Bruno Lowagie.
  *

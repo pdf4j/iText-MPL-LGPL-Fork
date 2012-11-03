@@ -1,5 +1,5 @@
 /*
- * $Id: RtfDocumentHeader.java 3580 2008-08-06 15:52:00Z howard_s $
+ * $Id: RtfDocumentHeader.java 3626 2008-11-11 19:27:25Z xlv $
  *
  * Copyright 2003, 2004 by Mark Hall
  *
@@ -72,7 +72,7 @@ import com.lowagie.text.rtf.style.RtfStylesheetList;
  * The RtfDocumentHeader contains all classes required for the generation of
  * the document header area.
  * 
- * @version $Id: RtfDocumentHeader.java 3580 2008-08-06 15:52:00Z howard_s $
+ * @version $Id: RtfDocumentHeader.java 3626 2008-11-11 19:27:25Z xlv $
  * @author Mark Hall (Mark.Hall@mail.room3b.eu)
  * @author Thomas Bickel (tmb99@inode.at)
  * @author Howard Shank (hgshank@yahoo.com)

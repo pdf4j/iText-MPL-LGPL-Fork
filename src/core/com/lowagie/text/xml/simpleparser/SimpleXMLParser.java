@@ -120,7 +120,7 @@ public final class SimpleXMLParser {
 	private final static int ATTRIBUTE_VALUE = 14;
     
 	/** the state stack */
-	Stack stack;
+	Stack<Integer> stack;
 	/** The current character. */
 	int character = 0;
 	/** The previous character. */
@@ -149,7 +149,7 @@ public final class SimpleXMLParser {
 	/** current tagname */
 	String tag = null;
 	/** current attributes */
-	HashMap attributes = null;
+	HashMap<String, String> attributes = null;
 	/** The handler to which we are going to forward document content */
 	SimpleXMLDocHandler doc;
 	/** The handler to which we are going to forward comments. */
@@ -171,7 +171,7 @@ public final class SimpleXMLParser {
     	this.doc = doc;
     	this.comment = comment;
     	this.html = html;
-    	stack = new Stack();
+    	stack = new Stack<Integer>();
     	state = html ? TEXT : UNKNOWN;
     }
     
@@ -490,7 +490,7 @@ public final class SimpleXMLParser {
      */
     private int restoreState() {
         if(!stack.empty())
-            return ((Integer)stack.pop()).intValue();
+            return stack.pop().intValue();
         else
             return UNKNOWN;
     }
@@ -539,7 +539,7 @@ public final class SimpleXMLParser {
      */
     private void initTag() {
         tag = null;
-        attributes = new HashMap();
+        attributes = new HashMap<String, String>();
     }
     /** Sets the name of the tag. */
     private void doTag() {

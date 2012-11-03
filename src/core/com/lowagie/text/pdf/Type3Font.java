@@ -59,7 +59,7 @@ public class Type3Font extends BaseFont {
     
 	private boolean[] usedSlot;
     private IntHashtable widths3 = new IntHashtable();
-    private HashMap char2glyph = new HashMap();
+    private HashMap<Integer, Type3Glyph> char2glyph = new HashMap<Integer, Type3Glyph>();
     private PdfWriter writer;
     private float llx = Float.NaN, lly, urx, ury;
     private PageResources pageResources = new PageResources();
@@ -126,10 +126,10 @@ public class Type3Font extends BaseFont {
      */    
     public PdfContentByte defineGlyph(char c, float wx, float llx, float lly, float urx, float ury) {
         if (c == 0 || c > 255)
-            throw new IllegalArgumentException(MessageLocalization.getComposedMessage("the.char.1.doesn.t.belong.in.this.type3.font", (int)c));
+            throw new IllegalArgumentException(MessageLocalization.getComposedMessage("the.char.1.doesn.t.belong.in.this.type3.font", c));
         usedSlot[c] = true;
         Integer ck = new Integer(c);
-        Type3Glyph glyph = (Type3Glyph)char2glyph.get(ck);
+        Type3Glyph glyph = char2glyph.get(ck);
         if (glyph != null)
             return glyph;
         widths3.put(c, (int)wx);
@@ -238,7 +238,7 @@ public class Type3Font extends BaseFont {
                 s = "a" + c2;
             PdfName n = new PdfName(s);
             diffs.add(n);
-            Type3Glyph glyph = (Type3Glyph)char2glyph.get(new Integer(c2));
+            Type3Glyph glyph = char2glyph.get(new Integer(c2));
             PdfStream stream = new PdfStream(glyph.toPdf(null));
             stream.flateCompress(compressionLevel);
             PdfIndirectReference refp = writer.addToBody(stream).getIndirectReference();

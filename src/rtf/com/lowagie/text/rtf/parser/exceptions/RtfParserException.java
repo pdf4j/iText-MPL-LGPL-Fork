@@ -1,5 +1,5 @@
 /*
- * $Id: RtfParserException.java 3373 2008-05-12 16:21:24Z xlv $
+ * $Id: RtfParserException.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * Copyright 2007 by Howard Shank (hgshank@yahoo.com)
  *

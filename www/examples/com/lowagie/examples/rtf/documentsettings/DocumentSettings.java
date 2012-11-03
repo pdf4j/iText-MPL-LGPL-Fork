@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentSettings.java 3373 2008-05-12 16:21:24Z xlv $
+ * $Id: DocumentSettings.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * This code is free software. It may only be copied or modified
  * if you include the following copyright notice:
@@ -32,7 +32,7 @@ import com.lowagie.text.rtf.document.output.RtfDataCache;
  * generation settings. Specifically the dataCacheStyle and alwaysGenerateSoftLinebreaks
  * properties are changed.
  * 
- * @version $Revision: 3373 $
+ * @version $Revision: 3393 $
  * @author Mark Hall (Mark.Hall@mail.room3b.eu)
  */
 public class DocumentSettings {

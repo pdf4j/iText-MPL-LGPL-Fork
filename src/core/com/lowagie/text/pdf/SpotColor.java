@@ -1,5 +1,5 @@
 /*
- * $Id: SpotColor.java 4069 2009-09-19 14:50:32Z psoares33 $
+ * $Id: SpotColor.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2002 by Phillip Pan
  *

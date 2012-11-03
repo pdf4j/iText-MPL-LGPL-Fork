@@ -1,5 +1,5 @@
 /*
- * $Id: ImgJBIG2.java 3962 2009-06-10 11:43:19Z psoares33 $
+ * $Id$
  *
  * Copyright 2009 by Nigel Kerr.
  *

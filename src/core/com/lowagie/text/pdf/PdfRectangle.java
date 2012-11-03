@@ -1,5 +1,5 @@
 /*
- * $Id: PdfRectangle.java 3694 2009-02-17 19:29:05Z mstorer $
+ * $Id: PdfRectangle.java 3787 2009-03-17 01:25:12Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

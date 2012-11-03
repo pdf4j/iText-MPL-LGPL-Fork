@@ -1,5 +1,5 @@
 /*
- * $Id: PdfContentParser.java 4066 2009-09-19 12:44:47Z psoares33 $
+ * $Id: PdfContentParser.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2005 by Paulo Soares.
  *
@@ -84,9 +84,9 @@ public class PdfContentParser {
      * @return the same <CODE>ArrayList</CODE> given as argument or a new one
      * @throws IOException on error
      */    
-    public ArrayList parse(ArrayList ls) throws IOException {
+    public ArrayList<PdfObject> parse(ArrayList<PdfObject> ls) throws IOException {
         if (ls == null)
-            ls = new ArrayList();
+            ls = new ArrayList<PdfObject>();
         else
             ls.clear();
         PdfObject ob = null;

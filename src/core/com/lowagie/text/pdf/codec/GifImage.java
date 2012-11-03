@@ -114,7 +114,7 @@ public class GifImage {
     protected URL fromUrl;
 
 
-    protected ArrayList frames = new ArrayList();     // frames read from current file
+    protected ArrayList<GifFrame> frames = new ArrayList<GifFrame>();     // frames read from current file
 
     /** Reads gif images from an URL.
      * @param url the URL
@@ -180,7 +180,7 @@ public class GifImage {
      * @return the image
      */    
     public Image getImage(int frame) {
-        GifFrame gf = (GifFrame)frames.get(frame - 1);
+        GifFrame gf = frames.get(frame - 1);
         return gf.image;
     }
     
@@ -190,7 +190,7 @@ public class GifImage {
      * @return the [x,y] position of the frame
      */    
     public int[] getFramePosition(int frame) {
-        GifFrame gf = (GifFrame)frames.get(frame - 1);
+        GifFrame gf = frames.get(frame - 1);
         return new int[]{gf.ix, gf.iy};
         
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfCopyFormsImp.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id$
  *
  * Copyright 2009 Bruno Lowagie (inspired by Paulo Soares)
  *
@@ -99,7 +99,7 @@ class PdfCopyFormsImp extends PdfCopyFieldsImp {
      */
     void mergeFields() {
         for (int k = 0; k < fields.size(); ++k) {
-            HashMap fd = ((AcroFields)fields.get(k)).getFields();
+            HashMap<String, AcroFields.Item> fd = fields.get(k).getFields();
             mergeWithMaster(fd);
         }
     }

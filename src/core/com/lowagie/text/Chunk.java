@@ -1,5 +1,5 @@
 /*
- * $Id: Chunk.java 4092 2009-11-11 17:58:16Z psoares33 $
+ * $Id: Chunk.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -108,7 +108,7 @@ public class Chunk implements Element {
 	protected Font font = null;
 
 	/** Contains some of the attributes for this Chunk. */
-	protected HashMap attributes = null;
+	protected HashMap<String, Object> attributes = null;
 
 	// constructors
 
@@ -132,7 +132,7 @@ public class Chunk implements Element {
             font = new Font(ck.font);
         }
         if (ck.attributes != null) {
-            attributes = new HashMap(ck.attributes);
+            attributes = new HashMap<String, Object>(ck.attributes);
         }
     }
     
@@ -316,8 +316,8 @@ public class Chunk implements Element {
 	 * 
 	 * @return an <CODE>ArrayList</CODE>
 	 */
-	public ArrayList getChunks() {
-		ArrayList tmp = new ArrayList();
+	public ArrayList<Chunk> getChunks() {
+		ArrayList<Chunk> tmp = new ArrayList<Chunk>();
 		tmp.add(this);
 		return tmp;
 	}
@@ -420,7 +420,7 @@ public class Chunk implements Element {
 	 * @return the attributes for this <CODE>Chunk</CODE>
 	 */
 
-	public HashMap getAttributes() {
+	public HashMap<String, Object> getAttributes() {
 		return attributes;
 	}
 
@@ -428,7 +428,7 @@ public class Chunk implements Element {
 	 * Sets the attributes all at once.
 	 * @param	attributes	the attributes of a Chunk
 	 */
-	public void setAttributes(HashMap attributes) {
+	public void setAttributes(HashMap<String, Object> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -444,7 +444,7 @@ public class Chunk implements Element {
 
 	private Chunk setAttribute(String name, Object obj) {
 		if (attributes == null)
-			attributes = new HashMap();
+			attributes = new HashMap<String, Object>();
 		attributes.put(name, obj);
 		return this;
 	}
@@ -526,7 +526,7 @@ public class Chunk implements Element {
 	public Chunk setUnderline(Color color, float thickness, float thicknessMul,
 			float yPosition, float yPositionMul, int cap) {
 		if (attributes == null)
-			attributes = new HashMap();
+			attributes = new HashMap<String, Object>();
 		Object obj[] = {
 				color,
 				new float[] { thickness, thicknessMul, yPosition, yPositionMul, cap } };

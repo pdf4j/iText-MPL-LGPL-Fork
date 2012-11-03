@@ -1,5 +1,5 @@
 /*
- * $Id: ColorDetails.java 3514 2008-06-27 09:26:36Z blowagie $
+ * $Id: ColorDetails.java 3561 2008-07-15 22:17:57Z xlv $
  *
  * Copyright 2002 by Phillip Pan
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfDashPattern.java 3373 2008-05-12 16:21:24Z xlv $
+ * $Id: PdfDashPattern.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

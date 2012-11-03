@@ -1,5 +1,5 @@
 /*
- * $Id: FormList.java 4104 2009-11-23 18:28:22Z mstorer $
+ * $Id: FormList.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * This code is part of the 'iText Tutorial'.
  * You can find the complete tutorial at the following address:
@@ -18,7 +18,6 @@ package com.lowagie.examples.forms;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
@@ -55,7 +54,7 @@ public class FormList {
             // you must turn on multiselect before making multiple selections or they will be discarded.
             fldDef.setOptions( TextField.MULTISELECT );
 
-            ArrayList selections = new ArrayList( 3 );
+            ArrayList<Integer> selections = new ArrayList<Integer>( 3 );
             selections.add( new Integer( 1 ) );
             selections.add( new Integer( 3 ) );
             selections.add( new Integer( 5 ) );

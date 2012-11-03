@@ -127,7 +127,7 @@ public class BmpImage {
     private boolean isBottomUp;
     private int bitsPerPixel;
     private int redMask, greenMask, blueMask, alphaMask;
-    public HashMap properties = new HashMap();    
+    public HashMap<String, Object> properties = new HashMap<String, Object>();    
     private long xPelsPerMeter;
     private long yPelsPerMeter;
     // BMP Image types
@@ -212,7 +212,7 @@ public class BmpImage {
         BmpImage bmp = new BmpImage(is, noHeader, size);
         try {
             Image img = bmp.getImage();
-            img.setDpi((int)(bmp.xPelsPerMeter * 0.0254d + 0.5d), (int)(bmp.yPelsPerMeter * 0.0254d + 0.5d));
+            img.setDpi((int)(bmp.xPelsPerMeter * 0.0254d + 0.5), (int)(bmp.yPelsPerMeter * 0.0254d + 0.5));
             img.setOriginalType(Image.ORIGINAL_BMP);
             return img;
         }

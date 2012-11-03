@@ -1,5 +1,5 @@
 /*
- * $Id: PagesTable.java 4033 2009-07-23 13:08:02Z blowagie $
+ * $Id: PagesTable.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2007 Bruno Lowagie.
  *
@@ -66,6 +66,7 @@ public class PagesTable extends JTable implements JTableAutoModelInterface, Obse
 	/**
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
+    @SuppressWarnings("unchecked")
 	public void update(Observable observable, Object obj) {
 		if (obj == null) {
 			list = new ArrayList<PdfPageTreeNode>();
@@ -83,11 +84,11 @@ public class PagesTable extends JTable implements JTableAutoModelInterface, Obse
 			if (pages == null) {
 				return;
 			}
-			Enumeration p = pages.depthFirstEnumeration();
+			Enumeration<PdfObjectTreeNode> p = pages.depthFirstEnumeration();
 			PdfObjectTreeNode  child;
 			StringBuffer buf;
 			while (p.hasMoreElements()) {
-				child = (PdfObjectTreeNode)p.nextElement();
+				child = p.nextElement();
 				if (child instanceof PdfPageTreeNode) {
 					buf = new StringBuffer("Page ");
 					buf.append(++i);

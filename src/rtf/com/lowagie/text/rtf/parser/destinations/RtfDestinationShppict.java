@@ -1,5 +1,5 @@
 /*
- * $Id: RtfDestinationShppict.java 3453 2008-05-26 03:02:41Z xlv $
+ * $Id: RtfDestinationShppict.java 3561 2008-07-15 22:17:57Z xlv $
  *
  * Copyright 2007, 2008 by Howard Shank (hgshank@yahoo.com)
  *

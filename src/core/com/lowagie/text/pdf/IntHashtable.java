@@ -382,7 +382,7 @@ public class IntHashtable implements Cloneable {
     }
     
     // extra inner class by Paulo
-    static class IntHashtableIterator implements Iterator {
+    static class IntHashtableIterator implements Iterator<Entry> {
         int index;
         Entry table[];
         Entry entry;
@@ -403,7 +403,7 @@ public class IntHashtable implements Cloneable {
         	return false;
         }
         
-        public Object next() {
+        public Entry next() {
             if (entry == null) {
                 while ((index-- > 0) && ((entry = table[index]) == null));
             }
@@ -421,7 +421,7 @@ public class IntHashtable implements Cloneable {
     
 // extra methods by Paulo Soares:
 
-    public Iterator getEntryIterator() {
+    public Iterator<Entry> getEntryIterator() {
         return new IntHashtableIterator(table);
     }
     

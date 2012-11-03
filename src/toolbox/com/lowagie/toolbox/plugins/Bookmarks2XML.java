@@ -1,5 +1,5 @@
 /*
- * $Id: Bookmarks2XML.java 3271 2008-04-18 20:39:42Z xlv $
+ * $Id: Bookmarks2XML.java 3307 2008-05-01 19:55:48Z xlv $
  * Copyright (c) 2005-2007 Hans-Werner Hilse, Bruno Lowagie
  *
  * Permission is hereby granted, free of charge, to any person
@@ -57,7 +57,7 @@ import com.lowagie.toolbox.arguments.filters.PdfFilter;
 public class Bookmarks2XML extends AbstractTool {
 
 	static {
-		addVersion("$Id: Bookmarks2XML.java 3271 2008-04-18 20:39:42Z xlv $");
+		addVersion("$Id: Bookmarks2XML.java 3307 2008-05-01 19:55:48Z xlv $");
 	}
 
 	/**

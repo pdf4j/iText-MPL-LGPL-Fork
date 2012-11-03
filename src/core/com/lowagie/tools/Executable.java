@@ -1,5 +1,5 @@
 /*
- * $Id: Executable.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: Executable.java 4167 2009-12-13 04:05:50Z xlv $
  * $Name$
  *
  * Copyright 2005 by Bruno Lowagie / Roger Mistelli
@@ -255,7 +255,7 @@ public class Executable {
 	public static final void launchBrowser(String url) throws IOException {
 		try {
 			if (isMac()) {
-				Class macUtils = Class.forName("com.apple.mrj.MRJFileUtils");
+				Class<?> macUtils = Class.forName("com.apple.mrj.MRJFileUtils");
 				Method openURL = macUtils.getDeclaredMethod("openURL", new Class[] {String.class});
 				openURL.invoke(null, new Object[] {url});
 			}

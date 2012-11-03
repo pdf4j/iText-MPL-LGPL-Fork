@@ -1,5 +1,5 @@
 /*
- * $Id: Element.java 3672 2009-02-01 15:32:09Z blowagie $
+ * $Id: Element.java 3787 2009-03-17 01:25:12Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -342,7 +342,7 @@ public interface Element {
 	 * @return an <CODE>ArrayList</CODE>
 	 */
 
-	public ArrayList getChunks();
+	public ArrayList<Chunk> getChunks();
 
 	/**
 	 * Gets the content of the text element.

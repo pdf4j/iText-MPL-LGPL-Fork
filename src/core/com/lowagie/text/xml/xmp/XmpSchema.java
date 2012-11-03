@@ -1,5 +1,5 @@
 /*
- * $Id: XmpSchema.java 3543 2008-07-10 17:37:37Z xlv $
+ * $Id: XmpSchema.java 3561 2008-07-15 22:17:57Z xlv $
  *
  * Copyright 2005 by Bruno Lowagie.
  *
@@ -75,7 +75,7 @@ public abstract class XmpSchema extends Properties {
 	 */
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		for (Enumeration e = this.propertyNames(); e.hasMoreElements(); ) {
+		for (Enumeration<?> e = this.propertyNames(); e.hasMoreElements(); ) {
 			process(buf, e.nextElement());
 		}
 		return buf.toString();

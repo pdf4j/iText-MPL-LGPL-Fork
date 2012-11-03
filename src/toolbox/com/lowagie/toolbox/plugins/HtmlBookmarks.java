@@ -1,5 +1,5 @@
 /*
- * $Id: HtmlBookmarks.java 3373 2008-05-12 16:21:24Z xlv $
+ * $Id: HtmlBookmarks.java 3393 2008-05-16 21:33:55Z xlv $
  *
  * Copyright 2005 by Bruno Lowagie.
  *
@@ -82,7 +82,7 @@ import com.lowagie.tools.Executable;
 public class HtmlBookmarks extends AbstractTool {
 
 	static {
-		addVersion("$Id: HtmlBookmarks.java 3373 2008-05-12 16:21:24Z xlv $");
+		addVersion("$Id: HtmlBookmarks.java 3393 2008-05-16 21:33:55Z xlv $");
 	}
 
 	/**

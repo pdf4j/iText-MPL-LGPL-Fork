@@ -1,5 +1,5 @@
 /*
- * $Id: PdfImage.java 4067 2009-09-19 12:56:50Z psoares33 $
+ * $Id: PdfImage.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

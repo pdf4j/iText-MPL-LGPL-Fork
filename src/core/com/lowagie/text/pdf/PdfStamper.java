@@ -82,7 +82,7 @@ public class PdfStamper
      * The writer
      */    
     protected PdfStamperImp stamper;
-    private HashMap moreInfo;
+    private HashMap<String, String> moreInfo;
     private boolean hasSignature;
     private PdfSignatureAppearance sigApp;
 
@@ -132,7 +132,7 @@ public class PdfStamper
      * @return the map or <CODE>null</CODE>
      *
      */
-    public HashMap getMoreInfo() {
+    public HashMap<String, String> getMoreInfo() {
         return this.moreInfo;
     }
 
@@ -142,7 +142,7 @@ public class PdfStamper
      * @param moreInfo additional entries to the info dictionary
      *
      */
-    public void setMoreInfo(HashMap moreInfo) {
+    public void setMoreInfo(HashMap<String, String> moreInfo) {
         this.moreInfo = moreInfo;
     }
 
@@ -445,7 +445,7 @@ public class PdfStamper
      * {@link SimpleBookmark}.
      * @param outlines the bookmarks or <CODE>null</CODE> to remove any
      */
-    public void setOutlines(List outlines) {
+    public void setOutlines(List<HashMap<String, Object>> outlines) {
         stamper.setOutlines(outlines);
     }
 
@@ -756,7 +756,7 @@ public class PdfStamper
      * @return	a Map with all the PdfLayers in the document (and the name/title of the layer as key)
      * @since	2.1.2
      */
-    public Map getPdfLayers() {
+    public Map<String, PdfLayer> getPdfLayers() {
     	return stamper.getPdfLayers();
     }
 }

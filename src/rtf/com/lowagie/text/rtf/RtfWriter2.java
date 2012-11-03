@@ -1,5 +1,5 @@
 /*
- * $Id: RtfWriter2.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: RtfWriter2.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -71,7 +71,7 @@ import com.lowagie.text.rtf.text.RtfNewPage;
 /**
  * The RtfWriter allows the creation of rtf documents via the iText system
  *
- * Version: $Id: RtfWriter2.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * Version: $Id: RtfWriter2.java 4167 2009-12-13 04:05:50Z xlv $
  * @author Mark Hall (Mark.Hall@mail.room3b.eu)
  */
 public class RtfWriter2 extends DocWriter {

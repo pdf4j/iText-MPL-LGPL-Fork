@@ -1,5 +1,5 @@
 /*
- * $Id: PdfNull.java 3759 2009-03-06 16:05:00Z blowagie $
+ * $Id: PdfNull.java 3787 2009-03-17 01:25:12Z xlv $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *

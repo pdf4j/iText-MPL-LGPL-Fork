@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractTool.java 3276 2008-04-19 00:32:58Z xlv $
+ * $Id: AbstractTool.java 3307 2008-05-01 19:55:48Z xlv $
  * Copyright (c) 2005-2007 Bruno Lowagie, Carsten Hammer
  *
  * Permission is hereby granted, free of charge, to any person
@@ -49,7 +49,7 @@ import com.lowagie.tools.Executable;
  * Every iText tool has to extend this abstract class.
  *
  * @author not attributable
- * @version $Id: AbstractTool.java 3276 2008-04-19 00:32:58Z xlv $
+ * @version $Id: AbstractTool.java 3307 2008-05-01 19:55:48Z xlv $
  * @since 2.1.1 (imported from itexttoolbox project)
  */
 public abstract class AbstractTool implements ActionListener {

@@ -1,5 +1,5 @@
 /*
- * $Id: ElementTags.java 3533 2008-07-07 21:27:13Z Howard_s $
+ * $Id: ElementTags.java 3561 2008-07-15 22:17:57Z xlv $
  *
  * Copyright (c) 2001, 2002 Bruno Lowagie.
  *

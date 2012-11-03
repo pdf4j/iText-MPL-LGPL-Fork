@@ -1,5 +1,5 @@
 /*
- * $Id: OcspClientBouncyCastle.java 4065 2009-09-16 23:09:11Z psoares33 $
+ * $Id: OcspClientBouncyCastle.java 4167 2009-12-13 04:05:50Z xlv $
  *
  * Copyright 2009 Paulo Soares
  *
@@ -61,6 +61,8 @@ import java.net.URL;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
+
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509Extension;
@@ -121,8 +123,8 @@ public class OcspClientBouncyCastle implements OcspClient {
         gen.addRequest(id);
         
         // create details for nonce extension
-        Vector oids = new Vector();
-        Vector values = new Vector();
+        Vector<DERObjectIdentifier> oids = new Vector<DERObjectIdentifier>();
+        Vector<X509Extension> values = new Vector<X509Extension>();
         
         oids.add(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
         values.add(new X509Extension(false, new DEROctetString(new DEROctetString(PdfEncryption.createDocumentId()).getEncoded())));

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPublicKeySecurityHandler.java 4055 2009-08-30 23:47:33Z psoares33 $
+ * $Id: PdfPublicKeySecurityHandler.java 4167 2009-12-13 04:05:50Z xlv $
  * $Name$
  *
  * Copyright 2006 Paulo Soares
@@ -132,7 +132,7 @@ public class PdfPublicKeySecurityHandler {
     
     static final int SEED_LENGTH = 20;
     
-    private ArrayList recipients = null;
+    private ArrayList<PdfPublicKeyRecipient> recipients = null;
     
     private byte[] seed = new byte[SEED_LENGTH];
 
@@ -147,7 +147,7 @@ public class PdfPublicKeySecurityHandler {
             seed = SecureRandom.getSeed(SEED_LENGTH); 
         }
     
-        recipients = new ArrayList();
+        recipients = new ArrayList<PdfPublicKeyRecipient>();
     }
 
     public void addRecipient(PdfPublicKeyRecipient recipient) {
@@ -155,7 +155,7 @@ public class PdfPublicKeySecurityHandler {
     }
     
     protected byte[] getSeed() {
-        return (byte[])seed.clone();
+        return seed.clone();
     }
     /*
     public PdfPublicKeyRecipient[] getRecipients() {
@@ -169,7 +169,7 @@ public class PdfPublicKeySecurityHandler {
     
     public byte[] getEncodedRecipient(int index) throws IOException, GeneralSecurityException {
         //Certificate certificate = recipient.getX509();
-        PdfPublicKeyRecipient recipient = (PdfPublicKeyRecipient)recipients.get(index);
+        PdfPublicKeyRecipient recipient = recipients.get(index);
         byte[] cms = recipient.getCms();
         
         if (cms != null) return cms;
