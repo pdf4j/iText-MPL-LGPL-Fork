@@ -1,6 +1,6 @@
 /*
- * $Id: RtfMapper.java 1734 2005-05-04 14:41:15Z blowagie $
- * $Name$
+ * $Id: RtfMapper.java,v 1.10 2005/05/04 14:41:15 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2003, 2004 by Mark Hall
  *

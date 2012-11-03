@@ -1,5 +1,5 @@
 /*
- * $Id: PRTokeniser.java 2517 2006-12-28 19:41:02Z psoares33 $
+ * $Id: PRTokeniser.java,v 1.55 2006/09/16 19:38:16 xlv Exp $
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *
@@ -196,7 +196,7 @@ public class PRTokeniser {
     public char checkPdfHeader() throws IOException {
         file.setStartOffset(0);
         String str = readString(1024);
-        int idx = str.indexOf("%PDF-");
+        int idx = str.indexOf("%PDF-1.");
         if (idx < 0)
             throw new IOException("PDF header signature not found.");
         file.setStartOffset(idx);

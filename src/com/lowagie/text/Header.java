@@ -1,6 +1,6 @@
 /*
- * $Id: Header.java 2692 2007-04-17 14:47:07Z blowagie $
- * $Name$
+ * $Id: Header.java,v 1.61 2005/05/04 14:31:10 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -63,21 +63,21 @@ package com.lowagie.text;
  * @see		Meta
  */
 
-public class Header extends Meta {
+public class Header extends Meta implements Element {
     
     // membervariables
     
-	/** This is the content of this chunk of text. */
+/** This is the content of this chunk of text. */
     private StringBuffer name;
     
     // constructors
     
-    /**
-     * Constructs a <CODE>Meta</CODE>.
-     *
-     * @param	name		the name of the meta-information
-     * @param	content		the content
-     */
+/**
+ * Constructs a <CODE>Meta</CODE>.
+ *
+ * @param	name		the name of the meta-information
+ * @param	content		the content
+ */
     
     public Header(String name, String content) {
         super(Element.HEADER, content);
@@ -85,25 +85,14 @@ public class Header extends Meta {
     }
     
     // methods to retrieve information
-
-	/**
-     * Returns the name of the meta information.
-     *
-     * @return	a <CODE>String</CODE>
-     */
-    public String getName() {
+    
+/**
+ * Returns the name of the meta information.
+ *
+ * @return	a <CODE>String</CODE>
+ */
+    
+    public String name() {
         return name.toString();
     }
-    
-    // deprecated
-    
-    /**
-	 * Returns the name of the meta information.
-	 *
-	 * @return	a <CODE>String</CODE>
-	 * @deprecated Use {@link #getName()} instead
-	 */
-	public String name() {
-		return getName();
-	}
 }

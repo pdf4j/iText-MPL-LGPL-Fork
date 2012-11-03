@@ -1,6 +1,6 @@
 /*
- * $Id: ColorDetails.java 2366 2006-09-14 23:10:58Z xlv $
- * $Name$
+ * $Id: ColorDetails.java,v 1.45 2006/09/14 23:10:43 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *

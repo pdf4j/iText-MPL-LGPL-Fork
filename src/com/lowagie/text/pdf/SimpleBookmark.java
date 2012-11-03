@@ -61,10 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
-
-import com.lowagie.text.xml.simpleparser.IanaEncodings;
-import com.lowagie.text.xml.simpleparser.SimpleXMLDocHandler;
-import com.lowagie.text.xml.simpleparser.SimpleXMLParser;
 /**
  * Bookmark processing in a simple way. It has some limitations, mainly the only
  * action types supported are GoTo, GoToR, URI and Launch.
@@ -377,7 +373,7 @@ public class SimpleBookmark implements SimpleXMLDocHandler {
                     }
                     if (hit) {
                         if (idx < 0)
-                            page = Integer.toString(pageNum + pageShift);
+                            page = (pageNum + pageShift) + "";
                         else
                             page = (pageNum + pageShift) + page.substring(idx);
                     }
@@ -639,7 +635,7 @@ public class SimpleBookmark implements SimpleXMLDocHandler {
      * @throws IOException on error
      */    
     public static void exportToXML(List list, OutputStream out, String encoding, boolean onlyASCII) throws IOException {
-        String jenc = IanaEncodings.getJavaEncoding(encoding);
+        String jenc = SimpleXMLParser.getJavaEncoding(encoding);
         Writer wrt = new BufferedWriter(new OutputStreamWriter(out, jenc));
         exportToXML(list, wrt, encoding, onlyASCII);
     }
@@ -730,7 +726,7 @@ public class SimpleBookmark implements SimpleXMLDocHandler {
                 return;
             }
             else
-                throw new RuntimeException("Root element is not Bookmark: " + tag);
+                throw new RuntimeException("Root element is not Bookmark.");
         }
         if (!tag.equals("Title"))
             throw new RuntimeException("Tag " + tag + " not allowed.");

@@ -1,6 +1,6 @@
 /*
- * $Id: Chapter.java 2748 2007-05-12 15:11:48Z blowagie $
- * $Name$
+ * $Id: Chapter.java,v 1.72 2006/11/21 12:57:20 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -52,6 +52,7 @@
 package com.lowagie.text;
 
 import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * A <CODE>Chapter</CODE> is a special <CODE>Section</CODE>.
@@ -75,21 +76,11 @@ import java.util.ArrayList;
  * </PRE></BLOCKQUOTE>
  */
 
-public class Chapter extends Section {
+public class Chapter extends Section implements TextElementArray {
     
-    // constant
+    // constructors
+    
 	private static final long serialVersionUID = 1791000695779357361L;
-	
-	/**
-	 * Constructs a new <CODE>Chapter</CODE>.
-	 * @param	number		the Chapter number
-     */
-    public Chapter(int number) {
-        super(null, 1);
-        numbers = new ArrayList();
-        numbers.add(new Integer(number));
-        triggerNewPage = true;
-    }
 	
 	/**
 	 * Constructs a new <CODE>Chapter</CODE>.
@@ -105,42 +96,64 @@ public class Chapter extends Section {
         triggerNewPage = true;
     }
     
-    /**
-     * Constructs a new <CODE>Chapter</CODE>.
-     *
-     * @param	title		the Chapter title (as a <CODE>String</CODE>)
-     * @param	number		the Chapter number
-     */
+/**
+ * Constructs a new <CODE>Chapter</CODE>.
+ *
+ * @param	title		the Chapter title (as a <CODE>String</CODE>)
+ * @param	number		the Chapter number
+ */
+    
     public Chapter(String title, int number) {
         this(new Paragraph(title), number);
     }
     
+/**
+ * Creates a new <CODE>Chapter</CODE> following a set of attributes.
+ *
+ * @param	attributes	the attributes
+ * @param number a userdefined Chapter number
+ */
+    
+    public Chapter(Properties attributes, int number) {
+        this(new Paragraph(""), number);
+        
+        String value;
+        if ((value = (String)attributes.remove(ElementTags.NUMBERDEPTH)) != null) {
+            setNumberDepth(Integer.parseInt(value));
+        }
+        if ((value = (String)attributes.remove(ElementTags.INDENT)) != null) {
+            setIndentation(Float.parseFloat(value + "f"));
+        }
+        if ((value = (String)attributes.remove(ElementTags.INDENTATIONLEFT)) != null) {
+            setIndentationLeft(Float.parseFloat(value + "f"));
+        }
+        if ((value = (String)attributes.remove(ElementTags.INDENTATIONRIGHT)) != null) {
+            setIndentationRight(Float.parseFloat(value + "f"));
+        }
+    }
+    
     // implementation of the Element-methods
     
-    /**
-     * Gets the type of the text element.
-     *
-     * @return	a type
-     */
+/**
+ * Gets the type of the text element.
+ *
+ * @return	a type
+ */
+    
     public int type() {
         return Element.CHAPTER;
     }
     
-// deprecated stuff
+    // methods
     
-    /**
-     * Creates a new <CODE>Chapter</CODE> following a set of attributes.
-     *
-     * @param	attributes	the attributes
-     * @param number a userdefined Chapter number
-     * @deprecated Use ElementFactory.getChapter(attributes)
-     */
-    public Chapter(java.util.Properties attributes, int number) {
-    	this("", number);
-    	Chapter chapter = com.lowagie.text.factories.ElementFactory.getChapter(attributes);
-    	setNumberDepth(chapter.getNumberDepth());
-    	setIndentation(chapter.getIndentation());
-    	setIndentationLeft(chapter.getIndentationLeft());
-    	setIndentationRight(chapter.getIndentationRight());
+/**
+ * Checks if a given tag corresponds with this object.
+ *
+ * @param   tag     the given tag
+ * @return  true if the tag corresponds
+ */
+    
+    public static boolean isTag(String tag) {
+        return ElementTags.CHAPTER.equals(tag);
     }
 }

@@ -1,6 +1,6 @@
 /*
- * $Id: RtfFont.java 2784 2007-05-24 15:43:40Z hallm $
- * $Name$
+ * $Id: RtfFont.java,v 1.25 2006/09/29 16:47:18 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -53,7 +53,6 @@ package com.lowagie.text.rtf.style;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.Font;
 import com.lowagie.text.rtf.RtfExtendedElement;
@@ -65,13 +64,12 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * BaseFont fontname handling contributed by Craig Fleming. Various fixes
  * Renaud Michel, Werner Daehn.
  *
- * Version: $Id: RtfFont.java 2784 2007-05-24 15:43:40Z hallm $
+ * Version: $Id: RtfFont.java,v 1.25 2006/09/29 16:47:18 hallm Exp $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  * @author Craig Fleming (rythos@rhana.dhs.org)
  * @author Renaud Michel (r.michel@immedia.be)
  * @author Werner Daehn (Werner.Daehn@BusinessObjects.com)
  * @author Lidong Liu (tmslld@gmail.com)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfFont extends Font implements RtfExtendedElement {
     /**
@@ -304,9 +302,9 @@ public class RtfFont extends Font implements RtfExtendedElement {
                 }
             }
             
-            setSize(font.getSize());
-            setStyle(font.getStyle());
-            setColor(font.getColor());
+            setSize(font.size());
+            setStyle(font.style());
+            setColor(font.color());
         }
 
         if(this.fontName.equalsIgnoreCase("unknown")) {
@@ -322,29 +320,19 @@ public class RtfFont extends Font implements RtfExtendedElement {
      * Writes the font definition
      *
      * @return A byte array with the font definition
-     * @deprecated replaced by {@link #writeDefinition(OutputStream)}
      */
     public byte[] writeDefinition() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeDefinition(result);
+            result.write(FONT_FAMILY);
+            result.write(FONT_CHARSET);
+            result.write(intToByteArray(charset));
+            result.write(DELIMITER);
+            result.write(document.filterSpecialChar(fontName, true, false).getBytes());
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
-    }
-    
-    /**
-     * Writes the font definition
-     */
-    public void writeDefinition(final OutputStream result) throws IOException
-    {
-        result.write(FONT_FAMILY);
-        result.write(FONT_CHARSET);
-        result.write(intToByteArray(charset));
-        result.write(DELIMITER);
-        //.result.write(document.filterSpecialChar(fontName, true, false).getBytes());
-        document.filterSpecialChar(result, fontName, true, false);
     }
     
     /**
@@ -464,16 +452,9 @@ public class RtfFont extends Font implements RtfExtendedElement {
     /**
      * Unused
      * @return an empty byte array
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
     public byte[] write() {
         return new byte[0];
-    }
-    /**
-     * unused
-     */
-    public void writeContent(OutputStream out) throws IOException
-    {    	
     }
     
     /**
@@ -583,7 +564,7 @@ public class RtfFont extends Font implements RtfExtendedElement {
      */
     public void setSize(float size){
         super.setSize(size);
-        this.fontSize = (int) getSize();
+        this.fontSize = (int) size();
     }
 
     /**
@@ -600,7 +581,7 @@ public class RtfFont extends Font implements RtfExtendedElement {
      */
     public void setStyle(int style){
         super.setStyle(style);
-        this.fontStyle = getStyle();
+        this.fontStyle = style();
     }
     
     /**
@@ -608,7 +589,7 @@ public class RtfFont extends Font implements RtfExtendedElement {
      */
     public void setStyle(String style) {
         super.setStyle(style);
-        fontStyle = getStyle();
+        fontStyle = style();
     }
 
     /**
@@ -711,30 +692,25 @@ public class RtfFont extends Font implements RtfExtendedElement {
             dFamilyname = this.fontName;
         }
 
-        float dSize = font.getSize();
+        float dSize = font.size();
         if(dSize == Font.UNDEFINED) {
-            dSize = this.getSize();
+            dSize = this.size();
         }
 
         int dStyle = Font.UNDEFINED;
-        if(this.getStyle() != Font.UNDEFINED && font.getStyle() != Font.UNDEFINED) {
-            dStyle = this.getStyle() | font.getStyle();
-        } else if(this.getStyle() != Font.UNDEFINED) {
-            dStyle = this.getStyle();
-        } else if(font.getStyle() != Font.UNDEFINED) {
-            dStyle = font.getStyle();
+        if(this.style() != Font.UNDEFINED && font.style() != Font.UNDEFINED) {
+            dStyle = this.style() | font.style();
+        } else if(this.style() != Font.UNDEFINED) {
+            dStyle = this.style();
+        } else if(font.style() != Font.UNDEFINED) {
+            dStyle = font.style();
         }
 
-        Color dColor = font.getColor();
+        Color dColor = font.color();
         if(dColor == null) {
-            dColor = this.getColor();
+            dColor = this.color();
         }
-        
-        int dCharset = this.charset;
-        if(font instanceof RtfFont) {
-            dCharset = ((RtfFont) font).getCharset();
-        }
-        
-        return new RtfFont(dFamilyname, dSize, dStyle, dColor, dCharset);
+
+        return new RtfFont(dFamilyname, dSize, dStyle, dColor);
     }
 }

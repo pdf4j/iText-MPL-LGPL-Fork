@@ -1,6 +1,6 @@
 /**
- * $Id: RtfParser.java 2377 2006-09-15 07:51:05Z xlv $
- * $Name$
+ * $Id: RtfParser.java,v 1.6 2006/09/15 07:51:05 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2006 by Mark Hall
  *
@@ -62,7 +62,7 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * font and color definitions corrected and then added to
  * the document being written.
  * 
- * @version $Revision: 2377 $
+ * @version $Revision: 1.6 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  */
 public class RtfParser {

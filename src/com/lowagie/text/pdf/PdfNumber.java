@@ -1,6 +1,6 @@
 /*
- * $Id: PdfNumber.java 2739 2007-05-04 11:24:51Z blowagie $
- * $Name$
+ * $Id: PdfNumber.java,v 1.57 2006/09/15 23:37:35 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -55,8 +55,8 @@ package com.lowagie.text.pdf;
  * <P>
  * Integers may be specified by signed or unsigned constants. Reals may only be
  * in decimal format.<BR>
- * This object is described in the 'Portable Document Format Reference Manual version 1.7'
- * section 3.3.2 (page 52-53).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.3'
+ * section 4.3 (page 37).
  *
  * @see		PdfObject
  * @see		BadPdfFormatException

@@ -1,6 +1,6 @@
 /**
- * $Id: RtfCell.java 2759 2007-05-16 10:52:31Z psoares33 $
- * $Name$
+ * $Id: RtfCell.java,v 1.40 2006/09/14 23:10:54 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Mark Hall
  *
@@ -199,30 +199,31 @@ public class RtfCell {
             cellRight = cellLeft + cellWidth;
             return cellRight;
         }
-        if (cell.getWidth() != 0) {
-            this.cellWidth = (int) (cell.getWidth() * RtfWriter.TWIPSFACTOR);
+        if (cell.cellWidth() != null && !cell.cellWidth().equals("")) {
+
+            this.cellWidth = (int) (Integer.parseInt(cell.cellWidth()) * RtfWriter.TWIPSFACTOR);
         }
         cellRight = cellLeft + this.cellWidth;
         store = cell;
         emptyCell = false;
-        if (cell.getColspan() > 1) {
-            if (cell.getRowspan() > 1) {
+        if (cell.colspan() > 1) {
+            if (cell.rowspan() > 1) {
                 mergeType = MERGE_BOTH_FIRST;
-                for (int i = y; i < y + cell.getRowspan(); i++) {
+                for (int i = y; i < y + cell.rowspan(); i++) {
                     if (i > y) mainTable.setMerge(x, i, MERGE_VERT_PREV, this);
-                    for (int j = x + 1; j < x + cell.getColspan(); j++) {
+                    for (int j = x + 1; j < x + cell.colspan(); j++) {
                         mainTable.setMerge(j, i, MERGE_BOTH_PREV, this);
                     }
                 }
             } else {
                 mergeType = MERGE_HORIZ_FIRST;
-                for (int i = x + 1; i < x + cell.getColspan(); i++) {
+                for (int i = x + 1; i < x + cell.colspan(); i++) {
                     mainTable.setMerge(i, y, MERGE_HORIZ_PREV, this);
                 }
             }
-        } else if (cell.getRowspan() > 1) {
+        } else if (cell.rowspan() > 1) {
             mergeType = MERGE_VERT_FIRST;
-            for (int i = y + 1; i < y + cell.getRowspan(); i++) {
+            for (int i = y + 1; i < y + cell.rowspan(); i++) {
                 mainTable.setMerge(x, i, MERGE_VERT_PREV, this);
             }
         }
@@ -253,7 +254,7 @@ public class RtfCell {
                 rStyle = RtfTableCell.getStyleControlWord(c.rightBorderStyle());
                 bStyle = RtfTableCell.getStyleControlWord(c.bottomBorderStyle());
             } else {
-                lWidth = tWidth = rWidth = bWidth = store.getBorderWidth();
+                lWidth = tWidth = rWidth = bWidth = store.borderWidth();
                 lStyle = tStyle = rStyle = bStyle = RtfRow.tableBorder;
             }
 
@@ -282,7 +283,7 @@ public class RtfCell {
                     os.write(cellMergeFirst);
                     break;
             }
-            switch (store.getVerticalAlignment()) {
+            switch (store.verticalAlignment()) {
                 case Element.ALIGN_BOTTOM:
                     os.write(RtfWriter.escape);
                     os.write(cellVerticalAlignBottom);
@@ -298,7 +299,7 @@ public class RtfCell {
                     break;
             }
 
-            if (((store.getBorder() & Rectangle.LEFT) == Rectangle.LEFT) &&
+            if (((store.border() & Rectangle.LEFT) == Rectangle.LEFT) &&
                     (lWidth > 0)) {
                 os.write(RtfWriter.escape);
                 os.write(cellBorderLeft);
@@ -309,14 +310,14 @@ public class RtfCell {
                 writeInt(os, (int) (lWidth * RtfWriter.TWIPSFACTOR));
                 os.write(RtfWriter.escape);
                 os.write(RtfRow.tableBorderColor);
-                if (store.getBorderColor() == null)
+                if (store.borderColor() == null)
                     writeInt(os, writer.addColor(new
                             Color(0, 0, 0)));
                 else
-                    writeInt(os, writer.addColor(store.getBorderColor()));
+                    writeInt(os, writer.addColor(store.borderColor()));
                 os.write((byte) '\n');
             }
-            if (((store.getBorder() & Rectangle.TOP) == Rectangle.TOP) && (tWidth > 0)) {
+            if (((store.border() & Rectangle.TOP) == Rectangle.TOP) && (tWidth > 0)) {
                 os.write(RtfWriter.escape);
                 os.write(cellBorderTop);
                 os.write(RtfWriter.escape);
@@ -326,14 +327,14 @@ public class RtfCell {
                 writeInt(os, (int) (tWidth * RtfWriter.TWIPSFACTOR));
                 os.write(RtfWriter.escape);
                 os.write(RtfRow.tableBorderColor);
-                if (store.getBorderColor() == null)
+                if (store.borderColor() == null)
                     writeInt(os, writer.addColor(new
                             Color(0, 0, 0)));
                 else
-                    writeInt(os, writer.addColor(store.getBorderColor()));
+                    writeInt(os, writer.addColor(store.borderColor()));
                 os.write((byte) '\n');
             }
-            if (((store.getBorder() & Rectangle.BOTTOM) == Rectangle.BOTTOM) &&
+            if (((store.border() & Rectangle.BOTTOM) == Rectangle.BOTTOM) &&
                     (bWidth > 0)) {
                 os.write(RtfWriter.escape);
                 os.write(cellBorderBottom);
@@ -344,14 +345,14 @@ public class RtfCell {
                 writeInt(os, (int) (bWidth * RtfWriter.TWIPSFACTOR));
                 os.write(RtfWriter.escape);
                 os.write(RtfRow.tableBorderColor);
-                if (store.getBorderColor() == null)
+                if (store.borderColor() == null)
                     writeInt(os, writer.addColor(new
                             Color(0, 0, 0)));
                 else
-                    writeInt(os, writer.addColor(store.getBorderColor()));
+                    writeInt(os, writer.addColor(store.borderColor()));
                 os.write((byte) '\n');
             }
-            if (((store.getBorder() & Rectangle.RIGHT) == Rectangle.RIGHT) &&
+            if (((store.border() & Rectangle.RIGHT) == Rectangle.RIGHT) &&
                     (rWidth > 0)) {
                 os.write(RtfWriter.escape);
                 os.write(cellBorderRight);
@@ -362,19 +363,19 @@ public class RtfCell {
                 writeInt(os, (int) (rWidth * RtfWriter.TWIPSFACTOR));
                 os.write(RtfWriter.escape);
                 os.write(RtfRow.tableBorderColor);
-                if (store.getBorderColor() == null)
+                if (store.borderColor() == null)
                     writeInt(os, writer.addColor(new
                             Color(0, 0, 0)));
                 else
-                    writeInt(os, writer.addColor(store.getBorderColor()));
+                    writeInt(os, writer.addColor(store.borderColor()));
                 os.write((byte) '\n');
             }
             os.write(RtfWriter.escape);
             os.write(cellBackgroundColor);
-            if (store.getBackgroundColor() == null) {
+            if (store.backgroundColor() == null) {
                 writeInt(os, writer.addColor(new Color(255, 255, 255)));
             } else {
-                writeInt(os, writer.addColor(store.getBackgroundColor()));
+                writeInt(os, writer.addColor(store.backgroundColor()));
             }
             os.write((byte) '\n');
             os.write(RtfWriter.escape);
@@ -442,20 +443,21 @@ public class RtfCell {
                             container.add(element);
                         } else {
                             container = new Paragraph();
-                            container.setAlignment(store.getHorizontalAlignment());
+                            container.setAlignment(store.horizontalAlignment());
                             container.add(element);
                         }
                     } else {
                         if(container != null) {
                             writer.addElement(container, os);
-                            container = null;
+                            container =null;
+                            container =null;
                         }
                         
                         
                         // if horizontal alignment is undefined overwrite
                         // with that of enclosing cell
-                        if (element instanceof Paragraph && ((Paragraph) element).getAlignment() == Element.ALIGN_UNDEFINED) {
-                            ((Paragraph) element).setAlignment(store.getHorizontalAlignment());
+                        if (element instanceof Paragraph && ((Paragraph) element).alignment() == Element.ALIGN_UNDEFINED) {
+                            ((Paragraph) element).setAlignment(store.horizontalAlignment());
                         }
                         writer.addElement(element, os);
                         if (element.type() == Element.PARAGRAPH && cellIterator.hasNext()) {

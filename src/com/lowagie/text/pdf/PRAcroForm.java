@@ -1,6 +1,6 @@
 /*
- * $Id: PRAcroForm.java 2441 2006-10-27 17:24:01Z xlv $
- * $Name$
+ * $Id: PRAcroForm.java,v 1.38 2006/10/27 17:23:17 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *

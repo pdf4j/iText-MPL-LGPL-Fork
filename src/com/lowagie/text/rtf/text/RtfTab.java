@@ -1,6 +1,6 @@
 /*
- * $Id: RtfTab.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfTab.java,v 1.1 2006/06/17 09:51:30 hallm Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -54,7 +54,6 @@ package com.lowagie.text.rtf.text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.rtf.RtfAddableElement;
 
@@ -69,9 +68,8 @@ import com.lowagie.text.rtf.RtfAddableElement;
  * para.add(tab);<br />
  * para.add("This paragraph has a\ttab defined.");</code>
  * 
- * @version $Id: RtfTab.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Revision: 1.1 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfTab extends RtfAddableElement {
 
@@ -123,30 +121,20 @@ public class RtfTab extends RtfAddableElement {
 	
 	/**
 	 * Writes the tab settings.
-	 * @deprecated replaced by {@link #writeContent(OutputStream)}
 	 */
 	public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+        	switch(this.type) {
+    		case TAB_CENTER_ALIGN: result.write("\\tqc".getBytes()); break;
+    		case TAB_RIGHT_ALIGN: result.write("\\tqr".getBytes()); break;
+    		case TAB_DECIMAL_ALIGN: result.write("\\tqdec".getBytes()); break;
+        	}
+        	result.write("\\tx".getBytes());
+        	result.write(intToByteArray(this.position));
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
 	}
-	
-	/**
-	 * Writes the tab settings.
-	 */
-    public void writeContent(final OutputStream result) throws IOException
-    {
-    	switch(this.type) {
-    		case TAB_CENTER_ALIGN: result.write("\\tqc".getBytes()); break;
-    		case TAB_RIGHT_ALIGN: result.write("\\tqr".getBytes()); break;
-    		case TAB_DECIMAL_ALIGN: result.write("\\tqdec".getBytes()); break;
-        }
-        result.write("\\tx".getBytes());
-        result.write(intToByteArray(this.position));    	
-    }
-	
 }

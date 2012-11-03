@@ -1,6 +1,6 @@
 /*
- * $Id: RandomAccessFileOrArray.java 2423 2006-10-02 21:09:37Z xlv $
- * $Name$
+ * $Id: RandomAccessFileOrArray.java,v 1.54 2006/10/02 21:09:37 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 Paulo Soares
  *

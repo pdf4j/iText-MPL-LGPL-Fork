@@ -1,6 +1,6 @@
 /*
- * $Id: PdfCopy.java 2760 2007-05-16 11:33:16Z psoares33 $
- * $Name$
+ * $Id: PdfCopy.java,v 1.46 2006/10/27 17:23:18 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -53,6 +53,7 @@ package com.lowagie.text.pdf;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,6 +89,8 @@ public class PdfCopy extends PdfWriter {
     protected int currentObjectNum = 1;
     protected PdfReader reader;
     protected PdfIndirectReference acroForm;
+    protected PdfIndirectReference topPageParent;
+    protected ArrayList pageNumbersToRefs = new ArrayList();
     protected List newBookmarks;
     
     /**
@@ -117,7 +120,7 @@ public class PdfCopy extends PdfWriter {
             return this.gen == other.gen && this.num == other.num;
         }
         public String toString() {
-            return Integer.toString(num) + ' ' + gen;
+            return "" + num + " " + gen;
         }
     }
     
@@ -132,9 +135,10 @@ public class PdfCopy extends PdfWriter {
         pdf.addWriter(this);
         indirectMap = new HashMap();
     }
-    
     public void open() {
         super.open();
+        topPageParent = getPdfIndirectReference();
+        root.setLinearMode(topPageParent);
     }
 
     /**
@@ -179,23 +183,18 @@ public class PdfCopy extends PdfWriter {
         if (iRef != null) {
             theRef = iRef.getRef();
             if (iRef.getCopied()) {
+                //	        System.out.println(">>> Value is " + theRef.toString());
                 return theRef;
             }
+            //	    System.out.println(">>> Fill in " + theRef.toString());
         }
         else {
             theRef = body.getPdfIndirectReference();
             iRef = new IndirectReferences(theRef);
             indirects.put(key, iRef);
         }
-        PdfObject obj = PdfReader.getPdfObjectRelease(in);
-        if (obj != null && obj.isDictionary()) {
-            PdfName type = (PdfName)PdfReader.getPdfObjectRelease(((PdfDictionary)obj).get(PdfName.TYPE));
-            if (type != null && PdfName.PAGE.equals(type)) {
-                return theRef;
-            }
-        }
         iRef.setCopied();
-        obj = copyObject(obj);
+        PdfObject obj = copyObject(PdfReader.getPdfObjectRelease(in));
         addToBody(obj, theRef);
         return theRef;
     }
@@ -207,14 +206,16 @@ public class PdfCopy extends PdfWriter {
     protected PdfDictionary copyDictionary(PdfDictionary in)
     throws IOException, BadPdfFormatException {
         PdfDictionary out = new PdfDictionary();
-        PdfName type = (PdfName)PdfReader.getPdfObjectRelease(in.get(PdfName.TYPE));
+        PdfName type = (PdfName)in.get(PdfName.TYPE);
         
         for (Iterator it = in.getKeys().iterator(); it.hasNext();) {
             PdfName key = (PdfName)it.next();
             PdfObject value = in.get(key);
             //	    System.out.println("Copy " + key);
             if (type != null && PdfName.PAGE.equals(type)) {
-                if (!key.equals(PdfName.B) && !key.equals(PdfName.PARENT))
+                if (key.equals(PdfName.PARENT))
+                    out.put(PdfName.PARENT, topPageParent);
+                else if (!key.equals(PdfName.B))
                     out.put(key, copyObject(value));
             }
             else
@@ -310,7 +311,9 @@ public class PdfCopy extends PdfWriter {
             indirects = new HashMap();
             indirectMap.put(reader,indirects);
             PdfDictionary catalog = reader.getCatalog();
-            PRIndirectReference ref = null;
+            PRIndirectReference ref = (PRIndirectReference)catalog.get(PdfName.PAGES);
+            indirects.put(new RefKey(ref), new IndirectReferences(topPageParent));
+            ref = null;
             PdfObject o = catalog.get(PdfName.ACROFORM);
             if (o == null || o.type() != PdfObject.INDIRECT)
                 return;
@@ -333,21 +336,33 @@ public class PdfCopy extends PdfWriter {
         RefKey key = new RefKey(origRef);
         PdfIndirectReference pageRef;
         IndirectReferences iRef = (IndirectReferences)indirects.get(key);
-        if (iRef != null && !iRef.getCopied()) {
-            pageReferences.add(iRef.getRef());
-            iRef.setCopied();
+        // if we already have an iref for the page (we got here by another link)
+        if (iRef != null) {
+            pageRef = iRef.getRef();
         }
-        pageRef = getCurrentPage();
-        if (iRef == null) {
+        else {
+            pageRef = body.getPdfIndirectReference();
             iRef = new IndirectReferences(pageRef);
             indirects.put(key, iRef);
         }
-        iRef.setCopied();
-        PdfDictionary newPage = copyDictionary(thePage);
-        root.addPage(newPage);
+        pageReferences.add(pageRef);
         ++currentPageNumber;
+        if (! iRef.getCopied()) {
+            iRef.setCopied();
+            PdfDictionary newPage = copyDictionary(thePage);
+            newPage.put(PdfName.PARENT, topPageParent);
+            addToBody(newPage, pageRef);
+        }
+        root.addPage(pageRef);
+        pageNumbersToRefs.add(pageRef);
     }
     
+    public PdfIndirectReference getPageReference(int page) {
+        if (page < 0 || page > pageNumbersToRefs.size())
+            throw new IllegalArgumentException("Invalid page number " + page);
+        return (PdfIndirectReference)pageNumbersToRefs.get(page - 1);
+    }
+
     /**
      * Copy the acroform for an input document. Note that you can only have one,
      * we make no effort to merge them.
@@ -387,7 +402,7 @@ public class PdfCopy extends PdfWriter {
      */
     protected PdfDictionary getCatalog(PdfIndirectReference rootObj) {
         try {
-            PdfDictionary theCat = pdf.getCatalog(rootObj);
+            PdfDictionary theCat = ((PdfDocument)document).getCatalog(rootObj);
             if (acroForm != null) theCat.put(PdfName.ACROFORM, acroForm);
             if (newBookmarks == null || newBookmarks.isEmpty())
                 return theCat;

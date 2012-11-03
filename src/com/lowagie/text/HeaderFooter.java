@@ -1,6 +1,6 @@
 /*
- * $Id: HeaderFooter.java 2688 2007-04-17 13:46:52Z blowagie $
- * $Name$
+ * $Id: HeaderFooter.java,v 1.69 2006/09/14 23:10:40 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -64,7 +64,7 @@ package com.lowagie.text;
  * </PRE></BLOCKQUOTE>
  */
 
-public class HeaderFooter extends Rectangle {
+public class HeaderFooter extends Rectangle implements MarkupAttributes {
     
     // membervariables
     
@@ -179,10 +179,10 @@ public class HeaderFooter extends Rectangle {
  */
     
     public Paragraph paragraph() {
-        Paragraph paragraph = new Paragraph(before.getLeading());
+        Paragraph paragraph = new Paragraph(before.leading());
         paragraph.add(before);
         if (numbered) {
-            paragraph.addSpecial(new Chunk(String.valueOf(pageN), before.getFont()));
+            paragraph.addSpecial(new Chunk(String.valueOf(pageN), before.font()));
         }
         if (after != null) {
             paragraph.addSpecial(after);

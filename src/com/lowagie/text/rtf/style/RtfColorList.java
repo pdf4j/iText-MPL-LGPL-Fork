@@ -1,6 +1,6 @@
 /*
- * $Id: RtfColorList.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfColorList.java,v 1.16 2005/05/04 14:33:52 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.style;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import com.lowagie.text.rtf.RtfElement;
@@ -64,9 +63,8 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * The RtfColorList stores all colours that appear in the document. Black
  * and White are always added
  * 
- * @version $Id: RtfColorList.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfColorList extends RtfElement implements RtfExtendedElement {
 
@@ -114,53 +112,26 @@ public class RtfColorList extends RtfElement implements RtfExtendedElement {
     }
     
     /**
-     * unused
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
-     */
-    public byte[] write()
-    {
-    	return(new byte[0]);
-    }
-    /**
-     * unused
-     */
-    public void writeContent(final OutputStream out) throws IOException
-    {    	
-    }
-    
-    /**
      * Write the definition part of the colour list. Calls the writeDefinition
      * methods of the RtfColors in the colour list. 
      * 
      * @return A byte array with the definition colour list
-     * @deprecated replaced by {@link #writeDefinition(OutputStream)}
      */
     public byte[] writeDefinition() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeDefinition(result);
+            result.write(OPEN_GROUP);
+            result.write(COLOR_TABLE);
+            for(int i = 0; i < colorList.size(); i++) {
+                RtfColor color = (RtfColor) colorList.get(i);
+                result.write(color.writeDefinition());
+            }
+            result.write(CLOSE_GROUP);
+            result.write((byte)'\n');
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-
-    /**
-     * Write the definition part of the colour list. Calls the writeDefinition
-     * methods of the RtfColors in the colour list. 
-     */
-    public void writeDefinition(final OutputStream result) throws IOException
-    {
-        result.write(OPEN_GROUP);
-        result.write(COLOR_TABLE);
-        for(int i = 0; i < colorList.size(); i++) {
-            RtfColor color = (RtfColor) colorList.get(i);
-            //.result.write(color.writeDefinition());
-            color.writeDefinition(result);
-        }
-        result.write(CLOSE_GROUP);
-        result.write((byte)'\n');    	
-    }
-    
 
 }

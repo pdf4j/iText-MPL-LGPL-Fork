@@ -1,6 +1,6 @@
 /*
- * $Id: RtfTable.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfTable.java,v 1.14 2006/09/14 23:10:56 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.table;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -68,11 +67,10 @@ import com.lowagie.text.rtf.text.RtfParagraph;
  * The RtfTable wraps a Table.
  * INTERNAL USE ONLY
  * 
- * @version $Id: RtfTable.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  * @author Steffen Stundzig
  * @author Benoit Wiart
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfTable extends RtfElement {
 
@@ -137,12 +135,12 @@ public class RtfTable extends RtfElement {
      */
     private void importTable(Table table) {
         this.rows = new ArrayList();
-        this.tableWidthPercent = table.getWidth();
+        this.tableWidthPercent = table.widthPercentage();
         this.proportionalWidths = table.getProportionalWidths();
-        this.cellPadding = (float) (table.getPadding() * TWIPS_FACTOR);
-        this.cellSpacing = (float) (table.getSpacing() * TWIPS_FACTOR);
-        this.borders = new RtfBorderGroup(this.document, RtfBorder.ROW_BORDER, table.getBorder(), table.getBorderWidth(), table.getBorderColor());
-        this.alignment = table.getAlignment();
+        this.cellPadding = (float) (table.cellpadding() * TWIPS_FACTOR);
+        this.cellSpacing = (float) (table.cellspacing() * TWIPS_FACTOR);
+        this.borders = new RtfBorderGroup(this.document, RtfBorder.ROW_BORDER, table.border(), table.borderWidth(), table.borderColor());
+        this.alignment = table.alignment();
         
         int i = 0;
         Iterator rowIterator = table.iterator();
@@ -154,44 +152,33 @@ public class RtfTable extends RtfElement {
             ((RtfRow) this.rows.get(i)).handleCellSpanning();
             ((RtfRow) this.rows.get(i)).cleanRow();
         }
-        this.headerRows = table.getLastHeaderRow();
-        this.cellsFitToPage = table.isCellsFitPage();
-        this.tableFitToPage = table.isTableFitsPage();
+        this.headerRows = table.lastHeaderRow();
+        this.cellsFitToPage = table.hasToFitPageCells();
+        this.tableFitToPage = table.hasToFitPageTable();
     }
     
     /**
      * Writes the content of this RtfTable
      * 
      * @return A byte array with the content of this RtfTable
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() 
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            if(!inHeader) {
+                result.write(RtfParagraph.PARAGRAPH);
+            }
+            
+            for(int i = 0; i < this.rows.size(); i++) {
+                result.write(((RtfElement) this.rows.get(i)).write());
+            }
+            
+            result.write(RtfParagraph.PARAGRAPH_DEFAULTS);
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    /**
-     * Writes the content of this RtfTable
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        if(!inHeader) {
-            result.write(RtfParagraph.PARAGRAPH);
-        }
-        
-        for(int i = 0; i < this.rows.size(); i++) {
-        	RtfElement re = (RtfElement)this.rows.get(i);
-            //.result.write(re.write());
-        	re.writeContent(result);
-        }
-        
-        result.write(RtfParagraph.PARAGRAPH_DEFAULTS);
-    }        
     
     /**
      * Gets the alignment of this RtfTable

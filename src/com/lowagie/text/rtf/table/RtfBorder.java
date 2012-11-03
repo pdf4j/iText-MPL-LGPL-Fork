@@ -1,6 +1,6 @@
 /*
- * $Id: RtfBorder.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfBorder.java,v 1.17 2006/08/07 10:42:35 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -53,7 +53,6 @@ package com.lowagie.text.rtf.table;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.rtf.RtfElement;
 import com.lowagie.text.rtf.document.RtfDocument;
@@ -64,9 +63,8 @@ import com.lowagie.text.rtf.style.RtfColor;
  * The RtfBorder handle one row or cell border.
  * INTERNAL USE ONLY
  * 
- * @version $Id: RtfBorder.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfBorder extends RtfElement {
 
@@ -428,83 +426,74 @@ public class RtfBorder extends RtfElement {
      * Writes the RtfBorder settings
      * 
      * @return A byte array with the RtfBorder settings
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() 
-    {
+    public byte[] write() {
+        if(this.borderStyle == BORDER_NONE || this.borderPosition == NO_BORDER || this.borderWidth == 0) {
+            return new byte[0];
+        }
+        
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            if(this.borderType == ROW_BORDER) {
+                switch(this.borderPosition) {
+                    case LEFT_BORDER:
+                        result.write(ROW_BORDER_LEFT);
+                    	break;
+                    case TOP_BORDER:
+                        result.write(ROW_BORDER_TOP);
+                        break;
+                    case RIGHT_BORDER:
+                        result.write(ROW_BORDER_RIGHT);
+                        break;
+                    case BOTTOM_BORDER:
+                        result.write(ROW_BORDER_BOTTOM);
+                        break;
+                    case HORIZONTAL_BORDER:
+                        result.write(ROW_BORDER_HORIZONTAL);
+                        break;
+                    case VERTICAL_BORDER:
+                        result.write(ROW_BORDER_VERTICAL);
+                        break;
+                    default:
+                        return new byte[0];
+                }
+                result.write(writeBorderStyle());
+                result.write(BORDER_WIDTH);
+                result.write(intToByteArray(this.borderWidth));
+                result.write(BORDER_COLOR_NUMBER);
+                result.write(intToByteArray(this.borderColor.getColorNumber()));
+                result.write('\n');
+            } else if(this.borderType == CELL_BORDER) {
+                switch(this.borderPosition) {
+                    case LEFT_BORDER:
+                        result.write(CELL_BORDER_LEFT);
+                    	break;
+                    case TOP_BORDER:
+                        result.write(CELL_BORDER_TOP);
+                        break;
+                    case RIGHT_BORDER:
+                        result.write(CELL_BORDER_RIGHT);
+                        break;
+                    case BOTTOM_BORDER:
+                        result.write(CELL_BORDER_BOTTOM);
+                        break;
+                    default:
+                        return new byte[0];
+                }
+                result.write(writeBorderStyle());
+                result.write(BORDER_WIDTH);
+                result.write(intToByteArray(this.borderWidth));
+                result.write(BORDER_COLOR_NUMBER);
+                result.write(intToByteArray(this.borderColor.getColorNumber()));
+                result.write('\n');
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         
         return result.toByteArray();
     }
-    /**
-     * Writes the RtfBorder settings
-     */
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        if(this.borderStyle == BORDER_NONE || this.borderPosition == NO_BORDER || this.borderWidth == 0) {
-            return;
-        }
-
-    	if(this.borderType == ROW_BORDER) {
-            switch(this.borderPosition) {
-                case LEFT_BORDER:
-                    result.write(ROW_BORDER_LEFT);
-                	break;
-                case TOP_BORDER:
-                    result.write(ROW_BORDER_TOP);
-                    break;
-                case RIGHT_BORDER:
-                    result.write(ROW_BORDER_RIGHT);
-                    break;
-                case BOTTOM_BORDER:
-                    result.write(ROW_BORDER_BOTTOM);
-                    break;
-                case HORIZONTAL_BORDER:
-                    result.write(ROW_BORDER_HORIZONTAL);
-                    break;
-                case VERTICAL_BORDER:
-                    result.write(ROW_BORDER_VERTICAL);
-                    break;
-                default:
-                    return;
-            }
-            result.write(writeBorderStyle());
-            result.write(BORDER_WIDTH);
-            result.write(intToByteArray(this.borderWidth));
-            result.write(BORDER_COLOR_NUMBER);
-            result.write(intToByteArray(this.borderColor.getColorNumber()));
-            result.write('\n');
-        } else if(this.borderType == CELL_BORDER) {
-            switch(this.borderPosition) {
-                case LEFT_BORDER:
-                    result.write(CELL_BORDER_LEFT);
-                	break;
-                case TOP_BORDER:
-                    result.write(CELL_BORDER_TOP);
-                    break;
-                case RIGHT_BORDER:
-                    result.write(CELL_BORDER_RIGHT);
-                    break;
-                case BOTTOM_BORDER:
-                    result.write(CELL_BORDER_BOTTOM);
-                    break;
-                default:
-                    return;
-            }
-            result.write(writeBorderStyle());
-            result.write(BORDER_WIDTH);
-            result.write(intToByteArray(this.borderWidth));
-            result.write(BORDER_COLOR_NUMBER);
-            result.write(intToByteArray(this.borderColor.getColorNumber()));
-            result.write('\n');
-        }    	
-    }
-     
+    
     /**
      * Writes the style of this RtfBorder
      * 

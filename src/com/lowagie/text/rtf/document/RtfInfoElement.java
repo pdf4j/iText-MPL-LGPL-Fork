@@ -1,6 +1,6 @@
 /*
- * $Id: RtfInfoElement.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfInfoElement.java,v 1.16 2005/05/04 14:33:53 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2003, 2004 by Mark Hall
  *
@@ -24,7 +24,7 @@
  * where applicable.
  *
  * Alternatively, the contents of this file may be used under the terms of the
- * LGPL license (the "GNU LIBRARY GENERAL PUBLIC LICENSE"), in which case the
+ * LGPL license (the ?GNU LIBRARY GENERAL PUBLIC LICENSE?), in which case the
  * provisions of LGPL are applicable instead of those above.  If you wish to
  * allow use of your version of this file only under the terms of the LGPL
  * License and not to allow others to use your version of this file under
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,9 +64,8 @@ import com.lowagie.text.rtf.RtfElement;
  * Stores one information group element. Valid elements are
  * author, title, subject, keywords, producer and creationdate.
  * 
- * @version $Id: RtfInfoElement.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfInfoElement extends RtfElement {
 
@@ -114,63 +112,53 @@ public class RtfInfoElement extends RtfElement {
     public RtfInfoElement(RtfDocument doc, Meta meta) {
         super(doc);
         infoType = meta.type();
-        content = meta.getContent();
+        content = meta.content();
     }
     
     /**
      * Writes this RtfInfoElement
      * 
      * @return A byte array containing the RtfInfoElement data
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write()
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            result.write(OPEN_GROUP);
+            switch(infoType) {
+                case Meta.AUTHOR:
+                    result.write(INFO_AUTHOR);
+                	break;
+                case Meta.SUBJECT:
+                    result.write(INFO_SUBJECT);
+            		break;
+                case Meta.KEYWORDS:
+                    result.write(INFO_KEYWORDS);
+            		break;
+                case Meta.TITLE:
+                    result.write(INFO_TITLE);
+            		break;
+                case Meta.PRODUCER:
+                    result.write(INFO_PRODUCER);
+            		break;
+                case Meta.CREATIONDATE:
+                    result.write(INFO_CREATION_DATE);
+                	break;
+                default:
+                    result.write(INFO_AUTHOR);
+                	break;
+            }
+            result.write(DELIMITER);
+            if(infoType == Meta.CREATIONDATE) {
+                result.write(convertDate(content).getBytes());
+            } else {
+                result.write(content.getBytes());
+            }
+            result.write(CLOSE_GROUP);
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    
-    /**
-     * Writes the element content to the given output stream.
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        result.write(OPEN_GROUP);
-        switch(infoType) {
-            case Meta.AUTHOR:
-                result.write(INFO_AUTHOR);
-            	break;
-            case Meta.SUBJECT:
-                result.write(INFO_SUBJECT);
-        		break;
-            case Meta.KEYWORDS:
-                result.write(INFO_KEYWORDS);
-        		break;
-            case Meta.TITLE:
-                result.write(INFO_TITLE);
-        		break;
-            case Meta.PRODUCER:
-                result.write(INFO_PRODUCER);
-        		break;
-            case Meta.CREATIONDATE:
-                result.write(INFO_CREATION_DATE);
-            	break;
-            default:
-                result.write(INFO_AUTHOR);
-            	break;
-        }
-        result.write(DELIMITER);
-        if(infoType == Meta.CREATIONDATE) {
-            result.write(convertDate(content).getBytes());
-        } else {
-            result.write(content.getBytes());
-        }
-        result.write(CLOSE_GROUP);
-    }        
     
     /**
      * Converts a date from the format used by iText to the format required by

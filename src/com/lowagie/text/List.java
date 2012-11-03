@@ -1,6 +1,6 @@
 /*
- * $Id: List.java 2744 2007-05-09 22:51:47Z xlv $
- * $Name$
+ * $Id: List.java,v 1.79 2006/11/09 19:03:49 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -52,8 +52,8 @@ package com.lowagie.text;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import com.lowagie.text.factories.RomanAlphabetFactory;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * A <CODE>List</CODE> contains several <CODE>ListItem</CODE>s.
@@ -100,90 +100,63 @@ import com.lowagie.text.factories.RomanAlphabetFactory;
  * @see		ListItem
  */
 
-public class List implements TextElementArray {
+public class List implements TextElementArray, MarkupAttributes {
     
-    // constants
-	
+    // membervariables
 	/** a possible value for the numbered parameter */
 	public static final boolean ORDERED = true;
 	/** a possible value for the numbered parameter */
 	public static final boolean UNORDERED = false;
 	/** a possible value for the lettered parameter */
-	public static final boolean NUMERICAL = false;
+	public static final boolean NUMBERICAL = false;
 	/** a possible value for the lettered parameter */
 	public static final boolean ALPHABETICAL = true;
-	/** a possible value for the lettered parameter */
-	public static final boolean UPPERCASE = false;
-	/** a possible value for the lettered parameter */
-	public static final boolean LOWERCASE = true;
 	
-    // member variables
-	
-	/** This is the <CODE>ArrayList</CODE> containing the different <CODE>ListItem</CODE>s. */
+    
+/** This is the <CODE>ArrayList</CODE> containing the different <CODE>ListItem</CODE>s. */
     protected ArrayList list = new ArrayList();
     
-    /** Indicates if the list has to be numbered. */
-    protected boolean numbered = false;
-    /** Indicates if the listsymbols are numerical or alphabetical. */
-    protected boolean lettered = false;
-    /** Indicates if the listsymbols are lowercase or uppercase. */
-    protected boolean lowercase = false;
-    /** Indicates if the indentation has to be set automatically. */
-    protected boolean autoindent = false;
-    /** Indicates if the indentation of all the items has to be aligned. */
-    protected boolean alignindent = false;
+/** This variable indicates if the list has to be numbered. */
+    protected boolean numbered;
+    protected boolean lettered;
     
-    /** This variable indicates the first number of a numbered list. */
+/** This variable indicates the first number of a numbered list. */
     protected int first = 1;
-    /** This is the listsymbol of a list that is not numbered. */
-    protected Chunk symbol = new Chunk("- ");
+    protected char firstCh = 'A';
+    protected char lastCh  = 'Z';
     
-    /** The indentation of this list on the left side. */
+/** This is the listsymbol of a list that is not numbered. */
+    protected Chunk symbol = new Chunk("-");
+    
+/** The indentation of this list on the left side. */
     protected float indentationLeft = 0;
-    /** The indentation of this list on the right side. */
+    
+/** The indentation of this list on the right side. */
     protected float indentationRight = 0;
-    /** The indentation of the listitems. */
-    protected float symbolIndent = 0;
+    
+/** The indentation of the listitems. */
+    protected float symbolIndent;
+
+/** Contains extra markupAttributes */
+    protected Properties markupAttributes;
     
     // constructors
-
-    /** Constructs a <CODE>List</CODE>. */
-    public List() {
-        this(false, false);
-    }
     
-    /**
-     * Constructs a <CODE>List</CODE>.
-     * @param	numbered		a boolean
-     */
-    public List(boolean numbered) {
-      	this(numbered, false);
-    }
-        
-    /**
-     * Constructs a <CODE>List</CODE>.
-     * @param	numbered		a boolean
-     * @param lettered has the list to be 'numbered' with letters
-     */
-    public List(boolean numbered, boolean lettered) {
-    	this.numbered = numbered;
-        this.lettered = lettered;
-        this.autoindent = true;
-        this.alignindent = true;
-    }
+/**
+ * Constructs a <CODE>List</CODE>.
+ * <P>
+ * Remark: the parameter <VAR>symbolIndent</VAR> is important for instance when
+ * generating PDF-documents; it indicates the indentation of the listsymbol.
+ * It is not important for HTML-documents.
+ *
+ * @param	numbered		a boolean
+ * @param	symbolIndent	the indentation that has to be used for the listsymbol
+ */
     
-    /**
-     * Constructs a <CODE>List</CODE>.
-     * <P>
-     * Remark: the parameter <VAR>symbolIndent</VAR> is important for instance when
-     * generating PDF-documents; it indicates the indentation of the listsymbol.
-     * It is not important for HTML-documents.
-     *
-     * @param	numbered		a boolean
-     * @param	symbolIndent	the indentation that has to be used for the listsymbol
-     */
     public List(boolean numbered, float symbolIndent) {
-        this(numbered, false, symbolIndent);
+        this.numbered = numbered;
+        this.lettered = false;
+        this.symbolIndent = symbolIndent;
     }
     
     /**
@@ -192,21 +165,66 @@ public class List implements TextElementArray {
      * @param lettered has the list to be 'numbered' with letters
      * @param symbolIndent the indentation of the symbol
      */
-    public List(boolean numbered, boolean lettered, float symbolIndent) {
+    public List(boolean numbered, boolean lettered, float symbolIndent ) {
         this.numbered = numbered;
         this.lettered = lettered;
         this.symbolIndent = symbolIndent;
     }
     
+        /**
+         * Returns a <CODE>List</CODE> that has been constructed taking in account
+         * the value of some <VAR>attributes</VAR>.
+         *
+         * @param	attributes		Some attributes
+         */
+    
+    public List(Properties attributes) {
+        String value= (String)attributes.remove(ElementTags.LISTSYMBOL);
+        if (value == null) {
+            value = "-";
+        }
+        symbol = new Chunk(value, FontFactory.getFont(attributes));
+        
+        if ((value = (String)attributes.remove(ElementTags.NUMBERED)) != null) {
+            this.numbered = Boolean.valueOf(value).booleanValue();
+        }
+        if ((value = (String)attributes.remove(ElementTags.LETTERED)) != null) {
+            this.lettered = Boolean.valueOf(value).booleanValue();
+            if ( this.numbered && this.lettered )
+                this.numbered = false;
+        }
+        if ((value = (String)attributes.remove(ElementTags.SYMBOLINDENT)) != null) {
+            this.symbolIndent = Float.parseFloat(value);
+        }
+        
+        if ((value = (String)attributes.remove(ElementTags.FIRST)) != null) {
+            char khar = value.charAt(0);
+            if ( Character.isLetter( khar ) ) {
+                setFirst( khar );
+            }
+            else {
+                setFirst(Integer.parseInt(value));
+            }
+        }
+        if ((value = (String)attributes.remove(ElementTags.INDENTATIONLEFT)) != null) {
+            setIndentationLeft(Float.parseFloat(value + "f"));
+        }
+        if ((value = (String)attributes.remove(ElementTags.INDENTATIONRIGHT)) != null) {
+            setIndentationRight(Float.parseFloat(value + "f"));
+        }
+        if (attributes.size() > 0) setMarkupAttributes(attributes);
+    }
+    
     // implementation of the Element-methods
     
-    /**
-     * Processes the element by adding it (or the different parts) to an
-     * <CODE>ElementListener</CODE>.
-     *
-     * @param	listener	an <CODE>ElementListener</CODE>
-     * @return	<CODE>true</CODE> if the element was processed successfully
-     */
+/**
+ * Processes the element by adding it (or the different parts) to an
+ * <CODE>ElementListener</CODE>.
+ *
+ * @param	listener	an <CODE>ElementListener</CODE>
+ * @return	<CODE>true</CODE> if the element was processed successfully
+ */
+    
     public boolean process(ElementListener listener) {
         try {
             for (Iterator i = list.iterator(); i.hasNext(); ) {
@@ -219,20 +237,22 @@ public class List implements TextElementArray {
         }
     }
     
-    /**
-     * Gets the type of the text element.
-     *
-     * @return	a type
-     */
+/**
+ * Gets the type of the text element.
+ *
+ * @return	a type
+ */
+    
     public int type() {
         return Element.LIST;
     }
     
-    /**
-     * Gets all the chunks in this element.
-     *
-     * @return	an <CODE>ArrayList</CODE>
-     */
+/**
+ * Gets all the chunks in this element.
+ *
+ * @return	an <CODE>ArrayList</CODE>
+ */
+    
     public ArrayList getChunks() {
         ArrayList tmp = new ArrayList();
         for (Iterator i = list.iterator(); i.hasNext(); ) {
@@ -243,35 +263,35 @@ public class List implements TextElementArray {
     
     // methods to set the membervariables
     
-    /**
-     * Adds an <CODE>Object</CODE> to the <CODE>List</CODE>.
-     *
-     * @param	o		the object to add.
-     * @return true if adding the object succeeded
-     */
+/**
+ * Adds an <CODE>Object</CODE> to the <CODE>List</CODE>.
+ *
+ * @param	o		the object to add.
+ * @return true if adding the object succeeded
+ */
+    
     public boolean add(Object o) {
         if (o instanceof ListItem) {
             ListItem item = (ListItem) o;
             if (numbered || lettered) {
                 Chunk chunk;
-                int index = first + list.size();
                 if ( lettered )
-                    chunk = new Chunk(RomanAlphabetFactory.getString(index, lowercase), symbol.getFont());
+                    chunk = new Chunk(nextLetter(), symbol.font());
                 else
-                    chunk = new Chunk(String.valueOf(index), symbol.getFont());
-                chunk.append(". ");
+                    chunk = new Chunk(String.valueOf(first + list.size()), symbol.font());
+                chunk.append(".");
                 item.setListSymbol(chunk);
             }
             else {
                 item.setListSymbol(symbol);
             }
-            item.setIndentationLeft(symbolIndent, autoindent);
+            item.setIndentationLeft(symbolIndent);
             item.setIndentationRight(0);
             list.add(item);
         }
         else if (o instanceof List) {
             List nested = (List) o;
-            nested.setIndentationLeft(nested.getIndentationLeft() + symbolIndent);
+            nested.setIndentationLeft(nested.indentationLeft() + symbolIndent);
             first--;
             return list.add(nested);
         }
@@ -281,319 +301,254 @@ public class List implements TextElementArray {
         return false;
     }
     
-    // extra methods
-	
-	/** Makes sure all the items in the list have the same indentation. */
-    public void normalizeIndentation() {
-        float max = 0;
-    	Element o;
-        for (Iterator i = list.iterator(); i.hasNext(); ) {
-        	o = (Element)i.next();
-            if (o instanceof ListItem) {
-            	max = Math.max(max, ((ListItem)o).getIndentationLeft());
-            }
-        }
-        for (Iterator i = list.iterator(); i.hasNext(); ) {
-        	o = (Element)i.next();
-            if (o instanceof ListItem) {
-            	((ListItem)o).setIndentationLeft(max);
-            }
-        }
-    }
+/**
+ * Sets the indentation of this paragraph on the left side.
+ *
+ * @param	indentation		the new indentation
+ */
     
-    // setters
-
-	/**
-	 * @param numbered the numbered to set
-	 */
-	public void setNumbered(boolean numbered) {
-		this.numbered = numbered;
-	}
-
-	/**
-	 * @param lettered the lettered to set
-	 */
-	public void setLettered(boolean lettered) {
-		this.lettered = lettered;
-	}
-
-	/**
-	 * @param uppercase the uppercase to set
-	 */
-	public void setLowercase(boolean uppercase) {
-		this.lowercase = uppercase;
-	}
-
-	/**
-	 * @param autoindent the autoindent to set
-	 */
-	public void setAutoindent(boolean autoindent) {
-		this.autoindent = autoindent;
-	}
-	/**
-	 * @param alignindent the alignindent to set
-	 */
-	public void setAlignindent(boolean alignindent) {
-		this.alignindent = alignindent;
-	}
-    
-    /**
-     * Sets the number that has to come first in the list.
-     *
-     * @param	first		a number
-     */
-    public void setFirst(int first) {
-        this.first = first;
-    }
-    
-    /**
-     * Sets the listsymbol.
-     *
-     * @param	symbol		a <CODE>Chunk</CODE>
-     */
-    public void setListSymbol(Chunk symbol) {
-        this.symbol = symbol;
-    }
-    
-    /**
-     * Sets the listsymbol.
-     * <P>
-     * This is a shortcut for <CODE>setListSymbol(Chunk symbol)</CODE>.
-     *
-     * @param	symbol		a <CODE>String</CODE>
-     */
-    public void setListSymbol(String symbol) {
-        this.symbol = new Chunk(symbol);
-    }
-    
-    /**
-     * Sets the indentation of this paragraph on the left side.
-     *
-     * @param	indentation		the new indentation
-     */
     public void setIndentationLeft(float indentation) {
         this.indentationLeft = indentation;
     }
     
-    /**
-     * Sets the indentation of this paragraph on the right side.
-     *
-     * @param	indentation		the new indentation
-     */
+/**
+ * Sets the indentation of this paragraph on the right side.
+ *
+ * @param	indentation		the new indentation
+ */
+    
     public void setIndentationRight(float indentation) {
         this.indentationRight = indentation;
     }
-
-	/**
-	 * @param symbolIndent the symbolIndent to set
-	 */
-	public void setSymbolIndent(float symbolIndent) {
-		this.symbolIndent = symbolIndent;
-	}
+    
+/**
+ * Sets the number that has to come first in the list.
+ *
+ * @param	first		a number
+ */
+    
+    public void setFirst(int first) {
+        this.first = first;
+    }
+    
+    
+/**
+ * Sets the Letter that has to come first in the list.
+ *
+ * @param	first		a letter
+ */
+    
+    public void setFirst(char first) {
+        this.firstCh = first;
+        if ( Character.isLowerCase( this.firstCh )) {
+            this.lastCh = 'z';
+        }
+        else {
+            this.lastCh = 'Z';
+        }
+    }
+    
+/**
+ * Sets the listsymbol.
+ *
+ * @param	symbol		a <CODE>Chunk</CODE>
+ */
+    
+    public void setListSymbol(Chunk symbol) {
+        this.symbol = symbol;
+    }
+    
+/**
+ * Sets the listsymbol.
+ * <P>
+ * This is a shortcut for <CODE>setListSymbol(Chunk symbol)</CODE>.
+ *
+ * @param	symbol		a <CODE>String</CODE>
+ */
+    
+    public void setListSymbol(String symbol) {
+        this.symbol = new Chunk(symbol);
+    }
     
     // methods to retrieve information
     
-    /**
-     * Gets all the items in the list.
-     *
-     * @return	an <CODE>ArrayList</CODE> containing <CODE>ListItem</CODE>s.
-     */
+/**
+ * Gets all the items in the list.
+ *
+ * @return	an <CODE>ArrayList</CODE> containing <CODE>ListItem</CODE>s.
+ */
+    
     public ArrayList getItems() {
         return list;
     }
     
-    /**
-     * Gets the size of the list.
-     *
-     * @return	a <CODE>size</CODE>
-     */
+/**
+ * Gets the size of the list.
+ *
+ * @return	a <CODE>size</CODE>
+ */
+    
     public int size() {
         return list.size();
     }
-
-    /**
-     * Returns <CODE>true</CODE> if the list is empty.
-     * 
-     * @return <CODE>true</CODE> if the list is empty
-     */
-    public boolean isEmpty() {
-    	return list.isEmpty();
-    }
-
-    /**
-     * Gets the leading of the first listitem.
-     *
-     * @return	a <CODE>leading</CODE>
-     */
-    public float getTotalLeading() {
+    
+/**
+ * Gets the leading of the first listitem.
+ *
+ * @return	a <CODE>leading</CODE>
+ */
+    
+    public float leading() {
         if (list.size() < 1) {
             return -1;
         }
         ListItem item = (ListItem) list.get(0);
-        return item.getTotalLeading();
+        return item.leading();
     }
     
-    // getters
-    
-    /**
-     * Checks if the list is numbered.
-     * @return	<CODE>true</CODE> if the list is numbered, <CODE>false</CODE> otherwise.
-     */
+/**
+ * Checks if the list is numbered.
+ *
+ * @return	<CODE>true</CODE> if the list is numbered, <CODE>false</CODE> otherwise.
+ */
     
     public boolean isNumbered() {
         return numbered;
     }
-
-    /**
-     * Checks if the list is lettered.
-     * @return  <CODE>true</CODE> if the list is lettered, <CODE>false</CODE> otherwise.
-     */
-    public boolean isLettered() {
-        return lettered;
-    }
-
-    /**
-     * Checks if the list lettering is lowercase.
-     * @return  <CODE>true</CODE> if it is lowercase, <CODE>false</CODE> otherwise.
-     */
-    public boolean isLowercase() {
-        return lowercase;
+    
+/**
+ * Gets the symbol indentation.
+ * @return the symbol indentation
+ */
+    
+    public float symbolIndent() {
+        return symbolIndent;
     }
     
-    /**
-     * Checks if the indentation of list items is done automatically.
-	 * @return the autoindent
-	 */
-	public boolean isAutoindent() {
-		return autoindent;
-	}
-	
-	/**
-	 * Checks if all the listitems should be aligned.
-	 * @return the alignindent
-	 */
-	public boolean isAlignindent() {
-		return alignindent;
-	}
-
-	/**
-     * Gets the first number        .
-     * @return a number
-	 */
-	public int getFirst() {
-		return first;
-	}
-
-	/**
-     * Gets the Chunk containing the symbol.
-     * @return a Chunk with a symbol
-	 */
-	public Chunk getSymbol() {
-		return symbol;
-	}
-
-	/**
-     * Gets the indentation of this paragraph on the left side.
-     * @return	the indentation
-	 */
-	public float getIndentationLeft() {
-		return indentationLeft;
-	}
-
-	/**
-     * Gets the indentation of this paragraph on the right side.
-     * @return	the indentation
-	 */
-	public float getIndentationRight() {
-		return indentationRight;
-	}
-
-	/**
-     * Gets the symbol indentation.
-     * @return the symbol indentation
-	 */
-	public float getSymbolIndent() {
-		return symbolIndent;
-	}
+/**
+ * Gets the Chunk containing the symbol.
+ * @return a Chunk with a symbol
+ */
     
-    // deprecated constructor and methods
-	/**
-     * Returns a <CODE>List</CODE> that has been constructed taking in account
-     * the value of some <VAR>attributes</VAR>.
-     *
-     * @param	attributes		Some attributes
-     * @deprecated use ElementFactory.getList(attributes);
-     */
-
-	public List(java.util.Properties attributes) {
-		this();
-		List l = com.lowagie.text.factories.ElementFactory.getList(attributes);
-		this.list = l.list;
-		this.numbered = l.numbered;
-		this.lettered = l.lettered;
-		this.lowercase = l.lowercase;
-		this.autoindent = l.autoindent;
-		this.alignindent = l.alignindent;
-		this.first = l.first;
-		this.symbol = l.symbol;
-		this.indentationLeft = l.indentationLeft;
-		this.indentationRight = l.indentationRight;
-		this.symbolIndent = l.symbolIndent;
-	}
-	
-    /**
-     * Checks if the list lettering is lowercase.
-     * @return  <CODE>true</CODE> if it is lowercase, <CODE>false</CODE> otherwise.
-     * @deprecated use isLowercase();
-     */
-    public boolean isLowerCase() {
-        return isLowercase();
-    }
-    
-    /**
-     * Gets the first number        .
-     * @return a number
-     * @deprecated use getFirst();
-     */
-    public int first() {
-        return getFirst();
-    }
-    
-    /**
-     * Gets the Chunk containing the symbol.
-     * @return a Chunk with a symbol
-     * @deprecated use getSymbol();
-     */
     public Chunk symbol() {
-        return getSymbol();
+        return symbol;
     }
     
-    /**
-     * Gets the indentation of this paragraph on the left side.
-     * @return	the indentation
-     * @deprecated use getIndentationLeft();
-     */
+/**
+ * Gets the first number        .
+ * @return a number
+ */
+    
+    public int first() {
+        return first;
+    }
+    
+/**
+ * Gets the indentation of this paragraph on the left side.
+ *
+ * @return	the indentation
+ */
     
     public float indentationLeft() {
         return indentationLeft;
     }
     
-    /**
-     * Gets the indentation of this paragraph on the right side.
-     * @return	the indentation
-     * @deprecated use getIndentationRight();
-     */
+/**
+ * Gets the indentation of this paragraph on the right side.
+ *
+ * @return	the indentation
+ */
     
     public float indentationRight() {
-        return getIndentationRight();
+        return indentationRight;
+    }
+    
+/**
+ * Checks if a given tag corresponds with the listsymbol tag of this object.
+ *
+ * @param   tag     the given tag
+ * @return  true if the tag corresponds
+ */
+    
+    public static boolean isSymbol(String tag) {
+        return ElementTags.LISTSYMBOL.equals(tag);
+    }
+    
+/**
+ * Checks if a given tag corresponds with this object.
+ *
+ * @param   tag     the given tag
+ * @return  true if the tag corresponds
+ */
+    
+    public static boolean isTag(String tag) {
+        return ElementTags.LIST.equals(tag);
     }
 
-	/**
-     * Gets the symbol indentation.
-     * @return the symbol indentation
-     * @deprecated use getSymbolIndent();
+/**
+ * Retrieves the next letter in the sequence
+ *
+ * @return  String contains the next character (A-Z or a-z)
+ */
+    private String nextLetter() {
+        int num_in_list = listItemsInList(); //list.size();
+        int max_ival = (lastCh + 0);
+        int ival = (firstCh + num_in_list);
+        while ( ival > max_ival ) {
+            ival -= 26;
+        }
+        char[] new_char = new char[1];
+        new_char[0] = (char) ival;
+        String ret = new String( new_char );
+        return ret;
+    }
+    
+    /**
+     * Counts the number of ListItems in the list ommiting nested lists
+     *
+     * @return  Integer number of ListItems in the list
      */
-    public float symbolIndent() {
-        return getSymbolIndent();
+    private int listItemsInList() {
+        int result = 0;
+        for (Iterator i = list.iterator(); i.hasNext(); ) {
+            if (!(i.next() instanceof List)) result++;
+        }
+        return result;
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#setMarkupAttribute(java.lang.String, java.lang.String)
+ */
+    public void setMarkupAttribute(String name, String value) {
+		if (markupAttributes == null) markupAttributes = new Properties();
+        markupAttributes.put(name, value);
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#setMarkupAttributes(java.util.Properties)
+ */
+    public void setMarkupAttributes(Properties markupAttributes) {
+        this.markupAttributes = markupAttributes;
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#getMarkupAttribute(java.lang.String)
+ */
+    public String getMarkupAttribute(String name) {
+        return (markupAttributes == null) ? null : String.valueOf(markupAttributes.get(name));
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#getMarkupAttributeNames()
+ */
+    public Set getMarkupAttributeNames() {
+        return Chunk.getKeySet(markupAttributes);
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#getMarkupAttributes()
+ */
+    public Properties getMarkupAttributes() {
+        return markupAttributes;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: Barcode.java 2505 2006-12-20 10:12:33Z blowagie $
+ * $Id: Barcode.java,v 1.22 2006/12/20 10:12:33 blowagie Exp $
  *
  * Copyright 2002-2006 by Paulo Soares.
  *

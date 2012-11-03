@@ -1,6 +1,6 @@
 /*
- * $Id: split_pdf.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: split_pdf.java,v 1.20 2006/09/14 23:10:57 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2002 by Bruno Lowagie
  *
@@ -109,7 +109,7 @@ public class split_pdf extends java.lang.Object {
 					page = writer1.getImportedPage(reader, i);
 					rotation = reader.getPageRotation(i);
 					if (rotation == 90 || rotation == 270) {
-						cb1.addTemplate(page, 0, -1f, 1f, 0, 0, reader.getPageSizeWithRotation(i).getHeight());
+						cb1.addTemplate(page, 0, -1f, 1f, 0, 0, reader.getPageSizeWithRotation(i).height());
 					}
 					else {
 						cb1.addTemplate(page, 1f, 0, 0, 1f, 0, 0);
@@ -122,7 +122,7 @@ public class split_pdf extends java.lang.Object {
 					page = writer2.getImportedPage(reader, i);
 					rotation = reader.getPageRotation(i);
 					if (rotation == 90 || rotation == 270) {
-						cb2.addTemplate(page, 0, -1f, 1f, 0, 0, reader.getPageSizeWithRotation(i).getHeight());
+						cb2.addTemplate(page, 0, -1f, 1f, 0, 0, reader.getPageSizeWithRotation(i).height());
 					}
 					else {
 						cb2.addTemplate(page, 1f, 0, 0, 1f, 0, 0);

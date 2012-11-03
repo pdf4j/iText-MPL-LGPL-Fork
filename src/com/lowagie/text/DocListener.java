@@ -1,6 +1,6 @@
 /*
- * $Id: DocListener.java 2564 2007-02-01 15:47:38Z blowagie $
- * $Name$
+ * $Id: DocListener.java,v 1.52 2004/12/14 11:52:47 blowagie Exp $
+ * $Name:  $
  *
  * Copyright (c) 1999, 2000, 2001, 2002 Bruno Lowagie.
  *
@@ -63,99 +63,120 @@ public interface DocListener extends ElementListener {
     
     // methods
     
-	/**
-	 * Signals that the <CODE>Document</CODE> has been opened and that
-	 * <CODE>Elements</CODE> can be added.
-	 */
+/**
+ * Signals that the <CODE>Document</CODE> has been opened and that
+ * <CODE>Elements</CODE> can be added.
+ */
     
-    public void open(); // [L1]
+    public void open();
     
-    /**
-     * Signals that the <CODE>Document</CODE> was closed and that no other
-     * <CODE>Elements</CODE> will be added.
-     * <P>
-     * The outputstream of every writer implementing <CODE>DocListener</CODE> will be closed.
-     */
-        
-    public void close(); // [L2] 
+/**
+ * Sets the pagesize.
+ *
+ * @param	pageSize	the new pagesize
+ * @return	a <CODE>boolean</CODE>
+ */
     
-    /**
-     * Signals that an new page has to be started.
-     *
-     * @return	<CODE>true</CODE> if the page was added, <CODE>false</CODE> if not.
-     * @throws	DocumentException	when a document isn't open yet, or has been closed
-     */
-        
-    public boolean newPage(); // [L3]
+    public boolean setPageSize(Rectangle pageSize);
     
-    /**
-     * Sets the pagesize.
-     *
-     * @param	pageSize	the new pagesize
-     * @return	a <CODE>boolean</CODE>
-     */
-        
-    public boolean setPageSize(Rectangle pageSize); // [L4]
-        
-    /**
-     * Sets the margins.
-     *
-     * @param	marginLeft		the margin on the left
-     * @param	marginRight		the margin on the right
-     * @param	marginTop		the margin on the top
-     * @param	marginBottom	the margin on the bottom
-     * @return	a <CODE>boolean</CODE>
-     */
-        
-    public boolean setMargins(float marginLeft, float marginRight, float marginTop, float marginBottom);  // [L5]
-        
+/**
+ * Signals that a <CODE>Watermark</CODE> was added to the <CODE>Document</CODE>.
+ * 
+ * @param watermark the Watermark object
+ * @return	<CODE>true</CODE> if the element was added, <CODE>false</CODE> if not.
+ */
+    
+    public boolean add(Watermark watermark);
+    
+/**
+ * Signals that a <CODE>Watermark</CODE> was removed from the <CODE>Document</CODE>.
+ */
+    
+    public void removeWatermark();
+    
+/**
+ * Sets the margins.
+ *
+ * @param	marginLeft		the margin on the left
+ * @param	marginRight		the margin on the right
+ * @param	marginTop		the margin on the top
+ * @param	marginBottom	the margin on the bottom
+ * @return	a <CODE>boolean</CODE>
+ */
+    
+    public boolean setMargins(float marginLeft, float marginRight, float marginTop, float marginBottom);
+    
     /**
      * Parameter that allows you to do margin mirroring (odd/even pages)
      * @param marginMirroring
      * @return true if succesfull
      */
-    public boolean setMarginMirroring(boolean marginMirroring); // [L6]
-        
-    /**
-     * Sets the page number.
-     *
-     * @param	pageN		the new page number
-     */
-        
-    public void setPageCount(int pageN); // [L7]
+    public boolean setMarginMirroring(boolean marginMirroring);
     
-    /**
-     * Sets the page number to 0.
-     */
-        
-    public void resetPageCount(); // [L8]
-
-    /**
-     * Changes the header of this document.
-     *
-     * @param	header		the new header
-     */
+/**
+ * Signals that an new page has to be started.
+ *
+ * @return	<CODE>true</CODE> if the page was added, <CODE>false</CODE> if not.
+ * @throws	DocumentException	when a document isn't open yet, or has been closed
+ */
     
-    public void setHeader(HeaderFooter header); // [L9]
+    public boolean newPage() throws DocumentException;
     
-    /**
-     * Resets the header of this document.
-     */
+/**
+ * Changes the header of this document.
+ *
+ * @param	header		the new header
+ */
     
-    public void resetHeader(); // [L10]
+    public void setHeader(HeaderFooter header);
     
-    /**
-     * Changes the footer of this document.
-     *
-     * @param	footer		the new footer
-     */
+/**
+ * Resets the header of this document.
+ */
     
-    public void setFooter(HeaderFooter footer); // [L11]
+    public void resetHeader();
     
-    /**
-     * Resets the footer of this document.
-     */
+/**
+ * Changes the footer of this document.
+ *
+ * @param	footer		the new footer
+ */
     
-    public void resetFooter(); // [L12]
-
+    public void setFooter(HeaderFooter footer);
+    
+/**
+ * Resets the footer of this document.
+ */
+    
+    public void resetFooter();
+    
+/**
+ * Sets the page number to 0.
+ */
+    
+    public void resetPageCount();
+    
+/**
+ * Sets the page number.
+ *
+ * @param	pageN		the new page number
+ */
+    
+    public void setPageCount(int pageN);
+    
+/**
+ * Clears text wrapping around images (if applicable).
+ * Method suggested by Pelikan Stephan
+ * @throws DocumentException
+ */
+	public void clearTextWrap() throws DocumentException;
+    
+/**
+ * Signals that the <CODE>Document</CODE> was closed and that no other
+ * <CODE>Elements</CODE> will be added.
+ * <P>
+ * The outputstream of every writer implementing <CODE>DocListener</CODE> will be closed.
+ */
+    
+    public void close();
 }

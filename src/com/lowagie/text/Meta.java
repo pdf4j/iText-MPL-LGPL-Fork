@@ -1,6 +1,6 @@
 /*
- * $Id: Meta.java 2748 2007-05-12 15:11:48Z blowagie $
- * $Name$
+ * $Id: Meta.java,v 1.65 2005/04/13 09:17:11 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -51,6 +51,8 @@
 package com.lowagie.text;
 
 import java.util.ArrayList;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * This is an <CODE>Element</CODE> that contains
@@ -65,35 +67,40 @@ import java.util.ArrayList;
  * @see		Header
  */
 
-public class Meta implements Element {
+public class Meta implements Element, MarkupAttributes {
     
     // membervariables
     
-	/** This is the type of Meta-information this object contains. */
+/** This is the type of Meta-information this object contains. */
     private int type;
     
-    /** This is the content of the Meta-information. */
+/** This is the content of the Meta-information. */
     private StringBuffer content;
+
+/** Contains extra markupAttributes */
+    protected Properties markupAttributes;
     
     // constructors
     
-    /**
-     * Constructs a <CODE>Meta</CODE>.
-     *
-     * @param	type		the type of meta-information
-     * @param	content		the content
-     */
+/**
+ * Constructs a <CODE>Meta</CODE>.
+ *
+ * @param	type		the type of meta-information
+ * @param	content		the content
+ */
+    
     Meta(int type, String content) {
         this.type = type;
         this.content = new StringBuffer(content);
     }
     
-    /**
-     * Constructs a <CODE>Meta</CODE>.
-     *
-     * @param	tag		    the tagname of the meta-information
-     * @param	content		the content
-     */
+/**
+ * Constructs a <CODE>Meta</CODE>.
+ *
+ * @param	tag		    the tagname of the meta-information
+ * @param	content		the content
+ */
+    
     public Meta(String tag, String content) {
         this.type = Meta.getType(tag);
         this.content = new StringBuffer(content);
@@ -101,13 +108,14 @@ public class Meta implements Element {
     
     // implementation of the Element-methods
     
-    /**
-     * Processes the element by adding it (or the different parts) to a
-     * <CODE>ElementListener</CODE>.
-     *
-     * @param	listener		the <CODE>ElementListener</CODE>
-     * @return	<CODE>true</CODE> if the element was processed successfully
-     */
+/**
+ * Processes the element by adding it (or the different parts) to a
+ * <CODE>ElementListener</CODE>.
+ *
+ * @param	listener		the <CODE>ElementListener</CODE>
+ * @return	<CODE>true</CODE> if the element was processed successfully
+ */
+    
     public boolean process(ElementListener listener) {
         try {
             return listener.add(this);
@@ -117,54 +125,58 @@ public class Meta implements Element {
         }
     }
     
-    /**
-     * Gets the type of the text element.
-     *
-     * @return	a type
-     */
+/**
+ * Gets the type of the text element.
+ *
+ * @return	a type
+ */
+    
     public int type() {
         return type;
     }
     
-    /**
-     * Gets all the chunks in this element.
-     *
-     * @return	an <CODE>ArrayList</CODE>
-     */
+/**
+ * Gets all the chunks in this element.
+ *
+ * @return	an <CODE>ArrayList</CODE>
+ */
+    
     public ArrayList getChunks() {
         return new ArrayList();
     }
     
     // methods
     
-    /**
-     * appends some text to this <CODE>Meta</CODE>.
-     *
-     * @param	string      a <CODE>String</CODE>
-     * @return	a <CODE>StringBuffer</CODE>
-     */
+/**
+ * appends some text to this <CODE>Meta</CODE>.
+ *
+ * @param	string      a <CODE>String</CODE>
+ * @return	a <CODE>StringBuffer</CODE>
+ */
+    
     public StringBuffer append(String string) {
         return content.append(string);
     }
     
     // methods to retrieve information
-
-	/**
-     * Returns the content of the meta information.
-     *
-     * @return	a <CODE>String</CODE>
-     */
-    public String getContent() {
+    
+/**
+ * Returns the content of the meta information.
+ *
+ * @return	a <CODE>String</CODE>
+ */
+    
+    public String content() {
         return content.toString();
     }
-
-	/**
-     * Returns the name of the meta information.
-     *
-     * @return	a <CODE>String</CODE>
-     */
     
-    public String getName() {
+/**
+ * Returns the name of the meta information.
+ *
+ * @return	a <CODE>String</CODE>
+ */
+    
+    public String name() {
         switch (type) {
             case Element.SUBJECT:
                 return ElementTags.SUBJECT;
@@ -183,12 +195,13 @@ public class Meta implements Element {
         }
     }
     
-    /**
-     * Returns the name of the meta information.
-     * 
-     * @param tag iText tag for meta information
-     * @return	the Element value corresponding with the given tag
-     */
+/**
+ * Returns the name of the meta information.
+ * 
+ * @param tag iText tag for meta information
+ * @return	the Element value corresponding with the given tag
+ */
+    
     public static int getType(String tag) {
         if (ElementTags.SUBJECT.equals(tag)) {
             return Element.SUBJECT;
@@ -211,25 +224,40 @@ public class Meta implements Element {
         return Element.HEADER;
     }
     
-    // deprecated
     
-    /**
-	 * Returns the name of the meta information.
-	 *
-	 * @return	a <CODE>String</CODE>
-	 * @deprecated Use {@link #getName()} instead
-	 */
-	public String name() {
-		return getName();
-	}
+/**
+ * @see com.lowagie.text.MarkupAttributes#setMarkupAttribute(java.lang.String, java.lang.String)
+ */
+    public void setMarkupAttribute(String name, String value) {
+		if (markupAttributes == null) markupAttributes = new Properties();
+        markupAttributes.put(name, value);
+    }
     
-    /**
-	 * Returns the content of the meta information.
-	 *
-	 * @return	a <CODE>String</CODE>
-	 * @deprecated Use {@link #getContent()} instead
-	 */
-	public String content() {
-		return getContent();
-	}
+/**
+ * @see com.lowagie.text.MarkupAttributes#setMarkupAttributes(java.util.Properties)
+ */
+    public void setMarkupAttributes(Properties markupAttributes) {
+        this.markupAttributes = markupAttributes;
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#getMarkupAttribute(java.lang.String)
+ */
+    public String getMarkupAttribute(String name) {
+        return (markupAttributes == null) ? null : String.valueOf(markupAttributes.get(name));
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#getMarkupAttributeNames()
+ */
+    public Set getMarkupAttributeNames() {
+        return Chunk.getKeySet(markupAttributes);
+    }
+    
+/**
+ * @see com.lowagie.text.MarkupAttributes#getMarkupAttributes()
+ */
+    public Properties getMarkupAttributes() {
+        return markupAttributes;
+    }
 }

@@ -1,6 +1,6 @@
 /*
- * $Id: RtfCodePage.java 2785 2007-05-24 15:45:47Z hallm $
- * $Name$
+ * $Id: RtfCodePage.java,v 1.17 2006/09/14 23:10:55 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.rtf.RtfElement;
 import com.lowagie.text.rtf.RtfExtendedElement;
@@ -61,9 +60,8 @@ import com.lowagie.text.rtf.RtfExtendedElement;
  * The RtfCodePage class allows different code pages to be used in the rtf document.
  * Currently always ansi / ansicpg1252
  *
- * @version: $Id: RtfCodePage.java 2785 2007-05-24 15:45:47Z hallm $
+ * Version: $Id: RtfCodePage.java,v 1.17 2006/09/14 23:10:55 xlv Exp $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfCodePage extends RtfElement implements RtfExtendedElement {
     /**
@@ -85,45 +83,20 @@ public class RtfCodePage extends RtfElement implements RtfExtendedElement {
     }
 
     /**
-     * unused
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
-     */
-    public byte[] write()
-    {
-    	return(new byte[0]);
-    }
-    /**
-     * unused
-     */
-    public void writeContent(final OutputStream out) throws IOException
-    {    	
-    }
-    
-    /**
      * Writes the selected codepage to a byte array
      *
      * @return Byte array with the current codepage
-     * @deprecated replaced by {@link #writeDefinition(OutputStream)}
      */
     public byte[] writeDefinition() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeDefinition(result);
+            result.write(ANSI);
+            result.write(ANSI_CODEPAGE);
+            result.write(intToByteArray(1252));
+            result.write((byte)'\n');
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-
-    /**
-     * Writes the selected codepage
-     */
-    public void writeDefinition(final OutputStream result) throws IOException
-    {
-        result.write(ANSI);
-        result.write(ANSI_CODEPAGE);
-        result.write(intToByteArray(1252));
-        result.write((byte)'\n');    	
-    }
-
 }

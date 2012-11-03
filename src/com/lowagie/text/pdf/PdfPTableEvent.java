@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPTableEvent.java 1733 2005-05-04 14:33:54Z blowagie $
- * $Name$
+ * $Id: PdfPTableEvent.java,v 1.45 2005/05/04 14:32:42 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 Paulo Soares
  *

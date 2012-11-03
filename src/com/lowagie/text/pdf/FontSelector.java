@@ -74,7 +74,7 @@ public class FontSelector {
             return;
         }
         BaseFont bf = font.getCalculatedBaseFont(true);
-        Font f2 = new Font(bf, font.getSize(), font.getCalculatedStyle(), font.getColor());
+        Font f2 = new Font(bf, font.size(), font.getCalculatedStyle(), font.color());
         fonts.add(f2);
     }
     
@@ -119,7 +119,7 @@ public class FontSelector {
             }
         }
         if (sb.length() > 0) {
-            Chunk ck = new Chunk(sb.toString(), (Font)fonts.get(lastidx == -1 ? 0 : lastidx));
+            Chunk ck = new Chunk(sb.toString(), (Font)fonts.get(lastidx));
             ret.add(ck);
         }
         return ret;

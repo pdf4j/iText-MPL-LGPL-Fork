@@ -1,6 +1,6 @@
 /*
- * $Id: RtfHeaderFooterGroup.java 2776 2007-05-23 20:01:40Z hallm $
- * $Name$
+ * $Id: RtfHeaderFooterGroup.java,v 1.9 2006/08/07 10:42:34 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002, 2003, 2004 by Mark Hall
  *
@@ -52,7 +52,6 @@ package com.lowagie.text.rtf.headerfooter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.Phrase;
@@ -64,9 +63,8 @@ import com.lowagie.text.rtf.document.RtfDocument;
  * The RtfHeaderFooterGroup holds 0 - 3 RtfHeaderFooters that create a group
  * of headers or footers.
  * 
- * @version $Id: RtfHeaderFooterGroup.java 2776 2007-05-23 20:01:40Z hallm $
+ * @version $Version:$
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
- * @author Thomas Bickel (tmb99@inode.at)
  */
 public class RtfHeaderFooterGroup extends HeaderFooter implements RtfBasicElement {
     
@@ -221,45 +219,31 @@ public class RtfHeaderFooterGroup extends HeaderFooter implements RtfBasicElemen
      * Write the content of this RtfHeaderFooterGroup.
      * 
      * @return A byte array with the content of this RtfHeaderFooterGroup
-     * @deprecated replaced by {@link #writeContent(OutputStream)}
      */
-    public byte[] write() 
-    {
+    public byte[] write() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try {
-        	writeContent(result);
+            if(this.mode == MODE_SINGLE) {
+                result.write(headerAll.write());
+            } else if(this.mode == MODE_MULTIPLE) {
+                if(headerFirst != null) {
+                    result.write(headerFirst.write());
+                }
+                if(headerLeft != null) {
+                    result.write(headerLeft.write());
+                }
+                if(headerRight != null) {
+                    result.write(headerRight.write());
+                }
+                if(headerAll != null) {
+                    result.write(headerAll.write());
+                }
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
         return result.toByteArray();
     }
-    /**
-     * Write the content of this RtfHeaderFooterGroup.
-     */    
-    public void writeContent(final OutputStream result) throws IOException
-    {
-        if(this.mode == MODE_SINGLE) {
-            //result.write(headerAll.write());
-        	headerAll.writeContent(result);
-        } else if(this.mode == MODE_MULTIPLE) {
-            if(headerFirst != null) {
-                //result.write(headerFirst.write());
-            	headerFirst.writeContent(result);
-            }
-            if(headerLeft != null) {
-                //result.write(headerLeft.write());
-                headerLeft.writeContent(result);
-            }
-            if(headerRight != null) {
-                //result.write(headerRight.write());
-                headerRight.writeContent(result);
-            }
-            if(headerAll != null) {
-                //result.write(headerAll.write());
-                headerAll.writeContent(result);
-            }
-        }
-    }        
     
     /**
      * Set a RtfHeaderFooter to be displayed at a certain position

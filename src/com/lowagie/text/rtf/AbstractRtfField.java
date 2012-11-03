@@ -1,5 +1,5 @@
 /**
- * $Id: AbstractRtfField.java 2698 2007-04-19 12:03:08Z blowagie $
+ * $Id: AbstractRtfField.java,v 1.19 2006/09/14 23:10:54 xlv Exp $
  *
  * Copyright 2002 by 
  * <a href="http://www.smb-tec.com">SMB</a> 
@@ -25,7 +25,7 @@
  * where applicable.
  *
  * Alternatively, the contents of this file may be used under the terms of the
- * LGPL license (the "GNU LIBRARY GENERAL PUBLIC LICENSE"), in which case the
+ * LGPL license (the “GNU LIBRARY GENERAL PUBLIC LICENSE”), in which case the
  * provisions of LGPL are applicable instead of those above.  If you wish to
  * allow use of your version of this file only under the terms of the LGPL
  * License and not to allow others to use your version of this file under
@@ -67,7 +67,7 @@ import com.lowagie.text.Font;
  * ONLY FOR USE WITH THE RtfWriter NOT with the RtfWriter2.
  *
  * @author Dirk Weigenand (Dirk.Weigenand@smb-tec.com)
- * @version $Id: AbstractRtfField.java 2698 2007-04-19 12:03:08Z blowagie $
+ * @version $Id: AbstractRtfField.java,v 1.19 2006/09/14 23:10:54 xlv Exp $
  * @since Mon Aug 19 14:50:39 2002
  * @deprecated Please move to the RtfWriter2 and associated classes.
  */
@@ -237,19 +237,10 @@ abstract class AbstractRtfField extends Chunk implements RtfField {
     }
 
     /**
-	 * empty implementation for Chunk.
-	 * @return an empty string
-	 * @deprecated Use {@link #getContent()} instead
-	 */
-	public final String content() {
-		return getContent();
-	}
-
-	/**
      * empty implementation for Chunk.
      * @return an empty string
      */
-    public final String getContent() {
+    public final String content() {
         return "";
     }
 

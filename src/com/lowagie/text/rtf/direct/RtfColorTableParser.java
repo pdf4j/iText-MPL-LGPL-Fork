@@ -1,6 +1,6 @@
 /**
- * $Id: RtfColorTableParser.java 2738 2007-05-04 10:04:43Z hallm $
- * $Name$
+ * $Id: RtfColorTableParser.java,v 1.6 2006/09/15 23:37:37 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2006 by Mark Hall
  *
@@ -56,7 +56,7 @@ import java.awt.Color;
  * by the RtfTokeniser while the RTF color table is
  * being parsed.
  * 
- * @version $Revision: 2738 $
+ * @version $Revision: 1.6 $
  * @author Mark Hall (mhall@edu.uni-klu.ac.at)
  */
 public class RtfColorTableParser {
@@ -121,9 +121,9 @@ public class RtfColorTableParser {
         if (stringMatches(ctrlWord, "\\red"))
             this.red = Integer.parseInt(ctrlWord.substring(4));
         else if (stringMatches(ctrlWord, "\\green"))
-            this.green = Integer.parseInt(ctrlWord.substring(6));
+            this.red = Integer.parseInt(ctrlWord.substring(6));
         else if (stringMatches(ctrlWord, "\\blue"))
-            this.blue = Integer.parseInt(ctrlWord.substring(5));
+            this.red = Integer.parseInt(ctrlWord.substring(5));
 	}
 	
 	/**

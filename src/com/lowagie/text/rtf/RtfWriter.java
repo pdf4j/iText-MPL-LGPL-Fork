@@ -1,6 +1,6 @@
 /*
- * $Id: RtfWriter.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: RtfWriter.java,v 1.73 2006/09/16 03:38:45 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Mark Hall
  *
@@ -67,11 +67,11 @@ import java.util.ListIterator;
 import com.lowagie.text.Anchor;
 import com.lowagie.text.Annotation;
 import com.lowagie.text.Chunk;
+import com.lowagie.text.DocListener;
 import com.lowagie.text.DocWriter;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
-import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Font;
 import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.Image;
@@ -138,7 +138,7 @@ import com.lowagie.text.pdf.codec.wmf.MetaDo;
  * @author Raul Wegmann (raul.wegmann@uam.es)
  * @deprecated The RtfWriter is deprecated and will be removed from the iText library end of 2007
  */
-public class RtfWriter extends DocWriter {
+public class RtfWriter extends DocWriter implements DocListener {
     /**
      * Static Constants
      */
@@ -743,10 +743,8 @@ public class RtfWriter extends DocWriter {
      * <code>OutputStream</code>
      */
     public void close() {
-        if (open) {
-            writeDocument();
-            super.close();
-        }
+        writeDocument();
+        super.close();
     }
 
     /**
@@ -787,14 +785,14 @@ public class RtfWriter extends DocWriter {
      * @return <code>true</code> if a new Page was begun.
      * @throws DocumentException if the Document was not open or had been closed.
      */
-    public boolean newPage() {
+    public boolean newPage() throws DocumentException {
         try {
             content.write(escape);
             content.write(newPage);
             content.write(escape);
             content.write(paragraph);
         } catch (IOException e) {
-            throw new ExceptionConverter(e);
+            return false;
         }
         return true;
     }
@@ -826,8 +824,8 @@ public class RtfWriter extends DocWriter {
      */
     public boolean setPageSize(Rectangle pageSize) {
         if (!parseFormat(pageSize, false)) {
-            pageWidth = (int) (pageSize.getWidth() * TWIPSFACTOR);
-            pageHeight = (int) (pageSize.getHeight() * TWIPSFACTOR);
+            pageWidth = (int) (pageSize.width() * TWIPSFACTOR);
+            pageHeight = (int) (pageSize.height() * TWIPSFACTOR);
             landscape = pageWidth > pageHeight;
         }
         return true;
@@ -960,15 +958,15 @@ public class RtfWriter extends DocWriter {
             out.write(sectionDefaults);
             writeSectionDefaults(out);
         }
-        if (sectionElement.getTitle() != null) {
+        if (sectionElement.title() != null) {
             if (writeTOC) {
                 StringBuffer title = new StringBuffer("");
-                for (ListIterator li = sectionElement.getTitle().getChunks().listIterator(); li.hasNext();) {
-                    title.append(((Chunk) li.next()).getContent());
+                for (ListIterator li = sectionElement.title().getChunks().listIterator(); li.hasNext();) {
+                    title.append(((Chunk) li.next()).content());
                 }
-                add(new RtfTOCEntry(title.toString(), sectionElement.getTitle().getFont()));
+                add(new RtfTOCEntry(title.toString(), sectionElement.title().font()));
             } else {
-                add(sectionElement.getTitle());
+                add(sectionElement.title());
             }
             out.write(escape);
             out.write(paragraph);
@@ -999,7 +997,7 @@ public class RtfWriter extends DocWriter {
             out.write(escape);
             out.write(RtfCell.cellInTable);
         }
-        switch (paragraphElement.getAlignment()) {
+        switch (paragraphElement.alignment()) {
             case Element.ALIGN_LEFT:
                 out.write(escape);
                 out.write(alignLeft);
@@ -1020,14 +1018,14 @@ public class RtfWriter extends DocWriter {
         }
         out.write(escape);
         out.write(listIndent);
-        writeInt(out, (int) (paragraphElement.getIndentationLeft() * TWIPSFACTOR));
+        writeInt(out, (int) (paragraphElement.indentationLeft() * TWIPSFACTOR));
         out.write(escape);
         out.write(rightIndent);
-        writeInt(out, (int) (paragraphElement.getIndentationRight() * TWIPSFACTOR));
+        writeInt(out, (int) (paragraphElement.indentationRight() * TWIPSFACTOR));
         Iterator chunks = paragraphElement.getChunks().iterator();
         while (chunks.hasNext()) {
             Chunk ch = (Chunk) chunks.next();
-            ch.setFont(paragraphElement.getFont().difference(ch.getFont()));
+            ch.setFont(paragraphElement.font().difference(ch.font()));
         }
         ByteArrayOutputStream save = content;
         content = out;
@@ -1057,7 +1055,7 @@ public class RtfWriter extends DocWriter {
         Iterator chunks = phrase.getChunks().iterator();
         while (chunks.hasNext()) {
             Chunk ch = (Chunk) chunks.next();
-            ch.setFont(phrase.getFont().difference(ch.getFont()));
+            ch.setFont(phrase.font().difference(ch.font()));
         }
         ByteArrayOutputStream save = content;
         content = out;
@@ -1074,7 +1072,7 @@ public class RtfWriter extends DocWriter {
      * @throws IOException
      */
     private void writeAnchor(Anchor anchor, ByteArrayOutputStream out) throws IOException {
-        if (anchor.getUrl() != null) {
+        if (anchor.url() != null) {
             out.write(openGroup);
             out.write(escape);
             out.write(field);
@@ -1084,7 +1082,7 @@ public class RtfWriter extends DocWriter {
             out.write(openGroup);
             out.write(fieldHyperlink);
             out.write(delimiter);
-            out.write(anchor.getUrl().toString().getBytes());
+            out.write(anchor.url().toString().getBytes());
             out.write(closeGroup);
             out.write(closeGroup);
             out.write(openGroup);
@@ -1116,7 +1114,7 @@ public class RtfWriter extends DocWriter {
                 writeImage(chunk.getImage(), out);
             } else {
                 writeInitialFontSignature(out, chunk);
-                out.write(filterSpecialChar(chunk.getContent(), false).getBytes());
+                out.write(filterSpecialChar(chunk.content(), false).getBytes());
                 writeFinishingFontSignature(out, chunk);
             }
         }
@@ -1124,7 +1122,7 @@ public class RtfWriter extends DocWriter {
 
 
     protected void writeInitialFontSignature(OutputStream out, Chunk chunk) throws IOException {
-        Font font = chunk.getFont();
+        Font font = chunk.font();
 
         out.write(escape);
         out.write(fontNumber);
@@ -1135,14 +1133,14 @@ public class RtfWriter extends DocWriter {
         }
         out.write(escape);
         out.write(fontSize);
-        if (font.getSize() > 0) {
-            writeInt(out, (int) (font.getSize() * 2));
+        if (font.size() > 0) {
+            writeInt(out, (int) (font.size() * 2));
         } else {
             writeInt(out, 20);
         }
         out.write(escape);
         out.write(fontColor);
-        writeInt(out, addColor(font.getColor()));
+        writeInt(out, addColor(font.color()));
         if (font.isBold()) {
             out.write(escape);
             out.write(bold);
@@ -1180,7 +1178,7 @@ public class RtfWriter extends DocWriter {
 
 
     protected void writeFinishingFontSignature(OutputStream out, Chunk chunk) throws IOException {
-        Font font = chunk.getFont();
+        Font font = chunk.font();
 
         if (font.isBold()) {
             out.write(escape);
@@ -1317,16 +1315,16 @@ public class RtfWriter extends DocWriter {
             }
             listtable.write(escape);
             listtable.write(firstIndent);
-            writeInt(listtable, (int) (list.getIndentationLeft() * TWIPSFACTOR * -1));
+            writeInt(listtable, (int) (list.indentationLeft() * TWIPSFACTOR * -1));
             listtable.write(escape);
             listtable.write(listIndent);
-            writeInt(listtable, (int) ((list.getIndentationLeft() + list.getSymbolIndent()) * TWIPSFACTOR));
+            writeInt(listtable, (int) ((list.indentationLeft() + list.symbolIndent()) * TWIPSFACTOR));
             listtable.write(escape);
             listtable.write(rightIndent);
-            writeInt(listtable, (int) (list.getIndentationRight() * TWIPSFACTOR));
+            writeInt(listtable, (int) (list.indentationRight() * TWIPSFACTOR));
             listtable.write(escape);
             listtable.write(tabStop);
-            writeInt(listtable, (int) (list.getSymbolIndent() * TWIPSFACTOR));
+            writeInt(listtable, (int) (list.symbolIndent() * TWIPSFACTOR));
             listtable.write(closeGroup);
             listtable.write((byte) '\n');
         }
@@ -1337,13 +1335,13 @@ public class RtfWriter extends DocWriter {
         out.write(alignLeft);
         out.write(escape);
         out.write(firstIndent);
-        writeInt(out, (int) (list.getIndentationLeft() * TWIPSFACTOR * -1));
+        writeInt(out, (int) (list.indentationLeft() * TWIPSFACTOR * -1));
         out.write(escape);
         out.write(listIndent);
-        writeInt(out, (int) ((list.getIndentationLeft() + list.getSymbolIndent()) * TWIPSFACTOR));
+        writeInt(out, (int) ((list.indentationLeft() + list.symbolIndent()) * TWIPSFACTOR));
         out.write(escape);
         out.write(rightIndent);
-        writeInt(out, (int) (list.getIndentationRight() * TWIPSFACTOR));
+        writeInt(out, (int) (list.indentationRight() * TWIPSFACTOR));
         out.write(escape);
         out.write(fontSize);
         writeInt(out, 20);
@@ -1379,13 +1377,13 @@ public class RtfWriter extends DocWriter {
                 }
                 out.write(escape);
                 out.write(firstIndent);
-                writeInt(out, (int) (list.getIndentationLeft() * TWIPSFACTOR * -1));
+                writeInt(out, (int) (list.indentationLeft() * TWIPSFACTOR * -1));
                 out.write(escape);
                 out.write(listIndent);
-                writeInt(out, (int) ((list.getIndentationLeft() + list.getSymbolIndent()) * TWIPSFACTOR));
+                writeInt(out, (int) ((list.indentationLeft() + list.symbolIndent()) * TWIPSFACTOR));
                 out.write(escape);
                 out.write(rightIndent);
-                writeInt(out, (int) (list.getIndentationRight() * TWIPSFACTOR));
+                writeInt(out, (int) (list.indentationRight() * TWIPSFACTOR));
                 out.write(delimiter);
                 if (list.isNumbered()) {
                     writeInt(out, count);
@@ -1409,13 +1407,13 @@ public class RtfWriter extends DocWriter {
                 out.write(alignLeft);
                 out.write(escape);
                 out.write(firstIndent);
-                writeInt(out, (int) (list.getIndentationLeft() * TWIPSFACTOR * -1));
+                writeInt(out, (int) (list.indentationLeft() * TWIPSFACTOR * -1));
                 out.write(escape);
                 out.write(listIndent);
-                writeInt(out, (int) ((list.getIndentationLeft() + list.getSymbolIndent()) * TWIPSFACTOR));
+                writeInt(out, (int) ((list.indentationLeft() + list.symbolIndent()) * TWIPSFACTOR));
                 out.write(escape);
                 out.write(rightIndent);
-                writeInt(out, (int) (list.getIndentationRight() * TWIPSFACTOR));
+                writeInt(out, (int) (list.indentationRight() * TWIPSFACTOR));
                 out.write(escape);
                 out.write(fontSize);
                 writeInt(out, 20);
@@ -1495,7 +1493,7 @@ public class RtfWriter extends DocWriter {
         if (!(type == Image.ORIGINAL_JPEG || type == Image.ORIGINAL_BMP
             || type == Image.ORIGINAL_PNG || type == Image.ORIGINAL_WMF))
             throw new DocumentException("Only BMP, PNG, WMF and JPEG images are supported by the RTF Writer");
-        switch (image.getAlignment()) {
+        switch (image.alignment()) {
             case Element.ALIGN_LEFT:
                 out.write(escape);
                 out.write(alignLeft);
@@ -1534,10 +1532,10 @@ public class RtfWriter extends DocWriter {
         }
         out.write(escape);
         out.write(pictureWidth);
-        writeInt(out, (int) (image.getPlainWidth() * TWIPSFACTOR));
+        writeInt(out, (int) (image.plainWidth() * TWIPSFACTOR));
         out.write(escape);
         out.write(pictureHeight);
-        writeInt(out, (int) (image.getPlainHeight() * TWIPSFACTOR));
+        writeInt(out, (int) (image.plainHeight() * TWIPSFACTOR));
 
 
 // For some reason this messes up the intended image size. It makes it too big. Weird
@@ -1550,15 +1548,15 @@ public class RtfWriter extends DocWriter {
 //        writeInt(out, (int) (image.plainHeight() * twipsFactor));
 
 
-        if (image.getWidth() > 0) {
+        if (image.width() > 0) {
             out.write(escape);
             out.write(pictureScaleX);
-            writeInt(out, (int) (100 / image.getWidth() * image.getPlainWidth()));
+            writeInt(out, (int) (100 / image.width() * image.plainWidth()));
         }
-        if (image.getHeight() > 0) {
+        if (image.height() > 0) {
             out.write(escape);
             out.write(pictureScaleY);
-            writeInt(out, (int) (100 / image.getHeight() * image.getPlainHeight()));
+            writeInt(out, (int) (100 / image.height() * image.plainHeight()));
         }
         out.write(delimiter);
         InputStream imgIn;
@@ -1567,7 +1565,7 @@ public class RtfWriter extends DocWriter {
         }
         else {
             if (image.getOriginalData() == null) {
-                imgIn = image.getUrl().openStream();
+                imgIn = image.url().openStream();
             } else {
                 imgIn = new ByteArrayInputStream(image.getOriginalData());
             }
@@ -1648,9 +1646,9 @@ public class RtfWriter extends DocWriter {
             info.write(metaName);
             info.write(delimiter);
             if (meta.type() == Meta.CREATIONDATE) {
-                writeFormatedDateTime(meta.getContent());
+                writeFormatedDateTime(meta.content());
             } else {
-                info.write(meta.getContent().getBytes());
+                info.write(meta.content().getBytes());
             }
         } finally {
             info.write(closeGroup);
@@ -2020,7 +2018,7 @@ public class RtfWriter extends DocWriter {
                         par.add(headerFooter.getBefore());
                     }
                     if (headerFooter.isNumbered()) {
-                        par.add(new RtfPageNumber("", headerFooter.getBefore().getFont()));
+                        par.add(new RtfPageNumber("", headerFooter.getBefore().font()));
                     }
                     if (headerFooter.getAfter() != null) {
                         par.add(headerFooter.getAfter());
@@ -2218,7 +2216,7 @@ public class RtfWriter extends DocWriter {
      * @return true if rect1 and rect2 represent the same rectangle
      */
     private boolean rectEquals(Rectangle rect1, Rectangle rect2) {
-        return (rect1.getWidth() == rect2.getWidth()) && (rect1.getHeight() == rect2.getHeight());
+        return (rect1.width() == rect2.width()) && (rect1.height() == rect2.height());
     }
 
     /**
@@ -2274,20 +2272,20 @@ public class RtfWriter extends DocWriter {
         if(hf instanceof RtfHeaderFooter) {
             RtfHeaderFooter rhf = (RtfHeaderFooter) hf;
             if(rhf.content() instanceof Chunk) {
-                addFont(((Chunk) rhf.content()).getFont());
-                addColor(((Chunk) rhf.content()).getFont().getColor());
+                addFont(((Chunk) rhf.content()).font());
+                addColor(((Chunk) rhf.content()).font().color());
             } else if(rhf.content() instanceof Phrase) {
-                addFont(((Phrase) rhf.content()).getFont());
-                addColor(((Phrase) rhf.content()).getFont().getColor());
+                addFont(((Phrase) rhf.content()).font());
+                addColor(((Phrase) rhf.content()).font().color());
             }
         }
         if(hf.getBefore() != null) {
-            addFont(hf.getBefore().getFont());
-            addColor(hf.getBefore().getFont().getColor());
+            addFont(hf.getBefore().font());
+            addColor(hf.getBefore().font().color());
         }
         if(hf.getAfter() != null) {
-            addFont(hf.getAfter().getFont());
-            addColor(hf.getAfter().getFont().getColor());
+            addFont(hf.getAfter().font());
+            addColor(hf.getAfter().font().color());
         }
     }
 

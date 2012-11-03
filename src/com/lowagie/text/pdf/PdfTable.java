@@ -1,6 +1,6 @@
 /*
- * $Id: PdfTable.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: PdfTable.java,v 1.70 2006/10/27 17:23:22 xlv Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -110,7 +110,7 @@ public class PdfTable extends Rectangle {
 		// copying the attributes from class Table
         cloneNonPositionParameters(table);
 
-		this.columns = table.getColumns();
+		this.columns = table.columns();
 		positions = table.getWidths(left, right - left);
         
 		// initialisation of some parameters
@@ -151,14 +151,14 @@ public class PdfTable extends Rectangle {
 		int rowNumber = 0;
 		int groupNumber = 0;
 		boolean groupChange;
-		int firstDataRow = table.getLastHeaderRow() + 1;
+		int firstDataRow = table.firstDataRow();
 		Cell cell;
 		PdfCell currentCell;
 		ArrayList newCells = new ArrayList();
 		int rows = table.size() + 1;
 		float[] offsets = new float[rows];
 		for (int i = 0; i < rows; i++) {
-			offsets[i] = getBottom();
+			offsets[i] = bottom();
 		}
         
 		// loop over all the rows
@@ -169,18 +169,18 @@ public class PdfTable extends Rectangle {
 				if (rowNumber < rows - 1 && offsets[rowNumber + 1] > offsets[rowNumber]) offsets[rowNumber + 1] = offsets[rowNumber];
 			}
 			else {
-				for(int i = 0; i < row.getColumns(); i++) {
+				for(int i = 0; i < row.columns(); i++) {
 					cell = (Cell) row.getCell(i);
 					if (cell != null) {
-						currentCell = new PdfCell(cell, rowNumber+prevRows, positions[i], positions[i + cell.getColspan()], offsets[rowNumber], cellspacing(), cellpadding());
+						currentCell = new PdfCell(cell, rowNumber+prevRows, positions[i], positions[i + cell.colspan()], offsets[rowNumber], cellspacing(), cellpadding());
 						try {
-                     if (offsets[rowNumber] - currentCell.getHeight() - cellpadding() < offsets[rowNumber + currentCell.rowspan()]) {
-                        offsets[rowNumber + currentCell.rowspan()] = offsets[rowNumber] - currentCell.getHeight() - cellpadding();
+                     if (offsets[rowNumber] - currentCell.height() - cellpadding() < offsets[rowNumber + currentCell.rowspan()]) {
+                        offsets[rowNumber + currentCell.rowspan()] = offsets[rowNumber] - currentCell.height() - cellpadding();
 							}
 						}
 						catch(ArrayIndexOutOfBoundsException aioobe) {
-							if (offsets[rowNumber] - currentCell.getHeight() < offsets[rows - 1]) {
-								offsets[rows - 1] = offsets[rowNumber] - currentCell.getHeight();
+							if (offsets[rowNumber] - currentCell.height() < offsets[rows - 1]) {
+								offsets[rows - 1] = offsets[rowNumber] - currentCell.height();
 							}
 						}
 						if (rowNumber < firstDataRow) {
@@ -272,7 +272,7 @@ public class PdfTable extends Rectangle {
 	 */
     
 	final float cellpadding() {
-		return table.getPadding();
+		return table.cellpadding();
 	}
     
 	/**
@@ -282,7 +282,7 @@ public class PdfTable extends Rectangle {
 	 */
     
 	final float cellspacing() {
-		return table.getSpacing();
+		return table.cellspacing();
 	}
 	
 	/**
@@ -292,7 +292,7 @@ public class PdfTable extends Rectangle {
 	 */
 
 	public final boolean hasToFitPageTable() {
-		return table.isTableFitsPage();
+		return table.hasToFitPageTable();
 	}
 
 	/**
@@ -302,7 +302,7 @@ public class PdfTable extends Rectangle {
 	 */
 	
 	public final boolean hasToFitPageCells() {
-		return table.isCellsFitPage();
+		return table.hasToFitPageCells();
 	}
 
 	/**

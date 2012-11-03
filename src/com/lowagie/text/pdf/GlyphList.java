@@ -1,6 +1,6 @@
 /*
- * $Id: GlyphList.java 2443 2006-10-30 12:37:37Z psoares33 $
- * $Name$
+ * $Id: GlyphList.java,v 1.60 2006/10/30 12:37:36 psoares33 Exp $
+ * $Name:  $
  *
  * Copyright 2001-2006 Paulo Soares
  *

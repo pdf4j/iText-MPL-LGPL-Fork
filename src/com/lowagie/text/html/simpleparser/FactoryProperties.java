@@ -60,7 +60,8 @@ import com.lowagie.text.FontFactory;
 import com.lowagie.text.FontFactoryImp;
 import com.lowagie.text.ListItem;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.html.Markup;
+import com.lowagie.text.markup.MarkupParser;
+import com.lowagie.text.markup.MarkupTags;
 import com.lowagie.text.pdf.BaseFont;
 
 /**
@@ -76,14 +77,11 @@ public class FactoryProperties {
     }
     
     public Chunk createChunk(String text, ChainedProperties props) {
-        Font font = getFont(props);
-        float size = font.getSize();
-        size /= 2;
-        Chunk ck = new Chunk(text, font);
+        Chunk ck = new Chunk(text, getFont(props));
         if (props.hasProperty("sub"))
-            ck.setTextRise(-size);
+            ck.setTextRise(-6);
         else if (props.hasProperty("sup"))
-            ck.setTextRise(size);
+            ck.setTextRise(6);
         return ck;
     }
     
@@ -195,7 +193,7 @@ public class FactoryProperties {
         float size = 12;
         if (value != null)
             size = Float.parseFloat(value);
-        Color color = Markup.decodeColor(props.getProperty("color"));
+        Color color = MarkupParser.decodeColor(props.getProperty("color"));
         String encoding = props.getProperty("encoding");
         if (encoding == null)
             encoding = BaseFont.WINANSI;
@@ -206,32 +204,32 @@ public class FactoryProperties {
         String style = (String)h.get("style");
         if (style == null)
             return;
-        Properties prop = Markup.parseAttributes(style);
+        Properties prop = MarkupParser.parseAttributes(style);
         for (Iterator it = prop.keySet().iterator(); it.hasNext();) {
             String key = (String)it.next();
-            if (key.equals(Markup.CSS_KEY_FONTFAMILY)) {
+            if (key.equals(MarkupTags.CSS_KEY_FONTFAMILY)) {
                 h.put("face", prop.getProperty(key));
             }
-            else if (key.equals(Markup.CSS_KEY_FONTSIZE)) {
-                h.put("size", Float.toString(Markup.parseLength(prop.getProperty(key))) + "px");
+            else if (key.equals(MarkupTags.CSS_KEY_FONTSIZE)) {
+                h.put("size", Float.toString(MarkupParser.parseLength(prop.getProperty(key))) + "px");
             }
-            else if (key.equals(Markup.CSS_KEY_FONTSTYLE)) {
+            else if (key.equals(MarkupTags.CSS_KEY_FONTSTYLE)) {
                 String ss = prop.getProperty(key).trim().toLowerCase();
                 if (ss.equals("italic") || ss.equals("oblique"))
                     h.put("i", null);
             }
-            else if (key.equals(Markup.CSS_KEY_FONTWEIGHT)) {
+            else if (key.equals(MarkupTags.CSS_KEY_FONTWEIGHT)) {
                 String ss = prop.getProperty(key).trim().toLowerCase();
                 if (ss.equals("bold") || ss.equals("700") || ss.equals("800") || ss.equals("900"))
                     h.put("b", null);
             }
-            else if (key.equals(Markup.CSS_KEY_FONTWEIGHT)) {
+            else if (key.equals(MarkupTags.CSS_KEY_FONTWEIGHT)) {
                 String ss = prop.getProperty(key).trim().toLowerCase();
                 if (ss.equals("underline"))
                     h.put("u", null);
             }
-            else if (key.equals(Markup.CSS_KEY_COLOR)) {
-                Color c = Markup.decodeColor(prop.getProperty(key));
+            else if (key.equals(MarkupTags.CSS_KEY_COLOR)) {
+                Color c = MarkupParser.decodeColor(prop.getProperty(key));
                 if (c != null) {
                     int hh = c.getRGB();
                     String hs = Integer.toHexString(hh);
@@ -240,9 +238,9 @@ public class FactoryProperties {
                     h.put("color", hs);
                 }
             }
-            else if (key.equals(Markup.CSS_KEY_LINEHEIGHT)) {
+            else if (key.equals(MarkupTags.CSS_KEY_LINEHEIGHT)) {
                 String ss = prop.getProperty(key).trim();
-                float v = Markup.parseLength(prop.getProperty(key));
+                float v = MarkupParser.parseLength(prop.getProperty(key));
                 if (ss.endsWith("%")) {
                     h.put("leading", "0," + (v / 100));
                 }
@@ -250,7 +248,7 @@ public class FactoryProperties {
                     h.put("leading", v + ",0");
                 }
             }
-            else if (key.equals(Markup.CSS_KEY_TEXTALIGN)) {
+            else if (key.equals(MarkupTags.CSS_KEY_TEXTALIGN)) {
                 String ss = prop.getProperty(key).trim().toLowerCase();
                 h.put("align", ss);
             }

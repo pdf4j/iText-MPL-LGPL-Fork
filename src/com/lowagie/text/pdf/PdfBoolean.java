@@ -1,6 +1,6 @@
 /*
- * $Id: PdfBoolean.java 2739 2007-05-04 11:24:51Z blowagie $
- * $Name$
+ * $Id: PdfBoolean.java,v 1.56 2006/11/11 16:55:31 psoares33 Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -53,8 +53,8 @@ package com.lowagie.text.pdf;
 /**
  * <CODE>PdfBoolean</CODE> is the boolean object represented by the keywords <VAR>true</VAR> or <VAR>false</VAR>.
  * <P>
- * This object is described in the 'Portable Document Format Reference Manual version 1.7'
- * section 3.2.1 (page 52).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.3'
+ * section 4.2 (page 37).
  *
  * @see		PdfObject
  * @see		BadPdfFormatException

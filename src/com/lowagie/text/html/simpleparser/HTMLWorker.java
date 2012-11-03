@@ -52,7 +52,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -69,9 +68,10 @@ import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.TextElementArray;
+import com.lowagie.text.Watermark;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.xml.simpleparser.SimpleXMLDocHandler;
-import com.lowagie.text.xml.simpleparser.SimpleXMLParser;
+import com.lowagie.text.pdf.SimpleXMLDocHandler;
+import com.lowagie.text.pdf.SimpleXMLParser;
 
 public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
     
@@ -192,7 +192,7 @@ public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
                 cprops.addToChain(tag, h);
                 Image img = null;
                 if (interfaceProps != null) {
-                    Map images = (Map)interfaceProps.get("img_static");
+                    HashMap images = (HashMap)interfaceProps.get("img_static");
                     if (images != null) {
                         Image tim = (Image)images.get(src);
                         if (tim != null)
@@ -225,8 +225,8 @@ public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
                     img.setSpacingBefore(Float.parseFloat(before));
                 if (after != null)
                     img.setSpacingAfter(Float.parseFloat(after));
-                float wp = lengthParse(width, (int)img.getWidth());
-                float lp = lengthParse(height, (int)img.getHeight());
+                float wp = lengthParse(width, (int)img.width());
+                float lp = lengthParse(height, (int)img.height());
                 if (wp > 0 && lp > 0)
                     img.scalePercent(wp > lp ? lp : wp);
                 else if (wp > 0)
@@ -446,7 +446,7 @@ public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
                 ((com.lowagie.text.List)list).add(item);
                 ArrayList cks = item.getChunks();
                 if (!cks.isEmpty())
-                    item.getListSymbol().setFont(((Chunk)cks.get(0)).getFont());
+                    item.listSymbol().setFont(((Chunk)cks.get(0)).font());
                 stack.push(list);
                 return;
             }
@@ -569,17 +569,24 @@ public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
         return true;
     }
     
+    public boolean add(Watermark watermark) {
+        return true;
+    }
+    
     public void clearTextWrap() throws DocumentException {
     }
     
     public void close() {
     }
     
-    public boolean newPage() {
+    public boolean newPage() throws DocumentException {
         return true;
     }
     
     public void open() {
+    }
+    
+    public void removeWatermark() {
     }
     
     public void resetFooter() {

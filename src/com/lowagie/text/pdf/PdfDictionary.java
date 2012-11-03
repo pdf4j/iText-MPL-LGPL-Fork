@@ -1,6 +1,6 @@
 /*
- * $Id: PdfDictionary.java 2739 2007-05-04 11:24:51Z blowagie $
- * $Name$
+ * $Id: PdfDictionary.java,v 1.65 2006/11/16 23:54:51 psoares33 Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 Bruno Lowagie
  *
@@ -67,8 +67,8 @@ import java.util.Set;
  * key-value pair specifying the name and value of an attribute.<BR>
  * A dictionary is represented by two left angle brackets (<<), followed by a sequence of
  * key-value pairs, followed by two right angle brackets (>>).<BR>
- * This object is described in the 'Portable Document Format Reference Manual version 1.7'
- * section 3.2.6 (page 59-60).
+ * This object is described in the 'Portable Document Format Reference Manual version 1.3'
+ * section 4.7 (page 40-41).
  * <P>
  *
  * @see		PdfObject
@@ -130,6 +130,8 @@ public class PdfDictionary extends PdfObject {
     
 /**
  * Returns the PDF representation of this <CODE>PdfDictionary</CODE>.
+ *
+ * @return		an array of <CODE>byte</CODE>
  */
     
     public void toPdf(PdfWriter writer, OutputStream os) throws IOException {
@@ -300,88 +302,5 @@ public class PdfDictionary extends PdfObject {
     
     public String toString() {
     	return "Dictionary of type: " + get(PdfName.TYPE);
-    }
-    
-    /**
-     * This function behaves the same as 'get', but will never return an indirect reference,
-     * it will always look such references up and return the actual object.
-     * @param key 
-     * @return null, or a non-indirect object
-     */
-    public PdfObject getDirectObject(PdfName key) {
-        return PdfReader.getPdfObject(get(key));
-    }
-    
-    /**
-     * All the getAs functions will return either null, or the specified object type
-     * This function will automatically look up indirect references. There's one obvious
-     * exception, the one that will only return an indirect reference.  All direct objects
-     * come back as a null.
-     * Mark A Storer (2/17/06)
-     * @param key
-     * @return the appropriate object in its final type, or null
-     */
-    public PdfDictionary getAsDict(PdfName key) {
-        PdfDictionary dict = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isDictionary())
-            dict = (PdfDictionary) orig;
-        return dict;
-    }
-    
-    public PdfArray getAsArray(PdfName key) {
-        PdfArray array = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isArray())
-            array = (PdfArray) orig;
-        return array;
-    }
-    
-    public PdfStream getAsStream(PdfName key) {
-        PdfStream stream = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isStream())
-            stream = (PdfStream) orig;
-        return stream;
-    }
-    
-    public PdfString getAsString(PdfName key) {
-        PdfString string = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isString())
-            string = (PdfString) orig;
-        return string;
-    }
-    
-    public PdfNumber getAsNumber(PdfName key) {
-        PdfNumber number = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isNumber())
-            number = (PdfNumber) orig;
-        return number;
-    }
-    
-    public PdfName getAsName(PdfName key) {
-        PdfName name = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isName())
-            name = (PdfName) orig;
-        return name;
-    }
-    
-    public PdfBoolean getAsBoolean(PdfName key) {
-        PdfBoolean bool = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isBoolean())
-            bool = (PdfBoolean)orig;
-        return bool;
-    }
-    
-    public PdfIndirectReference getAsIndirectObject( PdfName key ) {
-        PdfIndirectReference ref = null;
-        PdfObject orig = get(key); // not getDirect this time.
-        if (orig != null && orig.isIndirect())
-            ref = (PdfIndirectReference) orig;
-        return ref;
     }
 }

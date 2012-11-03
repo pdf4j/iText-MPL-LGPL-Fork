@@ -54,9 +54,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Stack;
 
-import com.lowagie.text.xml.simpleparser.SimpleXMLDocHandler;
-import com.lowagie.text.xml.simpleparser.SimpleXMLParser;
-
 /**
  * Reads a XFDF.
  * @author Leonard Rosenthol (leonardr@pdfsages.com)

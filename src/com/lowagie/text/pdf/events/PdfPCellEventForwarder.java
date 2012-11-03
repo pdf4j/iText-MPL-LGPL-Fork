@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPCellEventForwarder.java 2014 2005-10-27 15:57:53Z blowagie $
- * $Name$
+ * $Id: PdfPCellEventForwarder.java,v 1.1 2005/10/27 15:57:53 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2005 Bruno Lowagie
  *

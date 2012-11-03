@@ -1,6 +1,6 @@
 /*
- * $Id: ImgRaw.java 2752 2007-05-15 14:58:33Z blowagie $
- * $Name$
+ * $Id: ImgRaw.java,v 1.61 2005/05/04 14:31:11 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 2000, 2001, 2002 by Paulo Soares.
  *
@@ -61,7 +61,7 @@ import java.net.URL;
  * @author  Paulo Soares
  */
 
-public class ImgRaw extends Image {
+public class ImgRaw extends Image implements Element {
 
     ImgRaw(Image image) {
         super(image);
@@ -91,7 +91,7 @@ public class ImgRaw extends Image {
         colorspace = components;
         this.bpc = bpc;
         rawData = data;
-        plainWidth = getWidth();
-        plainHeight = getHeight();
+        plainWidth = width();
+        plainHeight = height();
     }
 }

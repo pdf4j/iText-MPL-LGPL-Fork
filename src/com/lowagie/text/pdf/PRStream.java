@@ -1,6 +1,6 @@
 /*
- * $Id: PRStream.java 2446 2006-11-08 17:33:44Z psoares33 $
- * $Name$
+ * $Id: PRStream.java,v 1.48 2006/11/08 17:33:44 psoares33 Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 by Paulo Soares.
  *

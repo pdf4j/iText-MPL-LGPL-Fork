@@ -1,6 +1,6 @@
 /*
- * $Id: PdfPTable.java 2742 2007-05-08 13:04:56Z blowagie $
- * $Name$
+ * $Id: PdfPTable.java,v 1.67 2006/09/14 23:10:50 xlv Exp $
+ * $Name:  $
  *
  * Copyright 2001, 2002 Paulo Soares
  *
@@ -325,7 +325,7 @@ public class PdfPTable implements Element{
         float totalWidth = 0;
         for (int k = 0; k < columnWidth.length; ++k)
             totalWidth += columnWidth[k];
-        widthPercentage = totalWidth / (pageSize.getRight() - pageSize.getLeft()) * 100f;
+        widthPercentage = totalWidth / (pageSize.right() - pageSize.left()) * 100f;
         setWidths(columnWidth);
     }
 

@@ -232,7 +232,7 @@ public class PdfFormField extends PdfAnnotation {
         kids.add(field);
     }
     
-    public ArrayList getKids() {
+    ArrayList getKids() {
         return kids;
     }
     
@@ -308,7 +308,7 @@ public class PdfFormField extends PdfAnnotation {
         mergeResources(result, source, null);
     }
 
-    public void setUsed() {
+    void setUsed() {
         used = true;
         if (parent != null)
             put(PdfName.PARENT, parent.getIndirectReference());

@@ -1,6 +1,6 @@
 /*
- * $Id: Document.java 2769 2007-05-21 08:50:59Z blowagie $
- * $Name$
+ * $Id: Document.java,v 1.118 2006/12/18 13:49:43 blowagie Exp $
+ * $Name:  $
  *
  * Copyright 1999, 2000, 2001, 2002 by Bruno Lowagie.
  *
@@ -102,7 +102,7 @@ public class Document implements DocListener {
     // membervariables
     
 	/** This constant may only be changed by Paulo Soares and/or Bruno Lowagie. */
-	private static final String ITEXT_VERSION = "iText 2.0.3 (by lowagie.com)";
+	private static final String ITEXT_VERSION = "iText 1.5.2 (release for Eclipse/BIRT by lowagie.com)";
     
 	/**
 	 * Allows the pdf documents to be produced without compression for debugging
@@ -123,6 +123,9 @@ public class Document implements DocListener {
     
 	/** The size of the page. */
     protected Rectangle pageSize;
+    
+	/** The watermark on the pages. */
+    protected Watermark watermark = null;
     
 	/** margin in x direction starting from the left */
     protected float marginLeft = 0;
@@ -157,9 +160,6 @@ public class Document implements DocListener {
     
 	/** This is the textual part of the footer */
     protected HeaderFooter footer = null;
-    
-    /** This is a chapter number in case ChapterAutoNumber is used. */
-    protected int chapternumber = 0;
     
     // constructor
     
@@ -258,8 +258,7 @@ public class Document implements DocListener {
 					|| type == Element.CHAPTER || type == Element.SECTION
 					|| type == Element.LIST || type == Element.LISTITEM
 					|| type == Element.RECTANGLE || type == Element.JPEG
-					|| type == Element.IMGRAW || type == Element.IMGTEMPLATE
-					|| type == Element.MARKED)) {
+					|| type == Element.IMGRAW || type == Element.IMGTEMPLATE || type == Element.GRAPHIC)) {
 				throw new DocumentException(
 						"The document is open; you can only add Elements with content.");
 			}
@@ -267,18 +266,13 @@ public class Document implements DocListener {
 			if (!(type == Element.HEADER || type == Element.TITLE
 					|| type == Element.SUBJECT || type == Element.KEYWORDS
 					|| type == Element.AUTHOR || type == Element.PRODUCER
-					|| type == Element.CREATOR || type == Element.CREATIONDATE
-					|| type == Element.MARKED)) {
+					|| type == Element.CREATOR || type == Element.CREATIONDATE)) {
 				throw new DocumentException(
 						"The document is not open yet; you can only add Meta information.");
             }
         }
         boolean success = false;
         DocListener listener;
-        if (element instanceof ChapterAutoNumber) {
-        	chapternumber++;
-        	((ChapterAutoNumber)element).setChapterNumber(chapternumber);
-        }
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
             listener = (DocListener) iterator.next();
             success |= listener.add(element);
@@ -327,6 +321,38 @@ public class Document implements DocListener {
     }
     
 	/**
+ * Sets the <CODE>Watermark</CODE>.
+ *
+	 * @param watermark
+	 *            the watermark to add
+	 * @return <CODE>true</CODE> if the element was added, <CODE>false
+	 *         </CODE> if not.
+ */
+    
+    public boolean add(Watermark watermark) {
+        this.watermark = watermark;
+        DocListener listener;
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+            listener = (DocListener) iterator.next();
+            listener.add(watermark);
+        }
+        return true;
+    }
+    
+	/**
+ * Removes the <CODE>Watermark</CODE>.
+ */
+    
+    public void removeWatermark() {
+        this.watermark = null;
+        DocListener listener;
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+            listener = (DocListener) iterator.next();
+            listener.removeWatermark();
+        }
+    }
+    
+	/**
  * Sets the margins.
  *
 	 * @param marginLeft
@@ -364,7 +390,7 @@ public class Document implements DocListener {
 	 *             when a document isn't open yet, or has been closed
  */
     
-    public boolean newPage() {
+    public boolean newPage() throws DocumentException {
         if (!open || close) {
             return false;
         }
@@ -672,7 +698,7 @@ public class Document implements DocListener {
  */
     
     public float left() {
-        return pageSize.getLeft(marginLeft);
+        return pageSize.left(marginLeft);
     }
     
 	/**
@@ -682,7 +708,7 @@ public class Document implements DocListener {
  */
     
     public float right() {
-        return pageSize.getRight(marginRight);
+        return pageSize.right(marginRight);
     }
     
 	/**
@@ -692,7 +718,7 @@ public class Document implements DocListener {
  */
     
     public float top() {
-        return pageSize.getTop(marginTop);
+        return pageSize.top(marginTop);
     }
     
 	/**
@@ -702,7 +728,7 @@ public class Document implements DocListener {
  */
     
     public float bottom() {
-        return pageSize.getBottom(marginBottom);
+        return pageSize.bottom(marginBottom);
     }
     
 	/**
@@ -714,7 +740,7 @@ public class Document implements DocListener {
  */
     
     public float left(float margin) {
-        return pageSize.getLeft(marginLeft + margin);
+        return pageSize.left(marginLeft + margin);
     }
     
 	/**
@@ -726,7 +752,7 @@ public class Document implements DocListener {
  */
     
     public float right(float margin) {
-        return pageSize.getRight(marginRight + margin);
+        return pageSize.right(marginRight + margin);
     }
     
 	/**
@@ -738,7 +764,7 @@ public class Document implements DocListener {
  */
     
     public float top(float margin) {
-        return pageSize.getTop(marginTop + margin);
+        return pageSize.top(marginTop + margin);
     }
     
 	/**
@@ -750,7 +776,7 @@ public class Document implements DocListener {
  */
     
     public float bottom(float margin) {
-        return pageSize.getBottom(marginBottom + margin);
+        return pageSize.bottom(marginBottom + margin);
     }
     
 	/**
@@ -843,6 +869,19 @@ public class Document implements DocListener {
     public String getHtmlStyleClass() {
         return this.htmlStyleClass;
     }
+
+	/**
+ 	 * @see com.lowagie.text.DocListener#clearTextWrap()
+     */
+	public void clearTextWrap() throws DocumentException {
+		if (open && !close) {
+			DocListener listener;
+			for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+				listener = (DocListener) iterator.next();
+				listener.clearTextWrap();
+			}
+		}
+	}
     
     /**
      * Set the margin mirroring. It will mirror margins for odd/even pages.
