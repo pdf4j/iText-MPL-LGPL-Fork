@@ -1,8 +1,12 @@
 README
 ======
 
-An un-official version of iText MPL/LGPL releases, based on sources from sourceforge.net SVN repository.
+This is an fork version(s) of iText before it moved its licences to AGPL.
 
-This is an fork version of iText before it moved its licences to AGPL.
+These are un-official version(s) of iText releases available under MPL/LGPL licences, based on sources from sourceforge.net SVN repository. Please refer to issues and commit logs for history of changes
 
 All contents of src, www, test folders strictly subjected to MPL/LGPL LICENSE.
+
+Reference documents available at http://pdf4j.github.com/pdf4j-base.
+
+iText API documents available at http://pdf4j.github.com/pdf4j-base/apidocs/.
