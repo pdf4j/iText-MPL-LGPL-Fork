@@ -7,6 +7,6 @@ These are un-official version(s) of iText releases available under MPL/LGPL lice
 
 All contents of src, www, test folders strictly subjected to MPL/LGPL LICENSE.
 
-Reference documents available at http://pdf4j.github.com/pdf4j-base.
+Reference documents available at http://pdf4j.github.io/iText-MPL-LGPL-Fork.
 
-iText API documents available at http://pdf4j.github.com/pdf4j-base/apidocs/.
+iText API documents available at http://pdf4j.github.io/iText-MPL-LGPL-Fork/apidocs/.
